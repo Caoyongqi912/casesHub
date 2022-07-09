@@ -3,14 +3,14 @@
 # @File : users.py 
 # @Software: PyCharm
 # @Desc: 用户模型类
-from typing import AnyStr
 
-from base import Base
+from typing import AnyStr
+from Models.base import Base
 from App import db
 
 
-class Users(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = "user"
     username = db.Column(db.String(20), unique=True, comment="用户名")
     phone = db.Column(db.String(12), unique=True, comment="手机")
     password = db.Column(db.String(100), comment="密码")
@@ -19,6 +19,8 @@ class Users(Base):
     avatar = db.Column(db.LargeBinary, nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
 
+    departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=False, comment="所属部门")
+
     def __int__(self, username: AnyStr, password: AnyStr, email: AnyStr, gender: AnyStr, isAdmin: bool):
         self.username = username
         self.password = password
@@ -26,10 +28,5 @@ class Users(Base):
         self.gender = gender
         self.isAdmin = isAdmin
 
-
     def __repr__(self):
-        return f"<{Users.__name__} {self.username}>"
-
-
-if __name__ == '__main__':
-    print(Users)
+        return f"<{User.__name__} {self.username}>"
