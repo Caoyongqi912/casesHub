@@ -19,26 +19,47 @@ Interval    datetime.timedelta  时间间隔
 Enum    str 字符列表
 PickleType  任意Python对象  自动Pickle序列化
 LargeBinary str 二进制
-常见的SQLALCHEMY列选项
-可选参数    描述
 primary_key 如果设置为True，则为该列表的主键
 unique  如果设置为True，该列不允许相同值
 index   如果设置为True，为该列创建索引，查询效率会更高
-nullable    如果设置为True，该列允许为空。如果设置为False，该列不允许空值
 default 定义该列的默认值
-
-primary_key	如果设为 True ,这列就是表的主键
 unique	如果设为 True ,这列不允许出现重复的值
 index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
+from typing import List
+
+from sqlalchemy import desc
+
 from App import db
 from datetime import datetime
+from Utils.log import MyLog
+from Comment.myException import MyException
+
+log = MyLog.get_log(__file__)
 
 
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    create_time = db.Column(db.Date, default=datetime.now)
-    update_time = db.Column(db.Date, default=datetime.now, onupdate=datetime.now)
+    create_time = db.Column(db.Date, default=datetime.now, comment="创建时间")
+    update_time = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            log.error(e)
+            db.session.rollback()
+            raise MyException()
+
+    @classmethod
+    def all(cls) -> List:
+        """
+        返回所有
+        :return:
+        """
+        return cls.query.filter_by().order_by(desc(cls.id)).all()
+

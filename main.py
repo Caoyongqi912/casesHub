@@ -4,7 +4,6 @@
 # @Software: PyCharm
 # @Desc: 入口
 
-
 from App import create_app
 
 app = create_app()

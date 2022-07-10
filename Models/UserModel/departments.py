@@ -15,7 +15,7 @@ class Department(Base):
     name = db.Column(db.String(20), unique=True, comment="用户名")
     desc = db.Column(db.String(40), nullable=True, comment="部门描述")
     adminID = db.Column(db.INTEGER, comment="部门负责人")
-    users = db.relationship("User",backref="users",lazy="dynamic")
+    users = db.relationship("User", backref="users", lazy="dynamic")
 
     def __init__(self, name: AnyStr, adminID: int, desc: AnyStr = None):
         self.name = name

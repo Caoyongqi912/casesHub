@@ -4,23 +4,34 @@
 # @Software: PyCharm
 # @Desc: 返回自定义
 from typing import Any, AnyStr, Dict
+from flask import jsonify
 from Enums.errorCode import ResponseCode, ResponseMSg
-
 
 
 class MyResponse:
 
     @staticmethod
-    def success(data: Any) -> Dict:
-        return {"code": ResponseCode.SUCCESS, "data": data, "msg": ResponseMSg.OK}
+    def success(data: Any = None) -> jsonify:
+        return jsonify({"code": ResponseCode.SUCCESS, "data": data, "msg": ResponseMSg.OK})
 
     @staticmethod
-    def error(code: ResponseCode, *args) -> Dict:
+    def error(code: ResponseCode) -> Dict:
         return {"code": code, "data": None, "msg": ResponseMSg.ERROR}
 
 
-class ParamError(MyResponse):
+class ParamError:
 
     @staticmethod
-    def error(msg: AnyStr, *args) -> Dict:
-        return super(ParamError, ParamError).error(ResponseCode.PARAMS_ERROR, msg)
+    def error(msg: AnyStr) -> Dict:
+        return {"code": ResponseCode.PARAMS_ERROR, "data": None, "msg": msg}
+
+
+class AuthError:
+
+    @staticmethod
+    def error() -> Dict:
+        return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseCode.AUTH_ERROR}
+
+
+if __name__ == '__main__':
+    print(MyResponse.success())

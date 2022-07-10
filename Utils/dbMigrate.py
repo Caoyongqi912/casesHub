@@ -5,7 +5,7 @@
 # @Desc:
 
 from App import create_app,db
-from Models.DeparmentModel import users,departments
+from Models.UserModel import users,departments
 
 
 if __name__ == '__main__':

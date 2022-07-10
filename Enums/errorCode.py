@@ -12,12 +12,14 @@ class ResponseCode:
     SUCCESS = 0
     SERVER_ERROR = 100
     PARAMS_ERROR = 1000
+    AUTH_ERROR = 2000
 
 
 class ResponseMSg:
-    OK = "ok"
-    ERROR = "server error"
-    REQUEST_BODY_EMPTY = "request body empty!"
+    OK = "ok !"
+    ERROR = "server error !"
+    REQUEST_BODY_EMPTY = "request body empty !"
+    AUTH_ERROR = "auth error !"
 
     @staticmethod
     def empty(target: AnyStr) -> AnyStr:
@@ -30,4 +32,3 @@ class ResponseMSg:
     @staticmethod
     def error_val(target: Any, choices: List[Any]) -> AnyStr:
         return f"{target} must in {choices} !"
-

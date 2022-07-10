@@ -8,16 +8,17 @@ from flask import Response
 from werkzeug.exceptions import HTTPException
 from typing import Dict, AnyStr
 
-from Comment.myResponse import MyResponse, ParamError
+from Comment.myResponse import MyResponse, ParamError, AuthError
 from Enums.errorCode import ResponseCode
 from Utils.log import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class MyException(HTTPException):
     """
     自定义 Exception 基类
     """
-    log = MyLog.get_log(__file__)
 
     def __init__(self, response: Dict = None):
         """
@@ -34,11 +35,35 @@ class MyException(HTTPException):
         自定义返回 response
         :return: Response
         """
-        self.log.error(self._response)
+        log.error(self._response)
         return Response(json.dumps(self._response), mimetype="application/json")
 
 
-class ParamException(MyException):
+class ParamException(HTTPException):
 
     def __init__(self, msg: AnyStr):
         self._response = ParamError.error(msg)
+        super(ParamException, self).__init__(response=self.__make_response())
+
+    def __make_response(self) -> Response:
+        """
+        自定义返回 response
+        :return: Response
+        """
+        log.error(self._response)
+        return Response(json.dumps(self._response), mimetype="application/json")
+
+
+class AuthException(HTTPException):
+
+    def __init__(self):
+        self._response = AuthError.error()
+        super(AuthException, self).__init__(response=self.__make_response())
+
+    def __make_response(self) -> Response:
+        """
+        自定义返回 response
+        :return: Response
+        """
+        log.error(self._response)
+        return Response(json.dumps(self._response), mimetype="application/json")

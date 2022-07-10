@@ -11,11 +11,12 @@ from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from Configs.projectConfig import config
-from Models.base_query import BaseQuery
+from Models.base_query import MyBaseQuery
 
 catch = Cache()
-db = SQLAlchemy(query_class=BaseQuery)
+db = SQLAlchemy(query_class=MyBaseQuery)
 auth = HTTPBasicAuth()
+
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -37,10 +38,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
 
     CORS(app, supports_credentials=True)
 
-    from .departmentController import userBP
+    from .userController import userBP
     app.register_blueprint(userBP)
-
-    from .indexController import indexPB
-    app.register_blueprint(indexPB)
 
     return app

@@ -3,9 +3,10 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc:
+from flask_sqlalchemy import BaseQuery
 
 
-class BaseQuery:
+class MyBaseQuery(BaseQuery):
 
     # def filter_by(self, **kwargs):
     #     """
