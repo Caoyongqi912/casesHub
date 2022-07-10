@@ -38,6 +38,7 @@ class User(Base):
         self.isAdmin = isAdmin
         self.departmentID = departmentID
 
+
     def hash_password(self, password: AnyStr):
         """
         密码加密

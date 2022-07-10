@@ -15,7 +15,7 @@ class ResponseCode:
     AUTH_ERROR = 2000
 
 
-class ResponseMSg:
+class ResponseMsg:
     OK = "ok !"
     ERROR = "server error !"
     REQUEST_BODY_EMPTY = "request body empty !"
@@ -32,3 +32,11 @@ class ResponseMSg:
     @staticmethod
     def error_val(target: Any, choices: List[Any]) -> AnyStr:
         return f"{target} must in {choices} !"
+
+    @staticmethod
+    def no_existent(target: AnyStr) -> AnyStr:
+        return f"{target} not existent !"
+
+    @staticmethod
+    def already_exist(target: AnyStr) -> AnyStr:
+        return f"{target} already exist !"

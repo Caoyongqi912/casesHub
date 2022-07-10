@@ -28,14 +28,13 @@ index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
-from typing import List
-
+from typing import List, AnyStr
 from sqlalchemy import desc
-
 from App import db
 from datetime import datetime
+from Enums.errorCode import ResponseMsg
 from Utils.log import MyLog
-from Comment.myException import MyException
+from Comment.myException import MyException, ParamException
 
 log = MyLog.get_log(__file__)
 
@@ -47,8 +46,19 @@ class Base(db.Model):
     update_time = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
     def save(self):
+        """save"""
         try:
             db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            log.error(e)
+            db.session.rollback()
+            raise MyException()
+
+    def delete(self):
+        """delete"""
+        try:
+            db.session.delete(self)
             db.session.commit()
         except Exception as e:
             log.error(e)
@@ -59,7 +69,22 @@ class Base(db.Model):
     def all(cls) -> List:
         """
         返回所有
-        :return:
         """
         return cls.query.filter_by().order_by(desc(cls.id)).all()
 
+    @classmethod
+    def get(cls, ident: int, name: AnyStr):
+        """
+        get entity by id
+        :param ident: field id
+        :param name: field name
+        :return: get_or_NoFound
+        """
+        return cls.query.get_or_NoFound(ident, name)
+
+    @classmethod
+    def verify_unique(cls,  **kwargs) -> None:
+        """verify_unique by field name"""
+        rv = cls.query.filter_by(**kwargs).first()
+        if rv:
+            raise ParamException(ResponseMsg.already_exist(list(kwargs.values())[0]))

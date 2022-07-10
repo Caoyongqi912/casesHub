@@ -6,7 +6,7 @@
 from typing import AnyStr, Dict
 
 from flask import request
-from Comment.myResponse import ResponseMSg
+from Comment.myResponse import ResponseMsg
 from Comment.myException import ParamException
 
 
@@ -39,21 +39,21 @@ class MyRequestParseUtil:
         :return: self.body
         """
         if self.body is None:
-            raise ParamException(ResponseMSg.REQUEST_BODY_EMPTY)
+            raise ParamException(ResponseMsg.REQUEST_BODY_EMPTY)
         for kw in self.args:
             # 设定 必传 但未传
             if kw['required'] is True and not self.body.get(kw["name"]):
-                raise ParamException(ResponseMSg.empty(kw["name"]))
+                raise ParamException(ResponseMsg.empty(kw["name"]))
             # 传空字符
             if self.body.get(kw['name']) == "":
-                raise ParamException(ResponseMSg.empty(kw["name"]))
+                raise ParamException(ResponseMsg.empty(kw["name"]))
             # 传参未按照定义类型
             if not isinstance(self.body[kw['name']], kw['type']):
-                raise ParamException(ResponseMSg.error_type(kw["name"], kw['type']))
+                raise ParamException(ResponseMsg.error_type(kw["name"], kw['type']))
             # 传参未按照指定区间
             if kw.get('choices'):
                 if self.body[kw['name']] not in kw['choices']:
-                    raise ParamException(ResponseMSg.error_val(kw["name"], kw['choices']))
+                    raise ParamException(ResponseMsg.error_val(kw["name"], kw['choices']))
             # 未传且设定默认
             if kw.get("default") and self.body.get(kw['name']) is None:
                 self.body[kw['name']] = kw.get('default')

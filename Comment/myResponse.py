@@ -5,18 +5,18 @@
 # @Desc: 返回自定义
 from typing import Any, AnyStr, Dict
 from flask import jsonify
-from Enums.errorCode import ResponseCode, ResponseMSg
+from Enums.errorCode import ResponseCode, ResponseMsg
 
 
 class MyResponse:
 
     @staticmethod
     def success(data: Any = None) -> jsonify:
-        return jsonify({"code": ResponseCode.SUCCESS, "data": data, "msg": ResponseMSg.OK})
+        return jsonify({"code": ResponseCode.SUCCESS, "data": data, "msg": ResponseMsg.OK})
 
     @staticmethod
     def error(code: ResponseCode) -> Dict:
-        return {"code": code, "data": None, "msg": ResponseMSg.ERROR}
+        return {"code": code, "data": None, "msg": ResponseMsg.ERROR}
 
 
 class ParamError:

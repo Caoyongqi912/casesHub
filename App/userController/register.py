@@ -47,6 +47,9 @@ class GetTokenController(Resource):
         t = {"token": g.user.generate_token().decode("utf-8")}
         return MyResponse.success(t)
 
+    def get(self):
+        User.verify_unique(username="cyq")
+        return "ok"
 
 api_script = Api(userBP)
 api_script.add_resource(RegisterController, "/register")

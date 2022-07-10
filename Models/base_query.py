@@ -2,8 +2,11 @@
 # @Author : cyq
 # @File : base_query.py
 # @Software: PyCharm
-# @Desc:
+# @Desc: MyBaseQuery
+
 from flask_sqlalchemy import BaseQuery
+from Comment.myException import ParamException
+from Enums.errorCode import ResponseMsg
 
 
 class MyBaseQuery(BaseQuery):
@@ -20,8 +23,6 @@ class MyBaseQuery(BaseQuery):
 
     def get_or_NoFound(self, ident, name):
         rv = self.get(ident)
-        # if not rv:
-        #     abort(400, **myResponse(ResponseCode.ERROR, None, f"{name}: {ident} non-existent "))
-        # elif rv.status == 0:
-        #     abort(400, **myResponse(ResponseCode.ERROR, None, f"{name}: {ident} Deleted"))
+        if not rv:
+            raise ParamException(ResponseMsg.no_existent(name))
         return rv
