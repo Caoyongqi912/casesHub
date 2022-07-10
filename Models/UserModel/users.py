@@ -24,20 +24,30 @@ class User(Base):
     gender = db.Column(db.Enum("MALE", "FEMALE"), server_default="MALE", comment="性别")
     avatar = db.Column(db.LargeBinary, nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
+    tag = db.Column(db.Enum("QA", "PR", "DEV"), comment="标签")
 
     from .departments import Department  # 不同文件下需引入
     departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=False, comment="所属部门")
 
-    def __init__(self, username: AnyStr, password: AnyStr, phone: AnyStr, email: AnyStr,
-                 gender: AnyStr, isAdmin: bool, departmentID: int):
+    from Models.ProjectModel.pro import Project,Product
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属项目")
+    productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=True, comment="所属产品")
+
+    def __init__(self, username: AnyStr, password: AnyStr, phone: AnyStr,
+                 email: AnyStr, tag: AnyStr,
+                 gender: AnyStr, isAdmin: bool, departmentID: int,
+                 projectID: int = None, productID: int = None):
         self.username = username
         self.hash_password(password)
         self.email = email
         self.gender = gender
         self.phone = phone
+        self.tag = tag
         self.isAdmin = isAdmin
         self.departmentID = departmentID
 
+        self.productID = productID
+        self.projectID = projectID
 
     def hash_password(self, password: AnyStr):
         """
