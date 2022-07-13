@@ -100,4 +100,10 @@ class Base(db.Model):
 
     @classmethod
     def page(cls, page: AnyStr, limit: AnyStr):
+        """
+
+        :param page: 页
+        :param limit: 数量
+        :return:
+        """
         return cls.query.my_paginate(page=int(page), limit=int(limit))

@@ -47,7 +47,15 @@ class MyRequest:
             rep = self.go(method="POST", url="v1/api/user/addUser", body=self.body)
             print(rep.text)
 
+    def addDepart(self):
+        for i in range(10):
+            self.body = {
+                "name": f.name(),
+                "desc": f.pystr(),
 
+            }
+            rep = self.go(method="POST", url="v1/api/user/department", body=self.body)
+            print(rep.text)
 if __name__ == '__main__':
     m = MyRequest()
     m.adduser()

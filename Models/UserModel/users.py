@@ -9,7 +9,7 @@ from typing import AnyStr, Union, Any, List, Dict
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from Comment.myException import MyException, ParamException, AuthException
+from Comment.myException import ParamException
 from Utils.myLog import MyLog
 from Models.base import Base
 from App import db
@@ -87,6 +87,7 @@ class User(Base):
         :return: bool
         """
         return check_password_hash(self.password, password)
+
 
     @property
     def admin(self) -> bool:

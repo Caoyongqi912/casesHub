@@ -1,6 +1,6 @@
 # @Time : 2022/7/10 13:28 
 # @Author : cyq
-# @File : auth.py 
+# @File : myAuth.py
 # @Software: PyCharm
 # @Desc: 登录与权限
 from functools import wraps
@@ -36,6 +36,26 @@ def is_admin(func):
     def wrap_func(*args, **kwargs):
         if not g.user.admin:
             raise AuthException()
+        return func(*args, **kwargs)
+
+    return wrap_func
+
+
+def is_DepartAdmin(func):
+    """
+    判断是部门ADMIN
+    :param func:
+    :return:
+    """
+
+    @wraps(func)
+    def wrap_func(*args, **kwargs):
+        print(args)
+        print(kwargs)
+        uid = g.user.id
+        if g.user.admin:
+            pass
+
         return func(*args, **kwargs)
 
     return wrap_func

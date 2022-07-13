@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc: 注册controller
 from flask import jsonify, g
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api
 
 from App import auth
 from App.userController import userBP
@@ -12,7 +12,7 @@ from Comment.myResponse import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.users import User
 from Utils.myLog import MyLog
-from App.auth import is_admin
+from App.myAuth import is_admin
 
 log = MyLog.get_log(__file__)
 

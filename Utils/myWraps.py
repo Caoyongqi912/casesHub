@@ -1,6 +1,6 @@
 # @Time : 2022/7/12 21:58
 # @Author : cyq
-# @File : myPageWraps.py
+# @File : myWraps.py
 # @Software: PyCharm
 # @Desc:
 from functools import wraps
@@ -26,3 +26,5 @@ def pageSerialize(func):
         }
         return results
     return decorator
+
+

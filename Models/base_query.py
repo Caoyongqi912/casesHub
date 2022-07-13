@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 
 from Comment.myException import ParamException,MyException
 from Enums.errorCode import ResponseMsg
-from Utils.myPageWraps import pageSerialize
+from Utils.myWraps import pageSerialize
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)

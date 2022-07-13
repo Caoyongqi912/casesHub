@@ -6,6 +6,8 @@
 
 
 from typing import AnyStr
+
+from Comment.myException import AuthException
 from Models.base import Base
 from App import db
 
@@ -21,6 +23,39 @@ class Department(Base):
         self.name = name
         self.desc = desc
         self.adminID = adminID
+
+    @property
+    def admin(self) -> int:
+        """
+        返回管理员ID
+        :return: adminID
+        """
+        return self.adminID
+
+    @property
+    def product_users(self):
+        return self.users.filter_by().all()
+
+    @classmethod
+    def update(cls, **kwargs):
+        """
+        userAdmin departAdmin权限
+        :param kwargs: Department
+        :return:
+        """
+        department = cls.get(kwargs.get("departID"), "departID")
+        from flask import g
+        if not g.user.admin or not g.user.id != department.adminID:
+            # 非admin or departAdmin 无权修改
+            raise AuthException()
+        department.name = kwargs.get("name")
+        department.desc = kwargs.get("desc")
+        if kwargs.get("adminID"):
+            # 校验adminID是否存在
+            from .users import User
+            u = User.get(kwargs.get("adminID"), "adminID")
+            department.adminID = u.id
+        department.save()
 
     def __repr__(self):
         return f"<{Department.__name__} {self.name}>"

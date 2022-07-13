@@ -9,4 +9,4 @@ from flask import Blueprint
 
 userBP = Blueprint("user", __name__, url_prefix="/v1/api/user")
 
-from . import user
+from . import user, department
