@@ -46,7 +46,7 @@ class DepartmentController(Resource):
     def put(self) -> MyResponse:
         """
         更新部门
-        :return:
+        :return:MyResponse
         """
         parse = MyRequestParseUtil()
         parse.add(name="departID", type=int, required=True)
@@ -60,9 +60,9 @@ class DepartmentController(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         """
-       分页查询部门
-       :return:MyResponse
-       """
+        分页查询部门
+        :return:MyResponse
+        """
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
@@ -73,6 +73,10 @@ class DepartmentController(Resource):
     @auth.login_required
     @is_admin
     def delete(self) -> MyResponse:
+        """
+        根据departID删除数据
+        :return: MyResponse
+        """
         parse = MyRequestParseUtil()
         parse.add(name="departID", type=int, required=True)
         info = parse.parse_args()

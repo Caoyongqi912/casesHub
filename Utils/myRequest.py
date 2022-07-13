@@ -17,7 +17,7 @@ class MyRequest:
     def __init__(self):
         pass
 
-    def go(self, method, url, params=None, body=None, files=None, auth=("ADMIN", "ADMIN")):
+    def go(self, method, url, params=None, body=None, files=None, auth=("cyq", "123")):
 
         if method == "GET":
             return requests.get(url=self.Host + url, params=params, json=body, auth=auth)
@@ -56,6 +56,15 @@ class MyRequest:
             }
             rep = self.go(method="POST", url="v1/api/user/department", body=self.body)
             print(rep.text)
+
+    def addAvatar(self):
+        # 用open的方式打开文件，作为字典的值。file是请求规定的参数，每个请求都不一样。
+        files = {'file': open("../resource/casesHub.png", 'rb')}
+        # 请求的地址，这个地址中规定请求文件的参数必须是file
+        # 用files参数接收 PFbUdtKZfSMYTdeOdUYJ_casesHub.png
+        res = self.go(method="POST", url="v1/api/user/avatar", files=files)
+        print(res.text)
+
 if __name__ == '__main__':
     m = MyRequest()
-    m.adduser()
+    m.addAvatar()

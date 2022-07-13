@@ -24,7 +24,7 @@ class User(Base):
     password = db.Column(db.String(200), comment="密码")
     email = db.Column(db.String(40), unique=True, comment="邮箱")
     gender = db.Column(db.Enum("MALE", "FEMALE"), server_default="MALE", comment="性别")
-    avatar = db.Column(db.LargeBinary, nullable=True, comment="头像")
+    avatar = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
     tag = db.Column(db.Enum("QA", "PR", "DEV", "ADMIN"), comment="标签")
     from .departments import Department  # 不同文件下需引入
@@ -38,7 +38,7 @@ class User(Base):
                  departmentID: int = None,
                  projectID: int = None, productID: int = None):
         self.username = username
-        self.__hash_password(password)
+        self.hash_password(password)
         self.email = self.username + "@caseHub.com"
         self.gender = gender
         self.phone = phone
@@ -49,7 +49,7 @@ class User(Base):
         self.productID = productID
         self.projectID = projectID
 
-    def __hash_password(self, password: AnyStr):
+    def hash_password(self, password: AnyStr):
         """
         密码加密
         :param password:  password

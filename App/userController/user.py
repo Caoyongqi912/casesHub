@@ -3,12 +3,15 @@
 # @File : user.py
 # @Software: PyCharm
 # @Desc: 注册controller
-from flask import jsonify, g
+from typing import AnyStr
+
+from flask import jsonify, g, request, Response
 from flask_restful import Resource, Api
 
 from App import auth
 from App.userController import userBP
 from Comment.myResponse import MyResponse
+from Utils.myAvatarPath import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.users import User
 from Utils.myLog import MyLog
@@ -93,10 +96,60 @@ class UserController(Resource):
         parse.add(name="userID", type=int, required=True)
         return MyResponse.success(User.get(parse.parse_args().get("userID")))
 
+    @auth.login_required
+    def put(self) -> MyResponse:
+        """
+        修改密码
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="password", type=str, required=True)
+        u = User.get(g.user.id, "")
+        u.hash_password(parse.parse_args().get("password"))
+        return MyResponse.success()
+
+
+class AvatarController(Resource):
+
+    @auth.login_required
+    def post(self) -> MyResponse:
+        """
+        上传头像
+        :return:
+        """
+        from werkzeug.utils import secure_filename
+        from faker import Faker
+        f = Faker()
+        file = request.files.get("file")
+        user = g.user
+
+        fileName = f.pystr() + '_' + secure_filename(file.filename)  # 头像名称
+        filePath = getAvatarPath(fileName)  # 头像路径
+        file.save(filePath)  # 存储头像
+
+        user.avatar = fileName
+        user.save()  # 入库
+        return MyResponse.success()
+
+
+class GetAvatarController(Resource):
+    def get(self, filename: AnyStr):
+        """
+        返回头像
+        :param filename: 头像名
+        :return:
+        """
+        path = getAvatarPath(filename)
+        with open(path, "rb") as f:
+            avatar = f.read()
+        return Response(avatar, mimetype="image/jpeg")
+
 
 api_script = Api(userBP)
-api_script.add_resource(AddUser, "/addUser")
-api_script.add_resource(QueryUserController, "/query/user/page")
+api_script.add_resource(AddUser, "/")
+api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 api_script.add_resource(UserController, "/info")
+api_script.add_resource(AvatarController, "/avatar")
+api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")
