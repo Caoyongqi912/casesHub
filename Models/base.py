@@ -28,12 +28,12 @@ index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
-from typing import List, AnyStr
+from typing import List, AnyStr, Dict
 from sqlalchemy import desc
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
-from Utils.log import MyLog
+from Utils.myLog import MyLog
 from Comment.myException import MyException, ParamException
 
 log = MyLog.get_log(__file__)
@@ -73,7 +73,7 @@ class Base(db.Model):
         return cls.query.filter_by().order_by(desc(cls.id)).all()
 
     @classmethod
-    def get(cls, ident: int, name: AnyStr):
+    def get(cls, ident: int, name: AnyStr = None):
         """
         get entity by id
         :param ident: field id
@@ -82,9 +82,22 @@ class Base(db.Model):
         """
         return cls.query.get_or_NoFound(ident, name)
 
+
     @classmethod
-    def verify_unique(cls,  **kwargs) -> None:
+    def verify_unique(cls, **kwargs) -> None:
         """verify_unique by field name"""
         rv = cls.query.filter_by(**kwargs).first()
         if rv:
             raise ParamException(ResponseMsg.already_exist(list(kwargs.values())[0]))
+
+    @staticmethod
+    def to_json(obj) -> Dict:
+        res = {}
+        for c in obj.__table__.columns:
+            value = getattr(obj, c.name, "")
+            res[c.name] = value
+        return res
+
+    @classmethod
+    def page(cls, page: AnyStr, limit: AnyStr):
+        return cls.query.my_paginate(page=int(page), limit=int(limit))

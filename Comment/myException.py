@@ -10,7 +10,7 @@ from typing import Dict, AnyStr
 
 from Comment.myResponse import MyResponse, ParamError, AuthError
 from Enums.errorCode import ResponseCode
-from Utils.log import MyLog
+from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
 

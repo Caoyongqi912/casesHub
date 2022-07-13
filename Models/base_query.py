@@ -3,11 +3,17 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc: MyBaseQuery
+from typing import Any, AnyStr
 
-from flask_sqlalchemy import BaseQuery
-from Comment.myException import ParamException
+from flask_sqlalchemy import BaseQuery, Pagination
+from sqlalchemy.exc import OperationalError
+
+from Comment.myException import ParamException,MyException
 from Enums.errorCode import ResponseMsg
+from Utils.myPageWraps import pageSerialize
+from Utils.myLog import MyLog
 
+log = MyLog.get_log(__file__)
 
 class MyBaseQuery(BaseQuery):
 
@@ -22,7 +28,16 @@ class MyBaseQuery(BaseQuery):
     #     return super().filter_by(**kwargs)
 
     def get_or_NoFound(self, ident, name):
-        rv = self.get(ident)
-        if not rv:
-            raise ParamException(ResponseMsg.no_existent(name))
-        return rv
+        try:
+            rv = self.get(ident)
+            if not rv:
+                raise ParamException(ResponseMsg.no_existent(name))
+            return rv
+        except OperationalError as e:
+            raise MyException()
+
+    @pageSerialize
+    def my_paginate(self, page: int, limit: int):
+        items = self.limit(limit).offset((page - 1) * limit).all()
+        total = self.order_by(None).count()
+        return Pagination(self, page, limit, total, items)

@@ -5,10 +5,12 @@
 # @Desc: 用户模型类
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
-from typing import AnyStr, Union, Any
+from typing import AnyStr, Union, Any, List, Dict
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from Utils.log import MyLog
+
+from Comment.myException import MyException, ParamException, AuthException
+from Utils.myLog import MyLog
 from Models.base import Base
 from App import db
 
@@ -24,22 +26,20 @@ class User(Base):
     gender = db.Column(db.Enum("MALE", "FEMALE"), server_default="MALE", comment="性别")
     avatar = db.Column(db.LargeBinary, nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
-    tag = db.Column(db.Enum("QA", "PR", "DEV"), comment="标签")
-
+    tag = db.Column(db.Enum("QA", "PR", "DEV", "ADMIN"), comment="标签")
     from .departments import Department  # 不同文件下需引入
-    departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=False, comment="所属部门")
-
-    from Models.ProjectModel.pro import Project,Product
+    departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
+    from Models.ProjectModel.pro import Project, Product
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属项目")
     productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=True, comment="所属产品")
 
-    def __init__(self, username: AnyStr, password: AnyStr, phone: AnyStr,
-                 email: AnyStr, tag: AnyStr,
-                 gender: AnyStr, isAdmin: bool, departmentID: int,
+    def __init__(self, username: AnyStr, password: AnyStr, phone: AnyStr, tag: AnyStr,
+                 gender: AnyStr, isAdmin: bool = False,
+                 departmentID: int = None,
                  projectID: int = None, productID: int = None):
         self.username = username
-        self.hash_password(password)
-        self.email = email
+        self.__hash_password(password)
+        self.email = self.username + "@caseHub.com"
         self.gender = gender
         self.phone = phone
         self.tag = tag
@@ -49,7 +49,7 @@ class User(Base):
         self.productID = productID
         self.projectID = projectID
 
-    def hash_password(self, password: AnyStr):
+    def __hash_password(self, password: AnyStr):
         """
         密码加密
         :param password:  password
@@ -91,9 +91,32 @@ class User(Base):
     @property
     def admin(self) -> bool:
         """
-        :return:
+        :return: bool
         """
         return self.isAdmin
+
+    @staticmethod
+    def to_json(obj) -> Dict:
+        """
+        序列化 删除密码字段
+        :param obj: User
+        :return: user serializer
+        """
+
+        res = super(User, User).to_json(obj)
+        res.pop("password")
+        return res
+
+    @classmethod
+    def login(cls, username: AnyStr, password: AnyStr):
+        user = cls.query.filter(User.username == username).first()
+        if user:
+            if user.verify_password(password):
+                token = user.generate_token().decode("utf-8")
+                return token
+            raise ParamException("password err!")
+        else:
+            raise ParamException("username err!")
 
     def __repr__(self):
         return f"<{User.__name__} {self.username}>"

@@ -5,7 +5,7 @@
 # @Desc: 报告实体
 from Models.base import Base
 from App import db
-from Utils.log import MyLog
+from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
 

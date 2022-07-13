@@ -19,7 +19,7 @@ class ResponseMsg:
     OK = "ok !"
     ERROR = "server error !"
     REQUEST_BODY_EMPTY = "request body empty !"
-    AUTH_ERROR = "auth error !"
+    AUTH_ERROR = " auth error No permission !"
 
     @staticmethod
     def empty(target: AnyStr) -> AnyStr:
@@ -32,6 +32,10 @@ class ResponseMsg:
     @staticmethod
     def error_val(target: Any, choices: List[Any]) -> AnyStr:
         return f"{target} must in {choices} !"
+
+    @staticmethod
+    def error_param(target: Any, msg: AnyStr):
+        return f"{target} err ! {msg}"
 
     @staticmethod
     def no_existent(target: AnyStr) -> AnyStr:

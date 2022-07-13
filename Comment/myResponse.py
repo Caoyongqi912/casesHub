@@ -30,7 +30,7 @@ class AuthError:
 
     @staticmethod
     def error() -> Dict:
-        return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseCode.AUTH_ERROR}
+        return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseMsg.AUTH_ERROR}
 
 
 if __name__ == '__main__':

@@ -34,11 +34,8 @@ def is_admin(func):
 
     @wraps(func)
     def wrap_func(*args, **kwargs):
-        try:
-            if not g.user.admin:
-                raise AuthException()
-            return func(*args, **kwargs)
-        except KeyError:
+        if not g.user.admin:
             raise AuthException()
+        return func(*args, **kwargs)
 
     return wrap_func

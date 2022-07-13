@@ -1,6 +1,6 @@
 # @Time : 2022/7/6 22:30 
 # @Author : cyq
-# @File : requestParseUtil.py
+# @File : myRequestParseUtil.py
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 from typing import AnyStr, Dict
@@ -14,11 +14,12 @@ class MyRequestParseUtil:
 
     def __init__(self, location: AnyStr = "json"):
         """
-        :param location: location default json
+        :param location: location ["json","values"] default json
         """
+
         self.location = location
         self.args = []
-        self.body = getattr(request, self.location, {})
+        self.body = dict(getattr(request, self.location, {}))
 
     def add(self, **kwargs):
         """
@@ -40,22 +41,39 @@ class MyRequestParseUtil:
         """
         if self.body is None:
             raise ParamException(ResponseMsg.REQUEST_BODY_EMPTY)
+
         for kw in self.args:
-            # 设定 必传 但未传
-            if kw['required'] is True and not self.body.get(kw["name"]):
+            # 分页数据
+            if kw["name"] == "page":
+                self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
+            if kw['name'] == "limit":
+                self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
+
+            # 设定 必传 但未传 或者空字符
+            if kw['required'] is True and not self.body.get(kw["name"]) or self.body.get(kw['name']) == "":
                 raise ParamException(ResponseMsg.empty(kw["name"]))
-            # 传空字符
-            if self.body.get(kw['name']) == "":
-                raise ParamException(ResponseMsg.empty(kw["name"]))
+
             # 传参未按照定义类型
             if not isinstance(self.body[kw['name']], kw['type']):
                 raise ParamException(ResponseMsg.error_type(kw["name"], kw['type']))
+
             # 传参未按照指定区间
             if kw.get('choices'):
                 if self.body[kw['name']] not in kw['choices']:
                     raise ParamException(ResponseMsg.error_val(kw["name"], kw['choices']))
+
             # 未传且设定默认
             if kw.get("default") and self.body.get(kw['name']) is None:
                 self.body[kw['name']] = kw.get('default')
 
         return self.body
+
+    def __verify_page(self, page: AnyStr) -> int:
+        if int(page) < 1:
+            raise ParamException(ResponseMsg.error_param("page", "must > 0"))
+        return page
+
+    def __verify_limit(self, limit: AnyStr) -> int:
+        if  int(limit) < 0:
+            raise ParamException(ResponseMsg.error_param("limit", "must > 0"))
+        return limit

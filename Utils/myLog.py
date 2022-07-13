@@ -1,6 +1,6 @@
 # @Time : 2022/7/9 10:49 
 # @Author : cyq
-# @File : log.py 
+# @File : myLog.py
 # @Software: PyCharm
 # @Desc: 日志
 

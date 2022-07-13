@@ -12,11 +12,11 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
+from Utils.myJsonSerialize import JSONEncoder
 
 catch = Cache()
 db = SQLAlchemy(query_class=MyBaseQuery)
 auth = HTTPBasicAuth()
-
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -35,7 +35,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     app.config["BABEL_DEFAULT_LOCALE"] = "zh"
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
-
+    app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
 
     from .userController import userBP

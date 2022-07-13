@@ -1,11 +1,11 @@
 # @Time : 2022/7/9 14:06 
 # @Author : cyq
-# @File : dbMigrate.py 
+# @File : myDBMigrate.py
 # @Software: PyCharm
 # @Desc:
 
 from App import create_app,db
-from Models.UserModel import users,departments
+from Models import *
 
 
 if __name__ == '__main__':
