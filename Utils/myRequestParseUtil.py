@@ -3,7 +3,7 @@
 # @File : myRequestParseUtil.py
 # @Software: PyCharm
 # @Desc:  自定义参数校验
-from typing import AnyStr, Dict
+from typing import AnyStr, Dict, Any, List
 
 from flask import request
 from Comment.myResponse import ResponseMsg
@@ -49,31 +49,71 @@ class MyRequestParseUtil:
             if kw['name'] == "limit":
                 self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
 
-            # 设定 必传 但未传 或者空字符
-            if kw['required'] is True and not self.body.get(kw["name"]) or self.body.get(kw['name']) == "":
-                raise ParamException(ResponseMsg.empty(kw["name"]))
+            #  必传
+            if kw['required'] is True:
+                self.__verify_empty(self.body.get(kw["name"]))
+            # 非必传
+            else:
+                # 未传
+                if self.body.get(kw["name"]) is None:
+                    if kw.get('default'):
+                        self.body[kw['name']] = kw.get('default')
+                    else:
+                        continue
+            self.__verify_type(self.body.get(kw["name"]), kw['type'])
 
-            # 传参未按照定义类型
-            if not isinstance(self.body[kw['name']], kw['type']):
-                raise ParamException(ResponseMsg.error_type(kw["name"], kw['type']))
-
-            # 传参未按照指定区间
-            if kw.get('choices'):
-                if self.body[kw['name']] not in kw['choices']:
-                    raise ParamException(ResponseMsg.error_val(kw["name"], kw['choices']))
-
-            # 未传且设定默认
-            if kw.get("default") and self.body.get(kw['name']) is None:
-                self.body[kw['name']] = kw.get('default')
+            if kw.get("choices"):
+                self.__verify_choices(self.body.get(kw["name"]), kw['choices'])
 
         return self.body
 
     def __verify_page(self, page: AnyStr) -> int:
+        """
+        page校验
+        :param page: 页
+        :raise: ParamException
+        :return page
+        """
         if int(page) < 1:
             raise ParamException(ResponseMsg.error_param("page", "must > 0"))
         return page
 
     def __verify_limit(self, limit: AnyStr) -> int:
-        if  int(limit) < 0:
+        """
+        limit 校验
+        :param limit: 行
+        :return: limit
+        """
+        if int(limit) < 0:
             raise ParamException(ResponseMsg.error_param("limit", "must > 0"))
         return limit
+
+    def __verify_empty(self, target: AnyStr):
+        """
+        校验参数是否为空
+        :param target:  目标
+        :raise: ParamException
+        """
+        if target is None or target == "":
+            raise ParamException(ResponseMsg.empty(target))
+
+    def __verify_type(self, target: Any, t: type, ):
+        """
+        校验类型
+        :param target: 目标值
+        :param t: 期望类型
+        :raise: ParamException
+        """
+        if not isinstance(target, t):
+            raise ParamException(ResponseMsg.error_type(target, t))
+
+    def __verify_choices(self, target: Any, choices: List):
+        """
+        区间校验
+        :param target: 目标值
+        :param choices:
+        :raise: ParamException
+        """
+
+        if target not in choices:
+            raise ParamException(ResponseMsg.error_val(target, choices))

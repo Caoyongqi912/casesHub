@@ -41,4 +41,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     from .userController import userBP
     app.register_blueprint(userBP)
 
+    from .proController import proBP
+    app.register_blueprint(proBP)
+
     return app

@@ -49,7 +49,7 @@ class DepartmentController(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="departID", type=int, required=True)
+        parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, required=False)

@@ -34,7 +34,7 @@ from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
 from Utils.myLog import MyLog
-from Comment.myException import MyException, ParamException
+from Comment.myException import MyException, ParamException, AuthException
 
 log = MyLog.get_log(__file__)
 
@@ -66,6 +66,23 @@ class Base(db.Model):
             raise MyException()
 
     @classmethod
+    def update(cls, **kwargs):
+        """
+        必须是ADMIN or cls.AdminID
+        """
+        from flask import g
+        target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
+        if not g.user.admin or not g.user.id != target.adminID:
+            raise AuthException()
+
+        c = [i.name for i in cls.__table__.columns]
+        kwargs.pop("id")  # 不修改id
+        for k, v in dict(kwargs).items():
+            if k in c:
+                setattr(target, k, v)
+        target.save()
+
+    @classmethod
     def all(cls) -> List:
         """
         返回所有
@@ -81,7 +98,6 @@ class Base(db.Model):
         :return: get_or_NoFound
         """
         return cls.query.get_or_NoFound(ident, name)
-
 
     @classmethod
     def verify_unique(cls, **kwargs) -> None:
