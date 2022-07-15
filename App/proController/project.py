@@ -9,7 +9,7 @@ from App import auth
 from App.myAuth import is_admin
 from Comment.myResponse import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.ProjectModel.pro import Project, Product
+from Models.ProjectModel.pro import Project
 
 
 class ProjectController(Resource):
@@ -21,14 +21,12 @@ class ProjectController(Resource):
         添加项目
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
-        parse.add(name="name", type=str, required=True)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, required=True)
         from Models.UserModel.users import User
-        project = parse.parse_args()
-        User.get(project.get("adminID"), "userID")
-        Project(**project).save()
+        parse = MyRequestParseUtil()
+        parse.add(name="name", type=str, unique=Project, required=True)
+        parse.add(name="desc", type=str, required=False)
+        parse.add(name="adminID", type=int, isExist=User, required=True)
+        Project(**parse.parse_args()).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -40,8 +38,7 @@ class ProjectController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        pages = parse.parse_args()
-        res = Project.page(**pages)
+        res = Project.page(**parse.parse_args())
         return MyResponse.success(res)
 
     @auth.login_required
@@ -50,17 +47,26 @@ class ProjectController(Resource):
         维护
         :return: MyResponse
         """
+        from Models.UserModel.users import User
         parse = MyRequestParseUtil()
-        parse.add(name="name", type=str, required=True)
+        parse.add(name="id", type=int, required=True)
+        parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, required=True)
-        project = parse.parse_args()
-        Project
+        parse.add(name="adminID", type=int, isExist=User, required=False)
+        Project.update(**parse.parse_args())
+        return MyResponse.success()
 
     @auth.login_required
     @is_admin
     def delete(self) -> MyResponse:
-        pass
+        """
+        删除
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=int, required=True)
+        Project.delete_by_id(parse.parse_args().get("id"))
+        return MyResponse.success()
 
 
 api_script = Api(proBP)

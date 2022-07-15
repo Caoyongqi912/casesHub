@@ -22,16 +22,13 @@ class ProductController(Resource):
         添加产品
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
-        parse.add(name="name", type=str, required=True)
-        parse.add(name="desc", type=str)
-        parse.add(name="projectID", type=int, required=True)
-        parse.add(name="adminID", type=int, required=True)
         from Models.UserModel.users import User
-        product = parse.parse_args()
-        Project.get(product.get("projectID"), "projectID")
-        User.get(product.get("adminID"), "userID")
-        Product(**product).save()
+        parse = MyRequestParseUtil()
+        parse.add(name="name", type=str, unique=Product, required=True)
+        parse.add(name="desc", type=str,required=False)
+        parse.add(name="projectID", type=int, isExist=Project, required=True)
+        parse.add(name="adminID", type=int, isExist=User, required=True)
+        Product(**parse.parse_args()).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -43,18 +40,35 @@ class ProductController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        pages = parse.parse_args()
-        res = Product.page(**pages)
+        res = Product.page(**parse.parse_args())
         return MyResponse.success(res)
 
     @auth.login_required
-    def put(self):
-        pass
+    def put(self) -> MyResponse:
+        """
+        维护
+        :return: MyResponse
+        """
+        from Models.UserModel.users import User
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=int, required=True)
+        parse.add(name="name", type=str, required=False)
+        parse.add(name="desc", type=str, required=False)
+        parse.add(name="adminID", type=int, isExist=User, required=False)
+        Product.update(**parse.parse_args())
+        return MyResponse.success()
 
     @auth.login_required
     def delete(self):
-        pass
+        """
+        删除
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=int, required=True)
+        Product.delete_by_id(parse.parse_args().get("id"))
+        return MyResponse.success()
 
 
 api_script = Api(proBP)
-api_script.add_resource(ProductController, "product")
+api_script.add_resource(ProductController, "/product")

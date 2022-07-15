@@ -8,23 +8,38 @@ from typing import AnyStr, Dict, Any, List
 from flask import request
 from Comment.myResponse import ResponseMsg
 from Comment.myException import ParamException
+from Utils.myLog import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class MyRequestParseUtil:
 
     def __init__(self, location: AnyStr = "json"):
         """
-        :param location: location ["json","values"] default json
+        :param location:  "json" -> application/json | "values"  -> query default json
         """
 
         self.location = location
         self.args = []
-        self.body = dict(getattr(request, self.location, {}))
+        try:
+            self.body = getattr(request, self.location, {})
+        except Exception as e:
+            log.error(e)
+            raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
 
     def add(self, **kwargs):
         """
         添加请求数据与数据类型
-        :param kwargs: name type required default choices
+        :param kwargs: name
+        :param kwargs: type
+        :param kwargs: required bool
+        :param kwargs: default
+        :param kwargs: choices
+        :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
+        :param kwargs: unique  put 不要添加
+
+
         """
         # 默认类型为字符
         if not kwargs.get("type"):
@@ -39,9 +54,8 @@ class MyRequestParseUtil:
         参数校验
         :return: self.body
         """
-        if self.body is None:
-            raise ParamException(ResponseMsg.REQUEST_BODY_EMPTY)
 
+        self.body = dict(self.body)
         for kw in self.args:
             # 分页数据
             if kw["name"] == "page":
@@ -51,7 +65,7 @@ class MyRequestParseUtil:
 
             #  必传
             if kw['required'] is True:
-                self.__verify_empty(self.body.get(kw["name"]))
+                self.__verify_empty(self.body.get(kw["name"]), kw["name"])
             # 非必传
             else:
                 # 未传
@@ -64,6 +78,14 @@ class MyRequestParseUtil:
 
             if kw.get("choices"):
                 self.__verify_choices(self.body.get(kw["name"]), kw['choices'])
+            #  校验cls ID
+            if kw.get("isExist"):
+                cls = kw.get("isExist")
+                cls.get(self.body.get(kw['name']), kw['name'])
+            #   校验cls 重名
+            if kw.get("unique"):
+                cls = kw.get("unique")
+                cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
 
         return self.body
 
@@ -88,14 +110,15 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.error_param("limit", "must > 0"))
         return limit
 
-    def __verify_empty(self, target: AnyStr):
+    def __verify_empty(self, target: AnyStr, filed: AnyStr):
         """
         校验参数是否为空
-        :param target:  目标
+        :param target:  目标值
+        :param filed:   参数名
         :raise: ParamException
         """
         if target is None or target == "":
-            raise ParamException(ResponseMsg.empty(target))
+            raise ParamException(ResponseMsg.empty(filed))
 
     def __verify_type(self, target: Any, t: type, ):
         """

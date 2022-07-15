@@ -7,7 +7,6 @@
 
 from typing import AnyStr
 
-from Comment.myException import AuthException
 from Models.base import Base
 from App import db
 
@@ -32,28 +31,9 @@ class Department(Base):
         """
         return self.adminID
 
-
     @property
     def product_users(self):
         return self.users.filter_by().all()
-
-    # @classmethod
-    # def update(cls, **kwargs):
-    #     """
-    #     userAdmin departAdmin权限
-    #     :param kwargs: Department
-    #     """
-    #     super(Department, cls).update(**kwargs)
-    #     department = cls.get(kwargs.get("departID"), "departID")
-    #
-    #     department.name = kwargs.get("name")
-    #     department.desc = kwargs.get("desc")
-    #     if kwargs.get("adminID"):
-    #         # 校验adminID是否存在
-    #         from .users import User
-    #         u = User.get(kwargs.get("adminID"), "adminID")
-    #         department.adminID = u.id
-    #     department.save()
 
     def __repr__(self):
         return f"<{Department.__name__} {self.name}>"

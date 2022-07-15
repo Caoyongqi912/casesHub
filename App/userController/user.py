@@ -30,15 +30,12 @@ class AddUser(Resource):
         :return: jsonify
         """
         parse = MyRequestParseUtil()
-        parse.add(name="username", type=str, required=True)
-        parse.add(name="phone", type=str, required=True)
+        parse.add(name="username", type=str, unique=User, required=True)
+        parse.add(name="phone", type=str, unique=User, required=True)
         parse.add(name="password", type=str, required=True)
         parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
         parse.add(name="tag", type=str, required=True)
-        body = parse.parse_args()
-        User.verify_unique(username=body.get("username"))
-        User.verify_unique(phone=body.get("phone"))
-        User(**body).save()
+        User(**parse.parse_args()).save()
         return MyResponse.success()
 
 
@@ -65,8 +62,7 @@ class QueryUserController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        pages = parse.parse_args()
-        res = User.page(**pages)
+        res = User.page(**parse.parse_args())
         return MyResponse.success(res)
 
 
@@ -80,8 +76,7 @@ class LoginController(Resource):
         parse = MyRequestParseUtil()
         parse.add(name="username", type=str, required=True)
         parse.add(name="password", type=str, required=True)
-        info = parse.parse_args()
-        return MyResponse.success(User.login(**info))
+        return MyResponse.success(User.login(**parse.parse_args()))
 
 
 class UserController(Resource):

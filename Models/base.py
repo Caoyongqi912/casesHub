@@ -66,17 +66,27 @@ class Base(db.Model):
             raise MyException()
 
     @classmethod
+    def delete_by_id(cls, id: int):
+        """
+        通过id 删除
+        :param id: cls。id
+        :raise:   ParamException
+        """
+        target = cls.get(id, f"{cls.__name__} id")
+        target.delete()
+
+    @classmethod
     def update(cls, **kwargs):
         """
         必须是ADMIN or cls.AdminID
+        通过kwargs.pop('id') 获得实例 修改
         """
         from flask import g
-        target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
+        target = cls.get(kwargs.pop('id'), f"{cls.__name__} id")
         if not g.user.admin or not g.user.id != target.adminID:
             raise AuthException()
 
         c = [i.name for i in cls.__table__.columns]
-        kwargs.pop("id")  # 不修改id
         for k, v in dict(kwargs).items():
             if k in c:
                 setattr(target, k, v)
@@ -117,7 +127,6 @@ class Base(db.Model):
     @classmethod
     def page(cls, page: AnyStr, limit: AnyStr):
         """
-
         :param page: 页
         :param limit: 数量
         :return:

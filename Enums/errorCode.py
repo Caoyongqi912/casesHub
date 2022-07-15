@@ -18,7 +18,7 @@ class ResponseCode:
 class ResponseMsg:
     OK = "ok !"
     ERROR = "server error !"
-    REQUEST_BODY_EMPTY = "request body empty !"
+    REQUEST_BODY_ERROR = "request body error !"
     AUTH_ERROR = " auth error No permission !"
 
     @staticmethod

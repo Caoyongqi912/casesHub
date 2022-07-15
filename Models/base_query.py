@@ -6,14 +6,13 @@
 from typing import Any, AnyStr
 
 from flask_sqlalchemy import BaseQuery, Pagination
-from sqlalchemy.exc import OperationalError
-
-from Comment.myException import ParamException,MyException
+from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
 from Utils.myWraps import pageSerialize
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
+
 
 class MyBaseQuery(BaseQuery):
 
@@ -27,17 +26,28 @@ class MyBaseQuery(BaseQuery):
     #     kwargs.setdefault('status', 1)
     #     return super().filter_by(**kwargs)
 
-    def get_or_NoFound(self, ident, name):
-        try:
-            rv = self.get(ident)
-            if not rv:
-                raise ParamException(ResponseMsg.no_existent(name))
-            return rv
-        except OperationalError as e:
-            raise MyException()
+    def get_or_NoFound(self, ident, name) -> Any:
+        """
+        get self by id
+        :param ident: id
+        :param name:  cls.__name__
+        :return: cls.self
+        :raise:ParamException
+        """
+
+        rv = self.get(ident)
+        if not rv:
+            raise ParamException(ResponseMsg.no_existent(name))
+        return rv
 
     @pageSerialize
-    def my_paginate(self, page: int, limit: int):
+    def my_paginate(self, page: int, limit: int) -> Pagination:
+        """
+        paginate
+        :param page:  page
+        :param limit: limit
+        :return: Pagination
+        """
         items = self.limit(limit).offset((page - 1) * limit).all()
         total = self.order_by(None).count()
         return Pagination(self, page, limit, total, items)

@@ -9,21 +9,11 @@ from App import auth
 from App.userController import userBP
 from App.myAuth import is_admin
 from Comment.myResponse import MyResponse
-from Models.UserModel.users import User
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.departments import Department
 
 
 class DepartmentController(Resource):
-
-    @auth.login_required
-    def get(self):
-        parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        pages = parse.parse_args()
-        res = Department.page(**pages)
-        return MyResponse.success(res)
 
     @auth.login_required
     @is_admin
@@ -32,29 +22,28 @@ class DepartmentController(Resource):
         添加一个部门
         :return: MyResponse
         """
+        from Models.UserModel.users import User
         parse = MyRequestParseUtil()
-        parse.add(name="name", type=str, required=True)
+        parse.add(name="name", type=str, unique=Department, required=True)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, required=False)
-        info = parse.parse_args()
-        Department.verify_unique(name=info.get("name"))
-        User.get(ident=info.get("adminID"), name="adminID")
-        Department(**info).save()
+        parse.add(name="adminID", type=int, isExist=User, required=False)
+        Department(**parse.parse_args()).save()
         return MyResponse.success()
 
     @auth.login_required
     def put(self) -> MyResponse:
         """
+
         更新部门
         :return:MyResponse
         """
+        from Models.UserModel.users import User
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, required=False)
-        info = parse.parse_args()
-        Department.update(**info)
+        parse.add(name="adminID", type=int, isExist=User, required=False)
+        Department.update(**parse.parse_args())
         return MyResponse.success()
 
     @auth.login_required
@@ -66,8 +55,7 @@ class DepartmentController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        pages = parse.parse_args()
-        res = Department.page(**pages)
+        res = Department.page(**parse.parse_args())
         return MyResponse.success(res)
 
     @auth.login_required
@@ -78,9 +66,8 @@ class DepartmentController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="departID", type=int, required=True)
-        info = parse.parse_args()
-        Department.get(info.get("departID"), "departID").delete()
+        parse.add(name="id", type=int, required=True)
+        Department.delete_by_id(parse.parse_args().get("id"))
         return MyResponse.success()
 
 
