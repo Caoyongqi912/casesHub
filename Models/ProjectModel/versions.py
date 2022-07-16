@@ -19,9 +19,12 @@ class Version(Base):
     desc = db.Column(db.String(100), nullable=True, comment="版本描述")
 
     from Models.ProjectModel.pro import Product
-    productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullabel=False, comment="所属产品")
+    productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=False, comment="所属产品")
 
-    def __init__(self, name: AnyStr, desc: AnyStr, productID: int):
+    def __init__(self, name: AnyStr, productID: int, desc: AnyStr = None):
         self.name = name
         self.desc = desc
         self.productID = productID
+
+    def __repr__(self):
+        return f"<{Version.__name__} {self.name}>"

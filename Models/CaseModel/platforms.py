@@ -16,6 +16,6 @@ class Platform(Base):
     name = db.Column(db.String(20), unique=True, comment="平台名称")
     desc = db.Column(db.String(100), nullable=True, comment="平台描述")
 
-    def __init__(self, name: AnyStr, desc: AnyStr):
+    def __init__(self, name: AnyStr, desc: AnyStr=None):
         self.name = name
         self.desc = desc

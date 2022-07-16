@@ -40,7 +40,8 @@ class Product(Base):
     adminID = db.Column(db.INTEGER, comment="产品负责人")
 
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=False, comment="所属项目")
-    users = db.relationship("User", backref="product_users", lazy="dynamic")
+    users = db.relationship("User", backref="user", lazy="dynamic")
+    cases = db.relationship("Cases", backref="case", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int,
                  projectID: int):
@@ -48,6 +49,14 @@ class Product(Base):
         self.desc = desc
         self.adminID = adminID
         self.projectID = projectID
+
+    def page_by(self, **kwargs):
+        """
+        分页
+        :param kwargs:
+        :return:
+        """
+        return self.cases.my_paginate(**kwargs)
 
     def __repr__(self):
         return f"<{Product.__name__} {self.name}>"
@@ -65,4 +74,3 @@ productUsers = db.Table(
     db.Column("userID", db.INTEGER, db.ForeignKey("user.id")),
 
 )
-

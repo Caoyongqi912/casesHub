@@ -48,3 +48,4 @@ def create_app(configName: AnyStr = "default") -> Flask:
     from .platformController import platformBP
     app.register_blueprint(platformBP)
     return app
+

@@ -41,13 +41,15 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, page: int, limit: int) -> Pagination:
+    def my_paginate(self, page: AnyStr, limit: AnyStr) -> Pagination:
         """
         paginate
         :param page:  page
         :param limit: limit
         :return: Pagination
         """
+        page = int(page)
+        limit = int(limit)
         items = self.limit(limit).offset((page - 1) * limit).all()
         total = self.order_by(None).count()
         return Pagination(self, page, limit, total, items)

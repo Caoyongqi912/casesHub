@@ -4,15 +4,19 @@
 # @Software: PyCharm
 # @Desc: version view
 from flask_restful import Resource, Api
+
+from App import auth
 from App.proController import proBP
 from Comment.myResponse import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.ProjectModel.versions import Version
 from Models.ProjectModel.pro import Product
+from App.myAuth import is_admin
 
 
 class VersionController(Resource):
 
+    @auth.login_required
     def post(self) -> MyResponse:
         parse = MyRequestParseUtil()
         parse.add(name='name', required=True, unique=Version, type=str)
@@ -21,12 +25,17 @@ class VersionController(Resource):
         Version(**parse.parse_args()).save()
         return MyResponse.success()
 
+    @auth.login_required
     def get(self):
         pass
 
+    @auth.login_required
+    @is_admin
     def delete(self):
         pass
 
+    @auth.login_required
+    @is_admin
     def put(self):
         pass
 

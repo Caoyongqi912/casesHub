@@ -22,5 +22,30 @@ class Test:
         self.__dict__[key] = "set + " + value
         print(self.__dict__)
 
+
 if __name__ == '__main__':
-    print(Test("dawa","dawa"))
+    a = [
+        {
+            "step": 1,
+            "setup": "im setup",
+            "do": "to do ...",
+            "exp": "exp ....",
+
+        },
+        {
+            "step": 3,
+            "setup": "im setup",
+            "do": "to do ...",
+            "exp": "exp ....",
+
+        },
+        {
+            "step": 2,
+            "setup": "im setup",
+            "do": "to do ...",
+            "exp": "exp ....",
+
+        }
+    ]
+    a.sort(key=lambda s:s['step'])
+    print(a)

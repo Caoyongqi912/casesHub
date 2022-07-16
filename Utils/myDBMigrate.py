@@ -3,10 +3,8 @@
 # @File : myDBMigrate.py
 # @Software: PyCharm
 # @Desc:
-
-from App import create_app,db
-from Models import *
-
+from App import create_app, db
+from Models.CaseModel import *
 
 if __name__ == '__main__':
     create_app().app_context().push()

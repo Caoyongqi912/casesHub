@@ -131,4 +131,4 @@ class Base(db.Model):
         :param limit: 数量
         :return:
         """
-        return cls.query.my_paginate(page=int(page), limit=int(limit))
+        return cls.query.my_paginate(page=page, limit=limit)

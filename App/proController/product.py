@@ -3,6 +3,8 @@
 # @File : product.py 
 # @Software: PyCharm
 # @Desc: 产品view
+from typing import AnyStr
+
 from flask_restful import Resource, Api
 
 from App import auth
@@ -25,7 +27,7 @@ class ProductController(Resource):
         from Models.UserModel.users import User
         parse = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Product, required=True)
-        parse.add(name="desc", type=str,required=False)
+        parse.add(name="desc", type=str, required=False)
         parse.add(name="projectID", type=int, isExist=Project, required=True)
         parse.add(name="adminID", type=int, isExist=User, required=True)
         Product(**parse.parse_args()).save()
@@ -70,5 +72,22 @@ class ProductController(Resource):
         return MyResponse.success()
 
 
+class QueryCaseController(Resource):
+
+    @auth.login_required
+    def get(self, productID: AnyStr) -> MyResponse:
+        """
+        通过MyResponse 分页查询
+        :param productID: 产品ID
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="page", default="1")
+        parse.add(name="limit", default="20")
+        res = Product.get(productID,"productID").page_by(**parse.parse_args())
+        return MyResponse.success(res)
+
+
 api_script = Api(proBP)
 api_script.add_resource(ProductController, "/product")
+api_script.add_resource(QueryCaseController, "/<string:productID>/cases")

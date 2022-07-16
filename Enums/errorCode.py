@@ -22,6 +22,10 @@ class ResponseMsg:
     AUTH_ERROR = " auth error No permission !"
 
     @staticmethod
+    def miss(target: AnyStr) -> AnyStr:
+        return f"miss {target} arg !"
+
+    @staticmethod
     def empty(target: AnyStr) -> AnyStr:
         return f"{target} cant be empty or ''!"
 
