@@ -24,5 +24,5 @@ class Bug(Base):
     file = db.Column(db.String(50), nullable=False, comment="附件地址")
     mark = db.Column(db.String(100), nullable=True, comment="BUG备注")
 
-    from .cases import Case
-    case = db.relationship("Case", uselist=False, back_populates="bug")
+    from .cases import Cases
+    case = db.relationship("Cases", uselist=False, back_populates="bug")

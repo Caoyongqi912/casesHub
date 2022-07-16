@@ -43,5 +43,8 @@ def create_app(configName: AnyStr = "default") -> Flask:
 
     from .proController import proBP
     app.register_blueprint(proBP)
-
+    from .caseController import caseBP
+    app.register_blueprint(caseBP)
+    from .platformController import platformBP
+    app.register_blueprint(platformBP)
     return app

@@ -21,9 +21,7 @@ class Version(Base):
     from Models.ProjectModel.pro import Product
     productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullabel=False, comment="所属产品")
 
-    def __init__(self, name: AnyStr, desc: AnyStr, adminID: int,
-                 productID: int):
+    def __init__(self, name: AnyStr, desc: AnyStr, productID: int):
         self.name = name
         self.desc = desc
-        self.adminID = adminID
         self.productID = productID

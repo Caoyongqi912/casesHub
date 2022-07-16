@@ -29,23 +29,6 @@ class Project(Base):
         self.desc = desc
         self.adminID = adminID
 
-    # @classmethod
-    # def update(cls, **kwargs):
-    #     """
-    #     userAdmin,ProjectAdmin
-    #     :param kwargs: Project
-    #     """
-    #     super(Project, cls).update()
-    #     pro = cls.get(kwargs.get("projectID"), "projectID")
-    #     pro.name = kwargs.get("name")
-    #     pro.desc = kwargs.get("desc")
-    #     if kwargs.get("adminID"):
-    #         from Models.UserModel.users import User
-    #         u = User.get(kwargs.get("adminID"), "adminID")
-    #         pro.adminID = u.id
-    #     pro.save()
-
-
     def __repr__(self):
         return f"<{Project.__name__} {self.name}>"
 
@@ -68,3 +51,18 @@ class Product(Base):
 
     def __repr__(self):
         return f"<{Product.__name__} {self.name}>"
+
+
+projectUsers = db.Table(
+    "project_user",
+    db.Column("projectID", db.INTEGER, db.ForeignKey("project.id")),
+    db.Column("userID", db.INTEGER, db.ForeignKey("user.id")),
+
+)
+productUsers = db.Table(
+    "product_user",
+    db.Column("productID", db.INTEGER, db.ForeignKey("product.id")),
+    db.Column("userID", db.INTEGER, db.ForeignKey("user.id")),
+
+)
+

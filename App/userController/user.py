@@ -140,11 +140,18 @@ class GetAvatarController(Resource):
         return Response(avatar, mimetype="image/jpeg")
 
 
+class SetUserInfo(Resource):
+
+    def post(self):
+        pass
+
 api_script = Api(userBP)
 api_script.add_resource(AddUser, "/")
 api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 api_script.add_resource(UserController, "/info")
+api_script.add_resource(SetUserInfo, "/info")
+
 api_script.add_resource(AvatarController, "/avatar")
 api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")
