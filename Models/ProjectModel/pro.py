@@ -7,10 +7,13 @@
 
 from typing import AnyStr
 
+from flask_sqlalchemy import Pagination
+
 from Comment.myException import AuthException
 from Models.base import Base
 from App import db
 from Utils.myLog import MyLog
+from Utils.myWraps import simpleCase
 
 log = MyLog.get_log(__file__)
 
@@ -28,6 +31,19 @@ class Project(Base):
         self.name = name
         self.desc = desc
         self.adminID = adminID
+
+    @classmethod
+    def update(cls, **kwargs):
+        """
+        添加权限过滤
+        必须是ADMIN or AdminID
+        :param kwargs: Project
+        """
+        from flask import g
+        target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
+        if not g.user.admin or not g.user.id != target.adminID:
+            raise AuthException()
+        return super(Project, Project).update(**kwargs)
 
     def __repr__(self):
         return f"<{Project.__name__} {self.name}>"
@@ -50,13 +66,33 @@ class Product(Base):
         self.adminID = adminID
         self.projectID = projectID
 
-    def page_by(self, **kwargs):
+    @classmethod
+    def update(cls, **kwargs):
         """
-        分页
+        添加权限过滤
+        必须是ADMIN or AdminID
         :param kwargs:
         :return:
         """
-        return self.cases.my_paginate(**kwargs)
+        from flask import g
+        target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
+        if not g.user.admin or not g.user.id != target.adminID:
+            raise AuthException()
+
+        return super(Product, Product).update(**kwargs)
+
+    @simpleCase
+    def page_by_case(self, page: AnyStr, limit: AnyStr):
+        """
+        查询用例分页
+        :param kwargs: page limit
+        :return:Pagination
+        """
+        limit = int(limit)
+        page = int(page)
+        items = self.cases.limit(limit).offset((page - 1) * limit).all()
+        total = self.cases.order_by(None).count()
+        return Pagination(self, page, limit, total, items)
 
     def __repr__(self):
         return f"<{Product.__name__} {self.name}>"

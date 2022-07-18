@@ -10,6 +10,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from Comment.myException import ParamException
+from Enums.errorCode import ResponseMsg
 from Utils.myLog import MyLog
 from Models.base import Base
 from App import db
@@ -66,6 +67,13 @@ class User(Base):
         token = {"id": self.id, "expires_time": time.time() + expires_time}
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
+    @classmethod
+    def query_by_tag(cls, tag: AnyStr):
+        if tag not in ["QA", "PR", "DEV", "ADMIN"]:
+            raise ParamException(ResponseMsg.error_val(tag, ["QA", "PR", "DEV", "ADMIN"]))
+
+        return cls.query.filter(User.tag == tag).all()
+
     @staticmethod
     def verify_token(token: AnyStr) -> Union[None, Any]:
         """
@@ -87,7 +95,6 @@ class User(Base):
         :return: bool
         """
         return check_password_hash(self.password, password)
-
 
     @property
     def admin(self) -> bool:

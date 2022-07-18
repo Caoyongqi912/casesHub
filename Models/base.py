@@ -29,7 +29,7 @@ nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列�
 default	为这列定义默认值
 """
 from typing import List, AnyStr, Dict
-from sqlalchemy import desc
+from sqlalchemy import asc
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
@@ -78,14 +78,9 @@ class Base(db.Model):
     @classmethod
     def update(cls, **kwargs):
         """
-        必须是ADMIN or cls.AdminID
-        通过kwargs.pop('id') 获得实例 修改
+        通过kwargs.get('id') 获得实例 修改
         """
-        from flask import g
-        target = cls.get(kwargs.pop('id'), f"{cls.__name__} id")
-        if not g.user.admin or not g.user.id != target.adminID:
-            raise AuthException()
-
+        target = cls.get(kwargs.pop('id'))
         c = [i.name for i in cls.__table__.columns]
         for k, v in dict(kwargs).items():
             if k in c:
@@ -97,7 +92,7 @@ class Base(db.Model):
         """
         返回所有
         """
-        return cls.query.filter_by().order_by(desc(cls.id)).all()
+        return cls.query.filter_by().order_by(asc(cls.id)).all()
 
     @classmethod
     def get(cls, ident: int, name: AnyStr = None):
@@ -118,11 +113,7 @@ class Base(db.Model):
 
     @staticmethod
     def to_json(obj) -> Dict:
-        res = {}
-        for c in obj.__table__.columns:
-            value = getattr(obj, c.name, "")
-            res[c.name] = value
-        return res
+        return {c.name: getattr(obj, c.name, None) for c in obj.__table__.columns}
 
     @classmethod
     def page(cls, page: AnyStr, limit: AnyStr):

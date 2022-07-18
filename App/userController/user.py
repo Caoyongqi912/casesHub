@@ -145,13 +145,25 @@ class SetUserInfo(Resource):
     def post(self):
         pass
 
+
+class QueryUserByTag(Resource):
+
+    def get(self, tag: AnyStr) -> MyResponse:
+        """
+        通过Tag 过滤
+        :param tag:  ["QA", "PR", "DEV", "ADMIN"]
+        :return: MyResponse
+        """
+        return MyResponse.success(User.query_by_tag(tag))
+
+
 api_script = Api(userBP)
 api_script.add_resource(AddUser, "/")
 api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 api_script.add_resource(UserController, "/info")
-api_script.add_resource(SetUserInfo, "/info")
+api_script.add_resource(QueryUserByTag, "/tag/<string:tag>")
 
 api_script.add_resource(AvatarController, "/avatar")
 api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")

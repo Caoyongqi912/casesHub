@@ -12,6 +12,7 @@ from Enums.errorCode import ResponseMsg
 from Models.base import Base
 from App import db
 from Utils.myLog import MyLog
+from Utils.myWraps import simpleBug
 
 log = MyLog.get_log(__file__)
 
@@ -51,6 +52,25 @@ class Cases(Base):
         self.case_level = case_level
         self.steps = self.__verify_steps(steps)
 
+    @property
+    @simpleBug
+    def bugs(self):
+        """
+        获取所有bug
+        :return: Pagination
+        """
+        return self.bug.all()
+
+    @classmethod
+    def update(cls, **kwargs):
+        """
+        case 更新 重写父类 不需要校验用户。
+        :param kwargs:
+        :return:
+        """
+        from flask import g
+        kwargs.setdefault("updater", g.user.id)  # 修改人
+        return super(Cases, Cases).update(**kwargs)
 
     @staticmethod
     def __verify_steps(steps: List[Dict]) -> json:
@@ -87,3 +107,6 @@ class Cases(Base):
                 raise ParamException(ResponseMsg.miss("exp"))
         steps.sort(key=lambda s: s['step'])
         return steps
+
+    def __repr__(self):
+        return f"<{Cases.__name__} {self.name}>"

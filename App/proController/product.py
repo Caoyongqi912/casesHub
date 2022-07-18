@@ -84,7 +84,7 @@ class QueryCaseController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        res = Product.get(productID,"productID").page_by(**parse.parse_args())
+        res = Product.get(productID, "productID").page_by_case(**parse.parse_args())
         return MyResponse.success(res)
 
 
