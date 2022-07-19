@@ -37,7 +37,6 @@ def create_app(configName: AnyStr = "default") -> Flask:
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
-
     from .userController import userBP
     app.register_blueprint(userBP)
 
@@ -48,4 +47,3 @@ def create_app(configName: AnyStr = "default") -> Flask:
     from .platformController import platformBP
     app.register_blueprint(platformBP)
     return app
-

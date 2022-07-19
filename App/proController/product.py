@@ -84,10 +84,27 @@ class QueryCaseController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        res = Product.get(productID, "productID").page_by_case(**parse.parse_args())
+        res = Product.get(productID, "productID").page_case(**parse.parse_args())
+        return MyResponse.success(res)
+
+
+class QueryVersionController(Resource):
+
+    @auth.login_required
+    def get(self, productID: AnyStr) -> MyResponse:
+        """
+        通过MyResponse 分页查询
+        :param productID: 产品ID
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="page", default="1")
+        parse.add(name="limit", default="20")
+        res = Product.get(productID, "productID").page_version(**parse.parse_args())
         return MyResponse.success(res)
 
 
 api_script = Api(proBP)
 api_script.add_resource(ProductController, "/product")
 api_script.add_resource(QueryCaseController, "/<string:productID>/cases")
+api_script.add_resource(QueryVersionController, "/<string:productID>/versions")

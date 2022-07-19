@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from App import create_app, db
-from Models.CaseModel import *
+from Models.ProjectModel.reports import Report
 
 if __name__ == '__main__':
     create_app().app_context().push()

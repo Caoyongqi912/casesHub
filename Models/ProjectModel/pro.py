@@ -13,7 +13,7 @@ from Comment.myException import AuthException
 from Models.base import Base
 from App import db
 from Utils.myLog import MyLog
-from Utils.myWraps import simpleCase
+from Utils.myWraps import simpleCase, pageSerialize
 
 log = MyLog.get_log(__file__)
 
@@ -56,8 +56,10 @@ class Product(Base):
     adminID = db.Column(db.INTEGER, comment="产品负责人")
 
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=False, comment="所属项目")
+
     users = db.relationship("User", backref="user", lazy="dynamic")
     cases = db.relationship("Cases", backref="case", lazy="dynamic")
+    versions = db.relationship("Version", backref="version", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int,
                  projectID: int):
@@ -82,16 +84,31 @@ class Product(Base):
         return super(Product, Product).update(**kwargs)
 
     @simpleCase
-    def page_by_case(self, page: AnyStr, limit: AnyStr):
+    def page_case(self, page: AnyStr, limit: AnyStr):
         """
         查询用例分页
-        :param kwargs: page limit
+        :param limit: limit
+        :param page: page
         :return:Pagination
         """
         limit = int(limit)
         page = int(page)
         items = self.cases.limit(limit).offset((page - 1) * limit).all()
         total = self.cases.order_by(None).count()
+        return Pagination(self, page, limit, total, items)
+
+    @pageSerialize
+    def page_version(self, page: AnyStr, limit: AnyStr):
+        """
+        查询版本分页
+        :param limit: limit
+        :param page: page
+        :return:Pagination
+        """
+        limit = int(limit)
+        page = int(page)
+        items = self.versions.limit(limit).offset((page - 1) * limit).all()
+        total = self.versions.order_by(None).count()
         return Pagination(self, page, limit, total, items)
 
     def __repr__(self):

@@ -52,14 +52,15 @@ class DevelopmentConfig(ProjectConfig):
     CACHE_TYPE = 'simple'
     ERROR_404_HELP = False
     CACHE_DEFAULT_TIMEOUT = 300
-    # MAIL_SERVER = 'smtp.googlemail.com'
-    # MAIL_PORT = 587
-    # MAIL_USE_TLS = True
-    # MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    # MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 123
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    REPORT_MAIL = "xxxx@mail.com"
     JSON_AS_ASCII = False  # 这个配置可以确保http请求返回的json数据中正常显示中文
 
-#    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    #    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@localhost:3306/caseHub"
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True

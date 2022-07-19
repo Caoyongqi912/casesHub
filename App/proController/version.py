@@ -26,18 +26,38 @@ class VersionController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    def get(self):
-        pass
+    @is_admin
+    def delete(self) -> MyResponse:
+        """
+        delete
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=int, required=True)
+        Version.delete_by_id(**parse.parse_args())
+        return MyResponse.success()
 
     @auth.login_required
-    @is_admin
-    def delete(self):
-        pass
+    def put(self) -> MyResponse:
+        """
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=int, required=True)
+        parse.add(name='name', required=False, type=str)
+        parse.add(name="desc", required=False, type=str)
+        Version.update(**parse.parse_args())
+        return MyResponse.success()
 
     @auth.login_required
-    @is_admin
-    def put(self):
-        pass
+    def get(self) -> MyResponse:
+        """
+        get
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("value")
+        parse.add(name="id", type=str, required=True)
+        return MyResponse.success(Version.get(parse.parse_args().get("id"), "id"))
 
 
 api_script = Api(proBP)
