@@ -88,9 +88,32 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 <div @click="do"></div>
 ```
 
+### Vue 相应API
 
-  
-  
-  
+- `computed`
+- 接受一个 `getter` 函数、 根据其返回值 返回一个不可变的响应式 `ref` 对象
+
+- `watch`
+- 组件监听器 `property` 、 监听特定的数据源、并在会点函数中执行作用。 
+```html
+<div id="app">
+ <button @click="num++">{{num}}</button>
+</div>
+<script>
+ Vue.createapp({
+  watch:{
+  num:function(n1,n2){
+   
+ }
+ },
+  data(){
+   return {num:0}
+  }
+ }).mount("#app")
+</script>
+
+```
+- `directives`
+- 注册自定义的指令,对普通 `dom` 元素进行底层操作，就会用到自定义指令.
   
   
