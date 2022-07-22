@@ -97,9 +97,7 @@ class UserController(Resource):
         解析token getinfo
         :return: MyResponse
         """
-        from flask import g,request
-        r =request.headers
-        a = request.authorization
+        from flask import g
         return MyResponse.success(User.get(g.user.id))
 
     @auth.login_required

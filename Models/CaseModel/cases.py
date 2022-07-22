@@ -23,7 +23,7 @@ class Cases(Base):
     desc = db.Column(db.String(100), nullable=False, comment="用例描述")
     creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
     steps = db.Column(db.JSON, nullable=False, comment="用例步骤")
-    status = db.Column(db.Enum("QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"), server_defautl="QUEUE",
+    status = db.Column(db.Enum("QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"), server_default="QUEUE",
                        comment="状态")
 
     case_level = db.Column(db.Enum('P1', 'P2', 'P3', 'P4'), server_default='P1', comment="用例等级")
