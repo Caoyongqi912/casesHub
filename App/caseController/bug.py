@@ -29,7 +29,7 @@ class BugController(Resource):
         parse.add(name="developer", type=str, required=True)
         parse.add(name="pr", type=str, required=True)
         parse.add(name="level", type=str, required=True, choices=["P1", "P2", "P3", "P4"])
-        parse.add(name="status", type=str, required=True, choices=["OPEN", "CLOSE"])
+        parse.add(name="status", type=str, required=True, choices=["OPEN", "CLOSE","BLOCK"])
         Bug(**parse.parse_args()).save()
         return MyResponse.success()
 
