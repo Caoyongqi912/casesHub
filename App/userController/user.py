@@ -92,6 +92,17 @@ class UserController(Resource):
         return MyResponse.success(User.get(parse.parse_args().get("userID")))
 
     @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        解析token getinfo
+        :return: MyResponse
+        """
+        from flask import g,request
+        r =request.headers
+        a = request.authorization
+        return MyResponse.success(User.get(g.user.id))
+
+    @auth.login_required
     def put(self) -> MyResponse:
         """
         修改密码

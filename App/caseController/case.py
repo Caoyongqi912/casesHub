@@ -30,6 +30,8 @@ class NewCaseController(Resource):
         parse.add(name="title", type=str, required=True, unique=Cases)
         parse.add(name="desc", type=str, required=True)
         parse.add(name="case_level", type=str, choices=["P1", "P2", "P3", "P4"], required=True)
+        parse.add(name="status", type=str, choices=["QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"],
+                  required=True)
         parse.add(name="case_type", type=str, choices=["功能", "接口", "性能"], required=False)
         parse.add(name="prd", type=str, required=True)
         parse.add(name="productID", type=int, isExist=Product, required=True)
