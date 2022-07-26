@@ -59,6 +59,7 @@ class Product(Base):
 
     users = db.relationship("User", backref="user", lazy="dynamic")
     cases = db.relationship("Cases", backref="case", lazy="dynamic")
+    parts = db.relationship("CasePart", backref='product_part', lazy="dynamic")
     versions = db.relationship("Version", backref="version", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int,
@@ -67,6 +68,14 @@ class Product(Base):
         self.desc = desc
         self.adminID = adminID
         self.projectID = projectID
+
+    @property
+    def getParts(self):
+        """
+        获取part
+        :return:
+        """
+        return self.parts.all()
 
     @classmethod
     def update(cls, **kwargs):
@@ -84,7 +93,7 @@ class Product(Base):
         return super(Product, Product).update(**kwargs)
 
     @simpleCase
-    def page_case(self, page: AnyStr, limit: AnyStr):
+    def page_case(self, page: AnyStr, limit: AnyStr) -> Pagination:
         """
         查询用例分页
         :param limit: limit

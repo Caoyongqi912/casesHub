@@ -34,7 +34,7 @@ from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
 from Utils.myLog import MyLog
-from Comment.myException import MyException, ParamException, AuthException
+from Comment.myException import MyException, ParamException
 
 log = MyLog.get_log(__file__)
 
@@ -54,6 +54,8 @@ class Base(db.Model):
             log.error(e)
             db.session.rollback()
             raise MyException()
+
+
 
     def delete(self):
         """delete"""

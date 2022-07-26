@@ -17,14 +17,29 @@ from Utils.myWraps import simpleBug
 log = MyLog.get_log(__file__)
 
 
+class CasePart(Base):
+    __tablename__ = 'case_part'
+    partName = db.Column(db.String(20), comment="用例模块")
+    productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=True, comment="所属产品")
+
+    def __init__(self, partName: AnyStr, productID: int):
+        self.partName = partName
+        self.productID = productID
+
+    def __repr__(self):
+        return f"<{CasePart.__name__} {self.part}>"
+
+
 class Cases(Base):
     __tablename__ = "cases"
+    part = db.Column(db.String(20), comment="模块")
     title = db.Column(db.String(20), unique=True, nullable=False, comment="用例名称")
     desc = db.Column(db.String(100), nullable=False, comment="用例描述")
     creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
     steps = db.Column(db.JSON, nullable=False, comment="用例步骤")
     status = db.Column(db.Enum("QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"), server_default="QUEUE",
                        comment="状态")
+    platform = db.Column(db.Enum("IOS", "ANDROID", "WEB", "PC", "APP"), server_default="IOS", comment="所属平台")
 
     case_level = db.Column(db.Enum('P1', 'P2', 'P3', 'P4'), server_default='P1', comment="用例等级")
     case_type = db.Column(db.Enum('功能', '接口', '性能'), server_default='功能', comment="用例类型")
@@ -33,22 +48,22 @@ class Cases(Base):
 
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
     mark = db.Column(db.String(100), nullable=True, comment="用例备注")
-
-    platformID = db.Column(db.INTEGER, db.ForeignKey('platform.id'), comment="所属平台")
     versionID = db.Column(db.INTEGER, db.ForeignKey('version.id'), comment="所属版本")
     productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=True, comment="所属产品")
 
     from .bugs import Bug
     bug = db.relationship("Bug", backref="bugs", lazy="dynamic")
 
-    def __init__(self, title: AnyStr, desc: AnyStr, steps: List[Dict], prd: AnyStr, platformID: int, status: AnyStr,
-                 versionID: int, productID: int, case_level: AnyStr, case_type: AnyStr = None):
-        self.title = title,
-        self.creator = g.user.id
-        self.desc = desc,
-        self.prd = prd,
+    def __init__(self, part: AnyStr, title: AnyStr, desc: AnyStr, steps: List[Dict], prd: AnyStr, platform: AnyStr,
+                 status: AnyStr,
+                 versionID: int, productID: int, case_level: AnyStr, case_type: AnyStr = None, creator: int = None):
+        self.part = part
+        self.title = title
+        self.creator = creator if creator else g.user.id
+        self.desc = desc
+        self.prd = prd
+        self.platform = platform
         self.productID = productID
-        self.platformID = platformID
         self.versionID = versionID
         self.case_type = case_type
         self.case_level = case_level

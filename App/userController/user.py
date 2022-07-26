@@ -11,7 +11,7 @@ from flask_restful import Resource, Api
 from App import auth
 from App.userController import userBP
 from Comment.myResponse import MyResponse
-from Utils.myAvatarPath import getAvatarPath
+from Utils.myPath import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.users import User
 from Utils.myLog import MyLog
@@ -173,6 +173,5 @@ api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 api_script.add_resource(UserController, "/info")
 api_script.add_resource(QueryUserByTag, "/tag/<string:tag>")
-
 api_script.add_resource(AvatarController, "/avatar")
 api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")

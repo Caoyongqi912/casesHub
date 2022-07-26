@@ -20,6 +20,7 @@ class ResponseMsg:
     ERROR = "server error !"
     REQUEST_BODY_ERROR = "request body error !"
     AUTH_ERROR = " auth error No permission !"
+    ERROR_EXCEL = "check ur excel param !"
 
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:

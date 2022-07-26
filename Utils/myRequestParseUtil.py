@@ -77,7 +77,7 @@ class MyRequestParseUtil:
             self.__verify_type(self.body.get(kw["name"]), kw['type'])
 
             if kw.get("choices"):
-                self.__verify_choices(self.body.get(kw["name"]), kw['choices'])
+                self.__verify_choices(self.body.get(kw["name"]), kw['choices'],kw['name'])
             #  校验cls ID
             if kw.get("isExist"):
                 cls = kw.get("isExist")
@@ -130,7 +130,7 @@ class MyRequestParseUtil:
         if not isinstance(target, t):
             raise ParamException(ResponseMsg.error_type(target, t))
 
-    def __verify_choices(self, target: Any, choices: List):
+    def __verify_choices(self, target: Any, choices: List,filedName:AnyStr):
         """
         区间校验
         :param target: 目标值
@@ -139,4 +139,4 @@ class MyRequestParseUtil:
         """
 
         if target not in choices:
-            raise ParamException(ResponseMsg.error_val(target, choices))
+            raise ParamException(ResponseMsg.error_val(filedName, choices))

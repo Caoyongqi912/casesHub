@@ -4,6 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 import json
+import re
 
 
 class Test:
@@ -47,5 +48,7 @@ if __name__ == '__main__':
 
         }
     ]
-    a.sort(key=lambda s:s['step'])
-    print(a)
+    # a.sort(key=lambda s:s['step'])
+    # print(a)
+    t = {'steps': '1.打开baidu.com\n2.录入py\n3.校验内容', 'exp': '1.打开成功\n2.录入成功\n3.校验成功'}
+    print(dict(zip(t.get("steps"), t.get("exp"))))
