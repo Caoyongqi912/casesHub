@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 /* Layout */
-// import Layout from '@/layout'
+import Layout from '@/layout'
 /* Router Modules */
 // import componentsRouter from './modules/components'
 // import chartsRouter from './modules/charts'
@@ -17,18 +17,18 @@ export const constantRoutes = [
     },
     {
         path: '/',
-        component: () => import('@/views/dashboard/index'),
+        component: Layout,
         name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-        // redirect: '/dashboard',
-        // children: [
-        //     {
-        //         path: 'dashboard',
-        //         component: () => import('@/views/dashboard/index'),
-        //         name: 'Dashboard',
-        //         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-        //     }
-        // ]
+        meta: { title: 'Dashboard', icon: 'dashboard', affix: true },
+        redirect: '/dashboard',
+        children: [
+            {
+                path: 'dashboard',
+                component: () => import('@/views/dashboard/index'),
+                name: 'Dashboard',
+                meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+            }
+        ]
     }
 ]
 const createRouter = () => new Router({

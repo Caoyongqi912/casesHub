@@ -84,7 +84,7 @@ class Base(db.Model):
         """
         target = cls.get(kwargs.pop('id'))
         c = [i.name for i in cls.__table__.columns]
-        for k, v in dict(kwargs).items():
+        for k, v in kwargs.items():
             if k in c:
                 setattr(target, k, v)
         target.save()
