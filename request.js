@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { getToken } from '@/utils/auth'
-import store from "@/store"
+import store from "case-vue/src/store"
 import { MessageBox, Message } from 'element-ui'
 
 // axios instance
