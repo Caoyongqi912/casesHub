@@ -24,7 +24,7 @@ def verify_password_or_token(username_or_token: AnyStr, password: AnyStr, ) -> b
     if not user:
         user = User.query.filter(User.username == username_or_token).first()
         if not user or not user.verify_password(password):
-            return False
+            raise AuthException()
     g.user = user
     return True
 

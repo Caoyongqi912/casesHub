@@ -115,6 +115,8 @@ class User(Base):
         res.pop("password")
         return res
 
+
+
     @classmethod
     def login(cls, username: AnyStr, password: AnyStr):
         user = cls.query.filter(User.username == username).first()
