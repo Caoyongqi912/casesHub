@@ -25,7 +25,7 @@ class AddUserTest(unittest.TestCase):
             "phone": f.phone_number(),
             "email": f.email(),
             "gender": random.choices(["MALE", "FEMALE"]),
-            "isAdmin": True,
+            "admin": True,
             "tag": random.choices(["QA", "PR", "DEV"])
 
         }

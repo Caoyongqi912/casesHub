@@ -41,7 +41,7 @@ class Project(Base):
         """
         from flask import g
         target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
-        if not g.user.admin or not g.user.id != target.adminID:
+        if not g.user.isAdmin or not g.user.id != target.adminID:
             raise AuthException()
         return super(Project, Project).update(**kwargs)
 
@@ -87,7 +87,7 @@ class Product(Base):
         """
         from flask import g
         target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
-        if not g.user.admin or not g.user.id != target.adminID:
+        if not g.user.isAdmin or not g.user.id != target.adminID:
             raise AuthException()
 
         return super(Product, Product).update(**kwargs)

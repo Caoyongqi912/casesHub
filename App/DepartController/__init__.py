@@ -7,6 +7,6 @@
 
 from flask import Blueprint
 
-userBP = Blueprint("user", __name__, url_prefix="/v1/api/user")
+userBP = Blueprint("user", __name__, url_prefix="/api/user")
 
 from . import user, department

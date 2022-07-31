@@ -13,8 +13,8 @@ def pageSerialize(func):
     """
 
     @wraps(func)
-    def decorator(cls, page, limit, *args):
-        info = func(cls, page, limit, *args)
+    def decorator(cls, page, limit, by, *args):
+        info = func(cls, page, limit, by, *args)
         results = {
             "items": info.items,
             "pageInfo": {
@@ -57,8 +57,8 @@ def simpleCase(func):
     """
 
     @wraps(func)
-    def d(cls, page, limit, *args):
-        info = func(cls, page, limit, *args)
+    def d(cls, page, limit, by, *args):
+        info = func(cls, page, limit, by, *args)
         results = {
             "items": [{
                 "id": i.id,

@@ -28,13 +28,16 @@ index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
-from typing import List, AnyStr, Dict
+from typing import List, AnyStr, Dict, NoReturn
+
+from flask_sqlalchemy import Pagination
 from sqlalchemy import asc
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
 from Utils.myLog import MyLog
 from Comment.myException import MyException, ParamException
+from Utils.myUid import UUID
 
 log = MyLog.get_log(__file__)
 
@@ -42,22 +45,22 @@ log = MyLog.get_log(__file__)
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid = db.Column(db.String(50), index=True, comment="唯一标识")
     create_time = db.Column(db.Date, default=datetime.now, comment="创建时间")
     update_time = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
-    def save(self):
+    def save(self) -> NoReturn:
         """save"""
         try:
+            self.uid = UUID().getUId
             db.session.add(self)
             db.session.commit()
         except Exception as e:
-            log.error(e)
+            log.error(f"{self.__name__}  [ {e} ]")
             db.session.rollback()
             raise MyException()
 
-
-
-    def delete(self):
+    def delete(self)->NoReturn:
         """delete"""
         try:
             db.session.delete(self)
@@ -68,7 +71,7 @@ class Base(db.Model):
             raise MyException()
 
     @classmethod
-    def delete_by_id(cls, id: int):
+    def delete_by_id(cls, id: int)->NoReturn:
         """
         通过id 删除
         :param id: cls。id
@@ -78,7 +81,7 @@ class Base(db.Model):
         target.delete()
 
     @classmethod
-    def update(cls, **kwargs):
+    def update(cls, **kwargs) -> NoReturn:
         """
         通过kwargs.get('id') 获得实例 修改
         """
@@ -107,7 +110,7 @@ class Base(db.Model):
         return cls.query.get_or_NoFound(ident, name)
 
     @classmethod
-    def verify_unique(cls, **kwargs) -> None:
+    def verify_unique(cls, **kwargs) -> NoReturn:
         """verify_unique by field name"""
         rv = cls.query.filter_by(**kwargs).first()
         if rv:
@@ -118,10 +121,11 @@ class Base(db.Model):
         return {c.name: getattr(obj, c.name, None) for c in obj.__table__.columns}
 
     @classmethod
-    def page(cls, page: AnyStr, limit: AnyStr):
+    def page(cls, **kwargs) -> Pagination:
         """
         :param page: 页
         :param limit: 数量
+        :param by: filed
         :return:
         """
-        return cls.query.my_paginate(page=page, limit=limit)
+        return cls.query.my_paginate(**kwargs)

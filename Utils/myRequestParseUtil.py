@@ -3,7 +3,7 @@
 # @File : myRequestParseUtil.py
 # @Software: PyCharm
 # @Desc:  自定义参数校验
-from typing import AnyStr, Dict, Any, List
+from typing import AnyStr, Dict, Any, List, ClassVar, Union, NoReturn
 
 from flask import request
 from Comment.myResponse import ResponseMsg
@@ -62,6 +62,8 @@ class MyRequestParseUtil:
                 self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
             if kw['name'] == "limit":
                 self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
+            if kw['name'] == "by":
+                self.__verify_by(self.body.get(kw['name']), kw.get("target"))
 
             #  必传
             if kw['required'] is True:
@@ -77,7 +79,7 @@ class MyRequestParseUtil:
             self.__verify_type(self.body.get(kw["name"]), kw['type'])
 
             if kw.get("choices"):
-                self.__verify_choices(self.body.get(kw["name"]), kw['choices'],kw['name'])
+                self.__verify_choices(self.body.get(kw["name"]), kw['choices'], kw['name'])
             #  校验cls ID
             if kw.get("isExist"):
                 cls = kw.get("isExist")
@@ -88,6 +90,17 @@ class MyRequestParseUtil:
                 cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
 
         return self.body
+
+    def __verify_by(self, by: AnyStr, cls: Any):
+        """
+        orderby columns 字段校验 如果不存在 返回None
+        :param by: filed
+        :param cls: entity
+        :return:
+        """
+        columns = [c.name for c in cls.__table__.columns]
+        if by not in columns:
+            return None
 
     def __verify_page(self, page: AnyStr) -> int:
         """
@@ -130,7 +143,7 @@ class MyRequestParseUtil:
         if not isinstance(target, t):
             raise ParamException(ResponseMsg.error_type(target, t))
 
-    def __verify_choices(self, target: Any, choices: List,filedName:AnyStr):
+    def __verify_choices(self, target: Any, choices: List, filedName: AnyStr):
         """
         区间校验
         :param target: 目标值

@@ -9,22 +9,40 @@ from flask import jsonify, g, request, Response
 from flask_restful import Resource, Api
 
 from App import auth
-from App.userController import userBP
+from App.DepartController import userBP
 from Comment.myResponse import MyResponse
 from Utils.myPath import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.UserModel.users import User
+from Models.DepartModel.userModel import User
+from Models.DepartModel.departModel import Department
 from Utils.myLog import MyLog
 from App.myAuth import is_admin
 
 log = MyLog.get_log(__file__)
 
 
-class AddUser(Resource):
+class AddAdmin(Resource):
+
+    def post(self) -> MyResponse:
+        """
+        添加管理员
+        :return: MyResponse
+        :raise: ParamException
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="username", type=str, unique=User, required=True)
+        parse.add(name="password", type=str, unique=User, required=True)
+        parse.add(name="phone", type=str, unique=User, required=True)
+        parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
+        User(**parse.parse_args()).addAdmin()
+        return MyResponse.success()
+
+
+class UserOpt(Resource):
 
     @auth.login_required
     @is_admin
-    def post(self) -> jsonify:
+    def post(self) -> MyResponse:
         """
         管理員添加用戶
         :return: jsonify
@@ -32,10 +50,17 @@ class AddUser(Resource):
         parse = MyRequestParseUtil()
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
-        parse.add(name="password", type=str, required=True)
         parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
-        parse.add(name="tag", type=str, required=True)
-        User(**parse.parse_args()).save()
+        parse.add(name="departmentID", type=int, isExist=Department, required=True)
+        User(**parse.parse_args()).addUser()
+        return MyResponse.success()
+
+    @auth.login_required
+    @is_admin
+    def delete(self) -> MyResponse:
+        parse = MyRequestParseUtil()
+        parse.add(name="id", type=str, required=True)
+        User.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 
@@ -62,7 +87,9 @@ class QueryUserController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        res = User.page(**parse.parse_args())
+        parse.add(name="by", target=User, required=False)
+        info = parse.parse_args()
+        res = User.page(**info)
         return MyResponse.success(res)
 
 
@@ -98,7 +125,8 @@ class UserController(Resource):
         :return: MyResponse
         """
         from flask import g
-        return MyResponse.success(User.get(g.user.id))
+
+        return MyResponse.success(User.get(**{"ident": g.user.id}))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -149,10 +177,19 @@ class GetAvatarController(Resource):
         return Response(avatar, mimetype="image/jpeg")
 
 
-class SetUserInfo(Resource):
+class SetPassword(Resource):
 
-    def post(self):
-        pass
+    @auth.login_required
+    def post(self) -> MyResponse:
+        """
+        用户修改密码
+        :return: MyResponse
+        """
+        user = g.user
+        parse = MyRequestParseUtil()
+        parse.add(name="password", type=str, required=True)
+        user.hash_password(**parse.parse_args()).save()
+        return MyResponse.success()
 
 
 class QueryUserByTag(Resource):
@@ -167,11 +204,16 @@ class QueryUserByTag(Resource):
 
 
 api_script = Api(userBP)
-api_script.add_resource(AddUser, "/")
+# api_script.add_resource(AddAdmin, "/admin")
+api_script.add_resource(UserOpt, "/opt")
+api_script.add_resource(SetPassword, "/setpassword")
+
 api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
+
 api_script.add_resource(UserController, "/info")
 api_script.add_resource(QueryUserByTag, "/tag/<string:tag>")
+
 api_script.add_resource(AvatarController, "/avatar")
 api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")

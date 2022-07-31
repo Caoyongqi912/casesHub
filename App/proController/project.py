@@ -21,7 +21,7 @@ class ProjectController(Resource):
         添加项目
         :return: MyResponse
         """
-        from Models.UserModel.users import User
+        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Project, required=True)
         parse.add(name="desc", type=str, required=False)
@@ -47,7 +47,7 @@ class ProjectController(Resource):
         维护
         :return: MyResponse
         """
-        from Models.UserModel.users import User
+        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)

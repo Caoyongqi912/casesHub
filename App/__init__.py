@@ -37,13 +37,13 @@ def create_app(configName: AnyStr = "default") -> Flask:
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
-    from .userController import userBP
+    from .DepartController import userBP
     app.register_blueprint(userBP)
-
-    from .proController import proBP
-    app.register_blueprint(proBP)
-    from .caseController import caseBP
-    app.register_blueprint(caseBP)
-    from .platformController import platformBP
-    app.register_blueprint(platformBP)
+    #
+    # from .proController import proBP
+    # app.register_blueprint(proBP)
+    # from .caseController import caseBP
+    # app.register_blueprint(caseBP)
+    # from .platformController import platformBP
+    # app.register_blueprint(platformBP)
     return app

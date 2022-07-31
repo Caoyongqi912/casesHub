@@ -6,11 +6,11 @@
 
 from flask_restful import Resource, Api
 from App import auth
-from App.userController import userBP
+from App.DepartController import userBP
 from App.myAuth import is_admin
 from Comment.myResponse import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.UserModel.departments import Department
+from Models.DepartModel.departModel import Department
 
 
 class DepartmentController(Resource):
@@ -22,7 +22,7 @@ class DepartmentController(Resource):
         添加一个部门
         :return: MyResponse
         """
-        from Models.UserModel.users import User
+        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Department, required=True)
         parse.add(name="desc", type=str, required=False)
@@ -33,11 +33,10 @@ class DepartmentController(Resource):
     @auth.login_required
     def put(self) -> MyResponse:
         """
-
         更新部门
         :return:MyResponse
         """
-        from Models.UserModel.users import User
+        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)

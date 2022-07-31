@@ -3,7 +3,7 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc: MyBaseQuery
-from typing import Any, AnyStr
+from typing import Any, AnyStr, ClassVar
 
 from flask_sqlalchemy import BaseQuery, Pagination
 from Comment.myException import ParamException
@@ -26,7 +26,7 @@ class MyBaseQuery(BaseQuery):
     #     kwargs.setdefault('status', 1)
     #     return super().filter_by(**kwargs)
 
-    def get_or_NoFound(self, ident, name) -> Any:
+    def get_or_NoFound(self, ident, name):
         """
         get self by id
         :param ident: id
@@ -41,15 +41,16 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, page: AnyStr, limit: AnyStr) -> Pagination:
+    def my_paginate(self, page: AnyStr, limit: AnyStr, by: AnyStr = None) -> Pagination:
         """
         paginate
+        :param by: order_by
         :param page:  page
         :param limit: limit
         :return: Pagination
         """
         page = int(page)
         limit = int(limit)
-        items = self.limit(limit).offset((page - 1) * limit).all()
-        total = self.order_by(None).count()
+        items = self.order_by(by).limit(limit).offset((page - 1) * limit).all()
+        total = self.order_by(by).count()
         return Pagination(self, page, limit, total, items)

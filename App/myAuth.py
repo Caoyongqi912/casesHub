@@ -8,7 +8,7 @@ from typing import AnyStr
 from flask import g
 from App import auth
 from Comment.myException import AuthException
-from Models.UserModel.users import User
+from Models.DepartModel.userModel import User
 
 
 @auth.verify_password
@@ -34,7 +34,7 @@ def is_admin(func):
 
     @wraps(func)
     def wrap_func(*args, **kwargs):
-        if not g.user.admin:
+        if not g.user.isAdmin:
             raise AuthException()
         return func(*args, **kwargs)
 
@@ -53,7 +53,7 @@ def is_DepartAdmin(func):
         print(args)
         print(kwargs)
         uid = g.user.id
-        if g.user.admin:
+        if g.user.isAdmin:
             pass
 
         return func(*args, **kwargs)
