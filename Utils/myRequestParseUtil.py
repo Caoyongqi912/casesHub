@@ -38,8 +38,6 @@ class MyRequestParseUtil:
         :param kwargs: choices
         :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
         :param kwargs: unique  put 不要添加
-
-
         """
         # 默认类型为字符
         if not kwargs.get("type"):

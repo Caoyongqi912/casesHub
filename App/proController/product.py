@@ -18,18 +18,16 @@ from Models.ProjectModel.pro import Project, Product
 class ProductController(Resource):
 
     @auth.login_required
-    @is_admin
     def post(self) -> MyResponse:
         """
         添加产品
+        ADMIN or ProjectAdmin 可添加
         :return: MyResponse
         """
-        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Product, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="projectID", type=int, isExist=Project, required=True)
-        parse.add(name="adminID", type=int, isExist=User, required=True)
         Product(**parse.parse_args()).save()
         return MyResponse.success()
 
@@ -42,6 +40,7 @@ class ProductController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
+        parse.add(name="by", target=Product, required=False)
         res = Product.page(**parse.parse_args())
         return MyResponse.success(res)
 
@@ -51,12 +50,10 @@ class ProductController(Resource):
         维护
         :return: MyResponse
         """
-        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
+        parse.add(name="id", type=int, isExist=Product, required=True)
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, isExist=User, required=False)
         Product.update(**parse.parse_args())
         return MyResponse.success()
 
@@ -64,11 +61,12 @@ class ProductController(Resource):
     def delete(self):
         """
         删除
+        考虑是否删除 产品下所有 信息 [cases,version .....]
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
-        Product.delete_by_id(parse.parse_args().get("id"))
+        Product.delete(**parse.parse_args().get("id"))
         return MyResponse.success()
 
 
@@ -84,6 +82,7 @@ class QueryCaseController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
+        parse.add(name="by", target=Product, required=False)
         res = Product.get(productID, "productID").page_case(**parse.parse_args())
         return MyResponse.success(res)
 

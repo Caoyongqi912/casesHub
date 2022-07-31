@@ -13,8 +13,8 @@ def pageSerialize(func):
     """
 
     @wraps(func)
-    def decorator(cls, page, limit, by, *args):
-        info = func(cls, page, limit, by, *args)
+    def decorator(cls, page, limit, *args, **kwargs):
+        info = func(cls, page, limit, *args, **kwargs)
         results = {
             "items": info.items,
             "pageInfo": {

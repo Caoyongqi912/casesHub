@@ -13,8 +13,7 @@ from App.DepartController import userBP
 from Comment.myResponse import MyResponse
 from Utils.myPath import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.DepartModel.userModel import User
-from Models.DepartModel.departModel import Department
+from Models.DepartModel import User, Department
 from Utils.myLog import MyLog
 from App.myAuth import is_admin
 

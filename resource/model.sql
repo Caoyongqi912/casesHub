@@ -47,3 +47,42 @@ VALUES ('4e111a28-e68c-429c-95f6-2f7370a4fbdd', '2022-07-31', '2022-07-31', 'ADM
         'ADMIN@caseHub.com', null, TRUE, 'MALE', 1, 'ADMIN')
 
 
+
+CREATE TABLE project
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    name        VARCHAR(20) COMMENT '项目名称',
+    `desc`      VARCHAR(100) COMMENT '项目描述',
+    `adminID`   INTEGER COMMENT '项目负责人',
+    PRIMARY KEY (id),
+    UNIQUE (name)
+);
+INSERT INTO project (id, uid, create_time, update_time, name, `desc`, `adminID`)
+VALUES (1, 'MuLaJydzZlrSPPGSENEa', 2022 - 07 - 31, 2022 - 07 - 31, 'P1', 'xxxxxxxxxxxxxxxxxxxxxxx', 1);
+
+
+CREATE TABLE product
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    name        VARCHAR(20) COMMENT '产品名称',
+    `desc`      VARCHAR(100) COMMENT '产品描述',
+    `adminID`   INTEGER COMMENT '产品负责人',
+    `projectID` INTEGER NOT NULL COMMENT '所属项目',
+    PRIMARY KEY (id),
+    UNIQUE (name),
+    FOREIGN KEY (`projectID`) REFERENCES project (id)
+);
+
+CREATE TABLE product_user
+(
+    `productID` INTEGER,
+    `userID`    INTEGER,
+    FOREIGN KEY (`productID`) REFERENCES product (id),
+    FOREIGN KEY (`userID`) REFERENCES user (id)
+);
