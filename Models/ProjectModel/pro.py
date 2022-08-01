@@ -43,12 +43,23 @@ class Project(Base):
             raise AuthException()
         return super(Project, Project).update(**kwargs)
 
-    def page_product(self, **kwargs) -> List:
-        return self.products.all()
-        # return super(Product, self.products).page(**kwargs)
+    def page_product(self, **kwargs) -> Pagination:
+        """
+        所属产品分页
+        :return: Pagination
+        """
+        return self.products.my_paginate(**kwargs)
 
     def __repr__(self):
         return f"<{Project.__name__} {self.name}>"
+
+
+productUsers = db.Table(
+    "product_user",
+    db.Column("productID", db.INTEGER, db.ForeignKey("product.id"), primary_key=True),
+    db.Column("userID", db.INTEGER, db.ForeignKey("user.id"), primary_key=True)
+
+)
 
 
 class Product(Base):
@@ -57,16 +68,26 @@ class Product(Base):
     desc = db.Column(db.String(100), nullable=True, comment="产品描述")
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=False, comment="所属项目")
 
-    # users = db.relationship("User", backref="user", lazy="dynamic")
+    # 用户跟产品是 多对多 绑定
+    users = db.relationship("User", backref="products", lazy="dynamic", secondary=productUsers)
+    # 版本跟产品是 多对一 关系
+    versions = db.relationship("Version", backref="product", lazy="dynamic")
+
     # cases = db.relationship("Cases", backref="case", lazy="dynamic")
     # parts = db.relationship("CasePart", backref='product_part', lazy="dynamic")
-    # versions = db.relationship("Version", backref="version", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr,
                  projectID: int):
         self.name = name
         self.desc = desc
         self.projectID = projectID
+
+    @property
+    def query_version(self) -> List:
+        """
+        :return: versions
+        """
+        return self.versions.all()
 
     @property
     def getParts(self):
@@ -110,47 +131,27 @@ class Product(Base):
         :return:
         """
         from flask import g
-        target = cls.get(kwargs.get('id'))
+        target = cls.get(kwargs.get('id'), "id")
         ProjectAdmin = Project.get(target.projectID).adminID
         if not g.user.isAdmin and not g.user.id == ProjectAdmin:
             raise AuthException()
-        return super(Product, target).delete_by_id(**kwargs)
+        return super(Product, target).delete()
 
     @simpleCase
-    def page_case(self, page: AnyStr, limit: AnyStr) -> Pagination:
+    def page_case(self, **kwargs) -> Pagination:
         """
         查询用例分页
         :param limit: limit
         :param page: page
         :return:Pagination
         """
-        limit = int(limit)
-        page = int(page)
-        items = self.cases.limit(limit).offset((page - 1) * limit).all()
-        total = self.cases.order_by(None).count()
-        return Pagination(self, page, limit, total, items)
+        pass
 
-    @pageSerialize
-    def page_version(self, page: AnyStr, limit: AnyStr):
+    def page_version(self, **kwargs) -> Pagination:
         """
         查询版本分页
-        :param limit: limit
-        :param page: page
-        :return:Pagination
         """
-        limit = int(limit)
-        page = int(page)
-        items = self.versions.limit(limit).offset((page - 1) * limit).all()
-        total = self.versions.order_by(None).count()
-        return Pagination(self, page, limit, total, items)
+        return self.versions.my_paginate(**kwargs)
 
     def __repr__(self):
         return f"<{Product.__name__} {self.name}>"
-
-
-productUsers = db.Table(
-    "product_user",
-    db.Column("productID", db.INTEGER, db.ForeignKey("product.id")),
-    db.Column("userID", db.INTEGER, db.ForeignKey("user.id")),
-
-)

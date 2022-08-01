@@ -55,13 +55,7 @@ class MyRequestParseUtil:
 
         self.body = dict(self.body)
         for kw in self.args:
-            # 分页数据
-            if kw["name"] == "page":
-                self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
-            if kw['name'] == "limit":
-                self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
-            if kw['name'] == "by":
-                self.__verify_by(self.body.get(kw['name']), kw.get("target"))
+
 
             #  必传
             if kw['required'] is True:
@@ -87,6 +81,13 @@ class MyRequestParseUtil:
                 cls = kw.get("unique")
                 cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
 
+            # 分页数据
+            if kw["name"] == "page":
+                self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
+            if kw['name'] == "limit":
+                self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
+            if kw['name'] == "by":
+                self.__verify_by(self.body.get(kw['name']), kw.get("target"))
         return self.body
 
     def __verify_by(self, by: AnyStr, cls: Any):
@@ -109,7 +110,7 @@ class MyRequestParseUtil:
         """
         if int(page) < 1:
             raise ParamException(ResponseMsg.error_param("page", "must > 0"))
-        return page
+        return int(page)
 
     def __verify_limit(self, limit: AnyStr) -> int:
         """
@@ -119,7 +120,7 @@ class MyRequestParseUtil:
         """
         if int(limit) < 0:
             raise ParamException(ResponseMsg.error_param("limit", "must > 0"))
-        return limit
+        return int(limit)
 
     def __verify_empty(self, target: AnyStr, filed: AnyStr):
         """

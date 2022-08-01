@@ -18,10 +18,15 @@ class VersionController(Resource):
 
     @auth.login_required
     def post(self) -> MyResponse:
+        """
+        新建版本
+        不打算做权限校验
+        :return:
+        """
         parse = MyRequestParseUtil()
-        parse.add(name='name', required=True, unique=Version, type=str)
-        parse.add(name="desc", required=False, type=str)
+        parse.add(name='name', required=True, type=str)
         parse.add(name="productID", required=True, type=int, isExist=Product)
+        parse.add(name="desc", required=False, type=str)
         Version(**parse.parse_args()).save()
         return MyResponse.success()
 

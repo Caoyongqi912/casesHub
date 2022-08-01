@@ -10,7 +10,7 @@ from typing import AnyStr, Any, List
 class ResponseCode:
     DATA = None
     SUCCESS = 0
-    SERVER_ERROR = 100
+    SERVER_ERROR = 500
     PARAMS_ERROR = 1000
     AUTH_ERROR = 2000
     NOT_FOUND = 404
@@ -20,7 +20,7 @@ class ResponseMsg:
     OK = "ok !"
     ERROR = "server error !"
     REQUEST_BODY_ERROR = "request body error !"
-    AUTH_ERROR = " auth error No permission !"
+    AUTH_ERROR = "auth error No permission !"
     ERROR_EXCEL = "check ur excel param !"
     NOT_FOUND = "not found"
 

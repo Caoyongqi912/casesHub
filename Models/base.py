@@ -28,6 +28,22 @@ index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
+
+
+"""
+关系表参数
+
+ondelete: 级联删除
+CASCADE 级联删除、 SET NULL 只有父表被删除，子表修改为NULL 、 RESTRICT 阻止删除数据
+比如
+productID = db.Column(db.INTEGER, db.ForeignKey("product.id",ondelete="CASCADE"), comment="所属产品")
+
+lazy: ->relationship
+懒加载 、 获取对象而非列表
+比如
+versions = db.relationship("Version", backref="product", lazy="dynamic")
+
+"""
 from typing import List, AnyStr, Dict, NoReturn
 
 from flask_sqlalchemy import Pagination
@@ -60,7 +76,7 @@ class Base(db.Model):
             db.session.rollback()
             raise MyException()
 
-    def delete(self)->NoReturn:
+    def delete(self) -> NoReturn:
         """delete"""
         try:
             db.session.delete(self)
@@ -71,7 +87,7 @@ class Base(db.Model):
             raise MyException()
 
     @classmethod
-    def delete_by_id(cls, id: int)->NoReturn:
+    def delete_by_id(cls, id: int) -> NoReturn:
         """
         通过id 删除
         :param id: cls。id

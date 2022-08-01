@@ -3,7 +3,6 @@
 # @File : project.py 
 # @Software: PyCharm
 # @Desc: 项目view
-from typing import AnyStr
 
 from flask_restful import Resource, Api
 from App.proController import proBP
@@ -72,17 +71,22 @@ class ProjectController(Resource):
 
 class QueryProductController(Resource):
     @auth.login_required
-    def get(self, projectID: AnyStr) -> MyResponse:
+    def get(self, projectID: Project.id) -> MyResponse:
+        """
+        查询产品列表 分页
+        :param projectID: Project.id
+        :return:
+        """
         from Models.ProjectModel import Product
-
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
         parse.add(name="by", target=Product, required=False)
-        info = Project.get(projectID, "projectID").page_product(**parse.parse_args())
+        info = parse.parse_args()
+        info = Project.get(projectID, "projectID").page_product(**info)
         return MyResponse.success(info)
 
 
 api_script = Api(proBP)
-api_script.add_resource(ProjectController, "/project")
-api_script.add_resource(QueryProductController, "/<string:projectID>/product/page")
+api_script.add_resource(ProjectController, "/project/opt")
+api_script.add_resource(QueryProductController, "/project/<string:projectID>/page_product")

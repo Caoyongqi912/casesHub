@@ -10,6 +10,8 @@ from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+
+from Comment.myException import MyException
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils.myJsonSerialize import JSONEncoder
@@ -37,10 +39,13 @@ def create_app(configName: AnyStr = "default") -> Flask:
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
+
     from .DepartController import userBP
     app.register_blueprint(userBP)
+
     from .proController import proBP
     app.register_blueprint(proBP)
+
     # from .caseController import caseBP
     # app.register_blueprint(caseBP)
     # from .platformController import platformBP

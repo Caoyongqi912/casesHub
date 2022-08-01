@@ -4,7 +4,9 @@
 # @Software: PyCharm
 # @Desc: 返回自定义
 from typing import Any
+
 from flask import jsonify
+
 from Enums.errorCode import ResponseCode, ResponseMsg
 
 
@@ -30,16 +32,16 @@ class MyResponse:
 class ParamError:
 
     @staticmethod
-    def error(msg: ResponseMsg) -> make_response:
-        return make_response(ResponseCode.PARAMS_ERROR, None, msg)
+    def error(msg: ResponseMsg) -> dict:
+        return {"code": ResponseCode.PARAMS_ERROR, "data": None, "msg": msg}
 
 
 class AuthError:
 
     @staticmethod
-    def error() -> make_response:
-        return make_response(ResponseCode.AUTH_ERROR, None, ResponseMsg.AUTH_ERROR)
+    def error() -> dict:
+        return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseMsg.AUTH_ERROR}
 
 
 if __name__ == '__main__':
-    print(MyResponse.success())
+    print(AuthError.error())

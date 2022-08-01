@@ -86,3 +86,15 @@ CREATE TABLE product_user
     FOREIGN KEY (`productID`) REFERENCES product (id),
     FOREIGN KEY (`userID`) REFERENCES user (id)
 );
+
+CREATE TABLE version (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	uid VARCHAR(50) COMMENT '唯一标识',
+	create_time DATE COMMENT '创建时间',
+	update_time DATE COMMENT '修改时间',
+	name VARCHAR(20) COMMENT '版本名称',
+	`desc` VARCHAR(100) COMMENT '版本描述',
+	`productID` INTEGER COMMENT '所属产品',
+	PRIMARY KEY (id),
+	FOREIGN KEY(`productID`) REFERENCES product (id) ON DELETE CASCADE
+)

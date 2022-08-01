@@ -49,8 +49,6 @@ class MyBaseQuery(BaseQuery):
         :param limit: limit
         :return: Pagination
         """
-        page = int(page)
-        limit = int(limit)
         items = self.order_by(by).limit(limit).offset((page - 1) * limit).all()
         total = self.order_by(by).count()
         return Pagination(self, page, limit, total, items)

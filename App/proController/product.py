@@ -8,7 +8,6 @@ from typing import AnyStr
 from flask_restful import Resource, Api
 
 from App import auth
-from App.myAuth import is_admin
 from App.proController import proBP
 from Comment.myResponse import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -23,6 +22,7 @@ class ProductController(Resource):
         添加产品
         ADMIN or ProjectAdmin 可添加
         :return: MyResponse
+        :raise ParamException | AuthException
         """
         parse = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Product, required=True)
@@ -32,11 +32,12 @@ class ProductController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    def get(self):
+    def get(self) -> MyResponse:
         """
-         分页查询
-         :return:
-         """
+        分页查询
+        :return:MyResponse
+        :raise ParamException | AuthException
+        """
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
@@ -49,6 +50,7 @@ class ProductController(Resource):
         """
         维护
         :return: MyResponse
+        :raise ParamException | AuthException
         """
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, isExist=Product, required=True)
@@ -66,7 +68,7 @@ class ProductController(Resource):
         """
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
-        Product.delete(**parse.parse_args().get("id"))
+        Product.delete(**parse.parse_args())
         return MyResponse.success()
 
 
@@ -96,14 +98,16 @@ class QueryVersionController(Resource):
         :param productID: 产品ID
         :return: MyResponse
         """
+        from Models.ProjectModel.versions import Version
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
+        parse.add(name="by", target=Version, required=False)
         res = Product.get(productID, "productID").page_version(**parse.parse_args())
         return MyResponse.success(res)
 
 
 api_script = Api(proBP)
-api_script.add_resource(ProductController, "/product")
-api_script.add_resource(QueryCaseController, "/<string:productID>/cases")
-api_script.add_resource(QueryVersionController, "/<string:productID>/versions")
+api_script.add_resource(ProductController, "/product/opt")
+api_script.add_resource(QueryCaseController, "/product/<string:productID>/page_cases")
+api_script.add_resource(QueryVersionController, "/product/<string:productID>/page_versions")
