@@ -39,11 +39,14 @@ def create_app(configName: AnyStr = "default") -> Flask:
     CORS(app, supports_credentials=True)
     from .DepartController import userBP
     app.register_blueprint(userBP)
-    #
     from .proController import proBP
     app.register_blueprint(proBP)
     # from .caseController import caseBP
     # app.register_blueprint(caseBP)
     # from .platformController import platformBP
     # app.register_blueprint(platformBP)
+
+    from .reqhook import logWrite, resp
+    app.before_request(logWrite)
+    app.after_request(resp)
     return app

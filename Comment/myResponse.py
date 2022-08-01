@@ -3,34 +3,42 @@
 # @File : myResponse.py
 # @Software: PyCharm
 # @Desc: 返回自定义
-from typing import Any, AnyStr, Dict
+from typing import Any
 from flask import jsonify
 from Enums.errorCode import ResponseCode, ResponseMsg
+
+
+def make_response(code: ResponseCode, data: Any, msg: ResponseMsg) -> jsonify:
+    return jsonify({"code": code, "data": data, "msg": msg})
 
 
 class MyResponse:
 
     @staticmethod
-    def success(data: Any = None) -> jsonify:
-        return jsonify({"code": ResponseCode.SUCCESS, "data": data, "msg": ResponseMsg.OK})
+    def success(data: Any = None) -> make_response:
+        return make_response(ResponseCode.SUCCESS, data, ResponseMsg.OK)
 
     @staticmethod
-    def error(code: ResponseCode) -> Dict:
-        return {"code": code, "data": None, "msg": ResponseMsg.ERROR}
+    def error(code: ResponseCode) -> make_response:
+        return make_response(code, None, ResponseMsg.ERROR)
+
+    @staticmethod
+    def not_find() -> make_response:
+        return make_response(ResponseCode.NOT_FOUND, None, ResponseMsg.NOT_FOUND)
 
 
 class ParamError:
 
     @staticmethod
-    def error(msg: AnyStr) -> Dict:
-        return {"code": ResponseCode.PARAMS_ERROR, "data": None, "msg": msg}
+    def error(msg: ResponseMsg) -> make_response:
+        return make_response(ResponseCode.PARAMS_ERROR, None, msg)
 
 
 class AuthError:
 
     @staticmethod
-    def error() -> Dict:
-        return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseMsg.AUTH_ERROR}
+    def error() -> make_response:
+        return make_response(ResponseCode.AUTH_ERROR, None, ResponseMsg.AUTH_ERROR)
 
 
 if __name__ == '__main__':

@@ -11,9 +11,9 @@ CREATE TABLE department
     UNIQUE (name)
 );
 INSERT INTO department (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (1, 'sWyPruqCGakgjwedMItN', 2022 - 07 - 31, 2022 - 07 - 31, 'QA', 'QA team', 1);
+VALUES (1, 'sWyPruqCGakgjwedMItN', '2022-07-31', '2022-07-31', 'QA', 'QA team', 1);
 INSERT INTO department (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (2, 'mUAFYnxNHKolWUcMziui', 2022 - 07 - 31, 2022 - 07 - 31, 'DEV', 'DEV team', 1);
+VALUES (2, 'mUAFYnxNHKolWUcMziui', '2022-07-31', '2022-07-31', 'DEV', 'DEV team', 1);
 
 
 
@@ -44,7 +44,7 @@ INSERT INTO user (uid, create_time, update_time, username, phone, password, emai
                   `departmentID`)
 VALUES ('4e111a28-e68c-429c-95f6-2f7370a4fbdd', '2022-07-31', '2022-07-31', 'ADMIN', '17612395915',
         'pbkdf2:sha256:260000$7dfUoYrnI6Ko3mDu$0c86e80f77259c2b6589c36e6f63ce323ecc28a96f05f72814406b4d5e1bb4e4',
-        'ADMIN@caseHub.com', null, TRUE, 'MALE', 1, 'ADMIN')
+        'ADMIN@caseHub.com', 'MALE', null, TRUE, 1, null);
 
 
 
@@ -61,7 +61,7 @@ CREATE TABLE project
     UNIQUE (name)
 );
 INSERT INTO project (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (1, 'MuLaJydzZlrSPPGSENEa', 2022 - 07 - 31, 2022 - 07 - 31, 'P1', 'xxxxxxxxxxxxxxxxxxxxxxx', 1);
+VALUES (1, 'MuLaJydzZlrSPPGSENEa', '2022-07-31', '2022-07-31', 'P1', 'xxxxxxxxxxxxxxxxxxxxxxx', 1);
 
 
 CREATE TABLE product

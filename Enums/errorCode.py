@@ -13,6 +13,7 @@ class ResponseCode:
     SERVER_ERROR = 100
     PARAMS_ERROR = 1000
     AUTH_ERROR = 2000
+    NOT_FOUND = 404
 
 
 class ResponseMsg:
@@ -21,6 +22,7 @@ class ResponseMsg:
     REQUEST_BODY_ERROR = "request body error !"
     AUTH_ERROR = " auth error No permission !"
     ERROR_EXCEL = "check ur excel param !"
+    NOT_FOUND = "not found"
 
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:
