@@ -13,9 +13,10 @@ from App import db
 class Platform(Base):
     __tablename__ = "platform"
 
-    name = db.Column(db.String(20), unique=True, comment="平台名称")
+    name = db.Column(db.Enum("IOS", "ANDROID", "WEB", "PC"), comment="平台名称")
     desc = db.Column(db.String(100), nullable=True, comment="平台描述")
+    cases = db.relationship("Cases", backref="platform", lazy="dynamic")
 
-    def __init__(self, name: AnyStr, desc: AnyStr=None):
+    def __init__(self, name: AnyStr, desc: AnyStr = None):
         self.name = name
         self.desc = desc

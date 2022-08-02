@@ -22,6 +22,8 @@ class Version(Base):
     name = db.Column(db.String(20), comment="版本名称")
     desc = db.Column(db.String(100), nullable=True, comment="版本描述")
     productID = db.Column(db.INTEGER, db.ForeignKey("product.id", ondelete="CASCADE"), comment="所属产品")
+    # prd = db.Column(db.String(200), nullable=False, comment="需求链接")
+    bugs = db.relationship("Bug", backref='version', lazy="dynamic")
 
     def __init__(self, name: AnyStr, productID: int, desc: AnyStr = None):
         self.name = name

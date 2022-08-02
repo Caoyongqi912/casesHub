@@ -72,9 +72,8 @@ class Product(Base):
     users = db.relationship("User", backref="products", lazy="dynamic", secondary=productUsers)
     # 版本跟产品是 多对一 关系
     versions = db.relationship("Version", backref="product", lazy="dynamic")
-
-    # cases = db.relationship("Cases", backref="case", lazy="dynamic")
-    # parts = db.relationship("CasePart", backref='product_part', lazy="dynamic")
+    # 用例 与 产品为一对多关系
+    cases = db.relationship("Cases", backref="product", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr,
                  projectID: int):

@@ -26,7 +26,6 @@ class PlatformController(Resource):
         Platform(**parse.parse_args()).save()
         return MyResponse.success()
 
-
     @auth.login_required
     def get(self) -> MyResponse:
         """
@@ -37,4 +36,4 @@ class PlatformController(Resource):
 
 
 api_script = Api(platformBP)
-api_script.add_resource(PlatformController, "")
+api_script.add_resource(PlatformController, "/opt")
