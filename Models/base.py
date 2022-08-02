@@ -43,6 +43,18 @@ lazy: ->relationship
 比如
 versions = db.relationship("Version", backref="product", lazy="dynamic")
 
+cascade: ->relationship
+save-update：在添加一条数据的时候，会把其他和它相关联的数据都添加到数据库中
+delete:表示当删除某一个模型中的数据的时候，是否也删除掉使用relationship和它关联的数据。
+delete-orphan:表示当对一个ORM对象解除了父表中的关联对象的时候，自己便会被删除掉。
+当然如果表中的数据被删除，自己也会被删除。这个选项只能用在一对多上，不能用在多对多以及多对一上。
+并且还需要在子模型中的relationship中，增加一个single_parent=True的参数。
+merge:默认选项。当在使用session.merge，合并一个对象的时候，会将使用了relationship相关联的对象也进行merge操作
+expunge:移除操作的时候，会将相关联的对象也进行移除。这个操作只是从session中移除，并不会真正的从数据库中删除。
+all:是对save-update，merge，refresh-expire，expunge，delete几种的填写
+比如
+articles = relationship("Article",cascade="save-update,delete")
+
 """
 from typing import List, AnyStr, Dict, NoReturn
 

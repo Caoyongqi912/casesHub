@@ -6,6 +6,6 @@
 
 from flask import Blueprint
 
-platformBP = Blueprint("platform", __name__, url_prefix="/v1/api/platform")
+platformBP = Blueprint("platform", __name__, url_prefix="/api/platform")
 
 from . import platform

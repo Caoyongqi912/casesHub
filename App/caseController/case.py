@@ -10,14 +10,11 @@ from flask import request, g
 from flask_restful import Resource, Api
 
 from App import auth
-from Comment.myResponse import MyResponse, ParamError
+from Comment import MyResponse, ParamError
 from App.caseController import caseBP
-from Enums.errorCode import ResponseMsg, ResponseCode
-from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.CaseModel.cases import Cases, CasePart
-from Models.ProjectModel.pro import Product
-from Models.ProjectModel.versions import Version
-from Models.CaseModel.platforms import Platform
+from Enums.errorCode import ResponseMsg
+from Utils import MyRequestParseUtil
+from Models import Product, Platform, Version, Cases, CasePart
 
 
 class CasePartController(Resource):
@@ -78,18 +75,15 @@ class NewCaseController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="part", type=str, required=True)
-        parse.add(name="title", type=str, required=True, unique=Cases)
+        parse.add(name="title", type=str, required=True)
+        parse.add(name="tag", type=str, choices=['常规', '冒烟'], default="常规", required=False)
         parse.add(name="desc", type=str, required=True)
         parse.add(name="case_level", type=str, choices=["P1", "P2", "P3", "P4"], required=True)
-        parse.add(name="status", type=str, choices=["QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"],
-                  required=True)
-        parse.add(name="platform", type=str, choices=["IOS", "ANDROID", "WEB", "PC", "APP"], required=True)
-        parse.add(name="case_type", type=str, choices=["功能", "接口", "性能"], required=False)
-        parse.add(name="prd", type=str, required=True)
+        parse.add(name="case_type", type=str, choices=["功能", "接口", "性能"], default="功能", required=False)
+        parse.add(name="platformID", type=int, target=Platform, required=True)
         parse.add(name="productID", type=int, isExist=Product, required=True)
-        parse.add(name="versionID", type=int, isExist=Version, required=True)
-        parse.add(name="steps", type=list, required=True)
+        parse.add(name="partID", type=int, isExist=CasePart, required=True)
+        parse.add(name="info", type=list, required=True)
         Cases(**parse.parse_args()).save()
         return MyResponse.success()
 
@@ -123,7 +117,7 @@ class NewCaseController(Resource):
         """
         parse = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True, isExist=Cases)
-        Cases.delete_by_id(parse.parse_args().get("id"))
+        Cases.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 
@@ -176,7 +170,7 @@ class ExcelPut(Resource):
 
 
 api_script = Api(caseBP)
-api_script.add_resource(NewCaseController, "")
+api_script.add_resource(NewCaseController, "/opt")
 api_script.add_resource(FindCase, "/<string:caseID>")
 api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
 api_script.add_resource(ExcelPut, "/upload/excel")

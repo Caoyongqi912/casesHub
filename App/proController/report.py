@@ -8,9 +8,9 @@ from flask_restful import Resource, Api
 
 from App import auth
 from App.proController import proBP
-from Comment.myResponse import MyResponse
-from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.ProjectModel.reports import Report
+from Comment import MyResponse
+from Utils import MyRequestParseUtil
+from Models import Report
 
 
 class ReportController(Resource):

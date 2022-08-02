@@ -6,13 +6,12 @@
 
 from typing import AnyStr, NoReturn
 
-from Comment.myException import ParamException
-from Comment.myResponse import ParamError
-from Enums.errorCode import ResponseMsg
-from Models.ProjectModel import Product
+from Comment import ParamException
+from Enums import ResponseMsg
+from Models import Product
 from Models.base import Base
 from App import db
-from Utils.myLog import MyLog
+from Utils import MyLog
 
 log = MyLog.get_log(__file__)
 

@@ -8,9 +8,9 @@ from flask_restful import Resource, Api
 from App.proController import proBP
 from App import auth
 from App.myAuth import is_admin
-from Comment.myResponse import MyResponse
-from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.ProjectModel import Project
+from Comment import MyResponse
+from Utils import MyRequestParseUtil
+from Models import Project
 
 
 class ProjectController(Resource):

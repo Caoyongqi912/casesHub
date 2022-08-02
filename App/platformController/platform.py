@@ -6,10 +6,10 @@
 from flask_restful import Resource, Api
 
 from App import auth
-from Comment.myResponse import MyResponse
+from Comment import MyResponse
 from App.platformController import platformBP
-from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.CaseModel.platforms import Platform
+from Utils import MyRequestParseUtil
+from Models import Platform
 
 
 class PlatformController(Resource):
@@ -21,8 +21,7 @@ class PlatformController(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="name", required=True, type=str, unique=Platform)
-        parse.add(name="desc", required=False, type=str)
+        parse.add(name="name", required=True, type=str)
         Platform(**parse.parse_args()).save()
         return MyResponse.success()
 

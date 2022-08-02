@@ -1,9 +1,7 @@
 from typing import Union, NoReturn
-from flask import request, Response, jsonify
-
-from Comment.myResponse import MyResponse, AuthError
-from Enums.errorCode import ResponseCode
-from Utils.myLog import MyLog
+from flask import request, Response
+from Comment import MyResponse
+from Utils import MyLog
 
 log = MyLog().get_log(__file__)
 

@@ -5,14 +5,11 @@
 # @Desc: 用例实体
 import json
 from typing import AnyStr, Dict, List, Any
-from flask import g
-
-from Comment.myException import ParamException
-from Enums.errorCode import ResponseMsg
+from Comment import ParamException
+from Enums import ResponseMsg
 from Models.base import Base
 from App import db
-from Utils.myLog import MyLog
-from Utils.myWraps import simpleBug
+from Utils import MyLog,simpleBug
 
 from flask import g
 
@@ -41,9 +38,7 @@ class Cases(Base):
     title = db.Column(db.String(20), nullable=False, comment="用例名称")
     tag = db.Column(db.Enum('常规', '冒烟'), server_default='常规', comment="用例标签")
     desc = db.Column(db.String(100), nullable=False, comment="用例描述")
-    creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
-    updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
-    case_level = db.Column(db.Enum('P1', 'P2', 'P3', 'P4'), server_default='P1', comment="用例等级")
+    case_level = db.Column(db.Enum('P1', 'P2', 'P3', 'P4'), comment="用例等级")
     # 暂时全是功能用例 、接口性能未定义
     case_type = db.Column(db.Enum('功能', '接口', '性能'), server_default='功能', comment="用例类型")
     status = db.Column(db.Enum("QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"), server_default="QUEUE",
@@ -52,25 +47,26 @@ class Cases(Base):
     info = db.Column(db.JSON, nullable=False, comment="用例步骤与预期结果")
     mark = db.Column(db.String(100), nullable=True, comment="用例备注")
 
-    # case 与 模块 属于多对一关系
-    partID = db.Column(db.String(20), db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="模块")
+    # case 与 模块 属于多对一 关系
+    partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="模块")
     # case 与 product 是多对一关系 、产品删除、用例productID 置为null
-    productID = db.column(db.INTEGER, db.ForeignKey("product.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
+    productID = db.Column(db.INTEGER, db.ForeignKey("product.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
     # case与platform 是多对一关系、平台删除、字段置为空、可无平台
     platformID = db.Column(db.INTEGER, db.ForeignKey('platform.id', ondelete="SET NUll"), nullable=True, comment="所属平台")
     # bug 与 用例是一对多关系
     bugs = db.relationship("Bug", backref="case", lazy="dynamic")
 
+    creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
+    updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
+
     def __init__(self, title: AnyStr, desc: AnyStr, info: List[Dict], tag: Any = None,
-                 updater: int = None, case_level: AnyStr = None, case_type: AnyStr = None,
+                 case_level: AnyStr = "QUEUE", case_type: AnyStr = None,
                  status: AnyStr = None, setup: AnyStr = None, mark: AnyStr = None, partID: int = None,
-                 creator: int = None,
                  productID: int = None,
                  platformID: int = None):
         self.title = title
         self.desc = desc
-        self.creator = creator if creator else g.user.id
-        self.updater = updater
+        self.creator = g.user.id
         self.status = status
         self.productID = productID
         self.platformID = platformID

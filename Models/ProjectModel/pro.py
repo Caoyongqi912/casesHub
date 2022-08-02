@@ -6,14 +6,11 @@
 
 
 from typing import AnyStr, NoReturn, List
-
 from flask_sqlalchemy import Pagination
-
-from Comment.myException import AuthException
+from Comment import AuthException
 from Models.base import Base
 from App import db
-from Utils.myLog import MyLog
-from Utils.myWraps import simpleCase, pageSerialize
+from Utils import MyLog, simpleCase
 
 log = MyLog.get_log(__file__)
 
@@ -71,9 +68,9 @@ class Product(Base):
     # 用户跟产品是 多对多 绑定
     users = db.relationship("User", backref="products", lazy="dynamic", secondary=productUsers)
     # 版本跟产品是 多对一 关系
-    versions = db.relationship("Version", backref="product", lazy="dynamic")
+    versions = db.relationship("Version", backref="v_product", lazy="dynamic")
     # 用例 与 产品为一对多关系
-    cases = db.relationship("Cases", backref="product", lazy="dynamic")
+    cases = db.relationship("Cases", backref="c_product", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr,
                  projectID: int):

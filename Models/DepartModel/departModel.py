@@ -7,7 +7,7 @@
 
 from typing import AnyStr
 
-from Comment.myException import AuthException
+from Comment import AuthException
 from Models.base import Base
 from App import db
 

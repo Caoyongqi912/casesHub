@@ -4,3 +4,6 @@
 # @Software: PyCharm
 # @Desc:
 
+from .bugs import Bug
+from .platforms import Platform
+from .cases import Cases, CasePart

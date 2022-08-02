@@ -14,9 +14,10 @@ class Platform(Base):
     __tablename__ = "platform"
 
     name = db.Column(db.Enum("IOS", "ANDROID", "WEB", "PC"), comment="平台名称")
-    desc = db.Column(db.String(100), nullable=True, comment="平台描述")
     cases = db.relationship("Cases", backref="platform", lazy="dynamic")
 
-    def __init__(self, name: AnyStr, desc: AnyStr = None):
+    def __init__(self, name: AnyStr):
         self.name = name
-        self.desc = desc
+
+    def __repr__(self):
+        return f"{Platform.__name__} {self.name}"

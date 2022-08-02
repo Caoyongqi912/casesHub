@@ -3,4 +3,6 @@
 # @File : __init__.py.py 
 # @Software: PyCharm
 # @Desc:
-from .pro import Project,Product
+from .pro import Project, Product
+from .versions import Version
+from .reports import Report

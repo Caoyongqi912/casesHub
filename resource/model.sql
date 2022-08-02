@@ -72,12 +72,21 @@ CREATE TABLE product
     update_time DATE COMMENT '修改时间',
     name        VARCHAR(20) COMMENT '产品名称',
     `desc`      VARCHAR(100) COMMENT '产品描述',
-    `adminID`   INTEGER COMMENT '产品负责人',
     `projectID` INTEGER NOT NULL COMMENT '所属项目',
     PRIMARY KEY (id),
     UNIQUE (name),
     FOREIGN KEY (`projectID`) REFERENCES project (id)
 );
+INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
+VALUES (1, 'ZsWBjEgGrRQijRZKzpZA', '2022-08-01', '2022-08-01', 'pro1', 'pro1 desc', 2);
+INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
+VALUES (2, 'yyuiZSdSmHvwjUslsOHv', '2022-08-01', '2022-08-01', 'pro2', 'pro2 for project 1', 2);
+INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
+VALUES (3, 'YXSVrSgQxowjjtlnPfFI', '2022-08-01', '2022-08-01', 'pro3', 'pro3 desc', 2);
+INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
+VALUES (4, 'bfvMFjEpLdxbQuoMxvLL', '2022-08-01', '2022-08-01', 'pro4', 'pro4 desc', 3);
+INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
+VALUES (5, 'eJpUgXNBrCfAYiKWJyxL', '2022-08-01', '2022-08-01', 'pro5', 'pro5 desc', 3);
 
 CREATE TABLE product_user
 (
@@ -87,14 +96,103 @@ CREATE TABLE product_user
     FOREIGN KEY (`userID`) REFERENCES user (id)
 );
 
-CREATE TABLE version (
-	id INTEGER NOT NULL AUTO_INCREMENT,
-	uid VARCHAR(50) COMMENT '唯一标识',
-	create_time DATE COMMENT '创建时间',
-	update_time DATE COMMENT '修改时间',
-	name VARCHAR(20) COMMENT '版本名称',
-	`desc` VARCHAR(100) COMMENT '版本描述',
-	`productID` INTEGER COMMENT '所属产品',
-	PRIMARY KEY (id),
-	FOREIGN KEY(`productID`) REFERENCES product (id) ON DELETE CASCADE
-)
+CREATE TABLE version
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    name        VARCHAR(20) COMMENT '版本名称',
+    `desc`      VARCHAR(100) COMMENT '版本描述',
+    `productID` INTEGER COMMENT '所属产品',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`productID`) REFERENCES product (id) ON DELETE CASCADE
+);
+INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
+VALUES (1, 'eErlYCZXtbolWXSFlWtD', '2022-08-01', '2022-08-01', '1.0', null, 4);
+INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
+VALUES (2, 'vmGwQrCzDxSLrTDivkTl', '2022-08-01', '2022-08-01', '1.0', null, 5);
+INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
+VALUES (3, 'qQbpCRnmROuxhutwLFGS', '2022-08-01', '2022-08-01', '1.1', null, 5);
+
+CREATE TABLE platform
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    name        ENUM ('IOS','ANDROID','WEB','PC') COMMENT '平台名称',
+    PRIMARY KEY (id)
+);
+INSERT INTO platform (id, uid, create_time, update_time, name)
+VALUES (1, 'XwrnNjNsHrKSrXWsoTqj', '2022-08-02', '2022-08-02', 'IOS');
+INSERT INTO platform (id, uid, create_time, update_time, name)
+VALUES (2, 'wkDKNwEcZxHAODJPbSHJ', '2022-08-02', '2022-08-02', 'ANDROID');
+INSERT INTO platform (id, uid, create_time, update_time, name)
+VALUES (3, 'ThlPwvBcfWOdioeNQPgO', '2022-08-02', '2022-08-02', 'PC');
+INSERT INTO platform (id, uid, create_time, update_time, name)
+VALUES (4, 'EQhfXBJxtxVDAXLZXcYH', '2022-08-02', '2022-08-02', 'WEB');
+
+CREATE TABLE case_part
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    `partName`  VARCHAR(20) COMMENT '用例模块',
+    `productID` INTEGER COMMENT '所属产品',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`productID`) REFERENCES product (id)
+);
+
+CREATE TABLE cases
+(
+    id           INTEGER      NOT NULL AUTO_INCREMENT,
+    uid          VARCHAR(50) COMMENT '唯一标识',
+    create_time  DATE COMMENT '创建时间',
+    update_time  DATE COMMENT '修改时间',
+    title        VARCHAR(20)  NOT NULL COMMENT '用例名称',
+    tag          ENUM ('常规','冒烟') COMMENT '用例标签'                                              DEFAULT '常规',
+    `desc`       VARCHAR(100) NOT NULL COMMENT '用例描述',
+    case_level   ENUM ('P1','P2','P3','P4') COMMENT '用例等级',
+    case_type    ENUM ('功能','接口','性能') COMMENT '用例类型'                                         DEFAULT '功能',
+    status       ENUM ('QUEUE','TESTING','BLOCK','SKIP','PASS','FAIL','CLOSE') COMMENT '用例状态' DEFAULT 'QUEUE',
+    setup        VARCHAR(40) COMMENT '用例前置',
+    info         JSON         NOT NULL COMMENT '用例步骤与预期结果',
+    mark         VARCHAR(100) COMMENT '用例备注',
+    `partID`     INTEGER COMMENT '模块',
+    `productID`  INTEGER COMMENT '所属产品',
+    `platformID` INTEGER COMMENT '所属平台',
+    creator      INTEGER      NOT NULL COMMENT '创建人',
+    updater      INTEGER COMMENT '修改人',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`partID`) REFERENCES case_part (id) ON DELETE SET NULL,
+    FOREIGN KEY (`productID`) REFERENCES product (id) ON DELETE SET NULL,
+    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll
+);
+
+CREATE TABLE bug
+(
+    id           INTEGER     NOT NULL AUTO_INCREMENT,
+    uid          VARCHAR(50) COMMENT '唯一标识',
+    create_time  DATE COMMENT '创建时间',
+    update_time  DATE COMMENT '修改时间',
+    title        VARCHAR(20) COMMENT 'bug名称',
+    `desc`       VARCHAR(100) COMMENT 'bug描述',
+    tag          VARCHAR(30) COMMENT 'bug标签',
+    tester       VARCHAR(20) NOT NULL COMMENT '测试人',
+    developer    VARCHAR(20) COMMENT '开发',
+    pr           VARCHAR(20) COMMENT '产品',
+    bug_type     ENUM ('线上问题','优化','缺陷') COMMENT 'bug类型',
+    level        ENUM ('P1','P2','P3','P4') COMMENT 'BUG等级',
+    status       ENUM ('OPEN','CLOSE','BLOCK') COMMENT 'BUG状态' DEFAULT 'OPEN',
+    file         VARCHAR(50) COMMENT '附件地址',
+    mark         VARCHAR(100) COMMENT 'BUG备注',
+    `platformID` INTEGER COMMENT '所属平台',
+    `versionID`  INTEGER COMMENT '所属版本',
+    `caseID`     INTEGER COMMENT '所属用例',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll,
+    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NULL,
+    FOREIGN KEY (`caseID`) REFERENCES cases (id) ON DELETE SET NULL
+);

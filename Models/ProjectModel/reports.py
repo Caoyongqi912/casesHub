@@ -6,7 +6,7 @@
 from typing import AnyStr, List, Dict
 from Models.base import Base
 from App import db
-from Utils.myLog import MyLog
+from Utils import MyLog
 
 log = MyLog.get_log(__file__)
 

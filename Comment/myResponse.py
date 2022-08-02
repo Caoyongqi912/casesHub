@@ -7,7 +7,7 @@ from typing import Any
 
 from flask import jsonify
 
-from Enums.errorCode import ResponseCode, ResponseMsg
+from Enums import ResponseCode, ResponseMsg
 
 
 def make_response(code: ResponseCode, data: Any, msg: ResponseMsg) -> jsonify:

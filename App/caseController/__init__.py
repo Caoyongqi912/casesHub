@@ -6,5 +6,5 @@
 
 from flask import Blueprint
 
-caseBP = Blueprint("caseBP", __name__, url_prefix="/v1/api/case")
-from . import case,bug
+caseBP = Blueprint("caseBP", __name__, url_prefix="/api/case")
+from . import case, bug

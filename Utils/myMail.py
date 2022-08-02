@@ -3,10 +3,10 @@
 # @File : myMail.py 
 # @Software: PyCharm
 # @Desc: mail
-from typing import AnyStr, Any
+from typing import Any
 from flask_mail import Mail, Message
 from App import create_app
-from Models.ProjectModel.reports import Report
+from Models import Report
 
 
 class SendMail:

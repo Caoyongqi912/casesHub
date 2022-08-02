@@ -5,16 +5,13 @@
 # @Desc: 注册controller
 from typing import AnyStr
 
-from flask import jsonify, g, request, Response
+from flask import g, request, Response
 from flask_restful import Resource, Api
-
 from App import auth
 from App.DepartController import userBP
-from Comment.myResponse import MyResponse
-from Utils.myPath import getAvatarPath
-from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.DepartModel import User, Department
-from Utils.myLog import MyLog
+from Comment import MyResponse
+from Utils import getAvatarPath, MyRequestParseUtil, MyLog
+from Models import User, Department
 from App.myAuth import is_admin
 
 log = MyLog.get_log(__file__)

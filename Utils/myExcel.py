@@ -10,7 +10,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from App import create_app
-from Models.CaseModel.cases import Cases
+from Models import Cases
 
 
 class MyExcel:

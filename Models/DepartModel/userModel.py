@@ -12,9 +12,9 @@ import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mappin
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from Comment.myException import ParamException
-from Enums.errorCode import ResponseMsg
-from Utils.myLog import MyLog
+from Comment import ParamException
+from Enums import ResponseMsg
+from Utils import MyLog
 
 log = MyLog().get_log(__file__)
 
