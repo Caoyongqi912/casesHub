@@ -16,6 +16,16 @@ from Enums.errorCode import ResponseMsg
 from Utils import MyRequestParseUtil
 from Models import Product, Platform, Version, Cases, CasePart
 
+"""
+case curd
+查
+    通过id查detail
+    通过productID 分页 orderby
+    通过casePartiD 分页 orderby
+    
+
+"""
+
 
 class CasePartController(Resource):
 
@@ -34,13 +44,13 @@ class CasePartController(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         """
-        通过
+        通过casePartID
         :return:MyResponse
         """
+        target = "casePartID"
         parse = MyRequestParseUtil("values")
-        parse.add(name="productID", type=str, required=True)
-        id = parse.parse_args().get("productID")
-        return MyResponse.success(Product.get(id, "productID").getParts)
+        parse.add(name=target, type=str, isExist=CasePart, required=True)
+        return MyResponse.success(CasePart.get(parse.parse_args().get(target), target))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -66,7 +76,7 @@ class CasePartController(Resource):
         return MyResponse.success()
 
 
-class NewCaseController(Resource):
+class CaseController(Resource):
 
     @auth.login_required
     def post(self) -> MyResponse:
@@ -120,6 +130,16 @@ class NewCaseController(Resource):
         Cases.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        通过caseID查
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="id", type=int, required=True, isExist=Cases)
+        return MyResponse.success(Cases.get(parse.parse_args().get("id"), "caseID"))
+
 
 class FindCase(Resource):
 
@@ -170,8 +190,7 @@ class ExcelPut(Resource):
 
 
 api_script = Api(caseBP)
-api_script.add_resource(NewCaseController, "/opt")
-api_script.add_resource(FindCase, "/<string:caseID>")
+api_script.add_resource(CaseController, "/opt")
 api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
 api_script.add_resource(ExcelPut, "/upload/excel")
-api_script.add_resource(CasePartController, "/part")
+api_script.add_resource(CasePartController, "/part/opt")

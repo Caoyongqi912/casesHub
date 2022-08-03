@@ -4,12 +4,12 @@
 # @Software: PyCharm
 # @Desc: 用例实体
 import json
-from typing import AnyStr, Dict, List, Any
+from typing import AnyStr, Dict, List, Any, Optional
 from Comment import ParamException
 from Enums import ResponseMsg
 from Models.base import Base
 from App import db
-from Utils import MyLog,simpleBug
+from Utils import MyLog, simpleBug
 
 from flask import g
 
@@ -59,11 +59,12 @@ class Cases(Base):
     creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
 
-    def __init__(self, title: AnyStr, desc: AnyStr, info: List[Dict], tag: Any = None,
-                 case_level: AnyStr = "QUEUE", case_type: AnyStr = None,
-                 status: AnyStr = None, setup: AnyStr = None, mark: AnyStr = None, partID: int = None,
-                 productID: int = None,
-                 platformID: int = None):
+    def __init__(self, title: AnyStr, desc: AnyStr, info: List[Dict], tag: Optional[str] = None,
+                 case_level: AnyStr = "QUEUE", case_type: Optional[str] = None,
+                 status: Optional[str] = None, setup: Optional[str] = None, mark: Optional[str] = None,
+                 partID: Optional[int] = None,
+                 productID: Optional[int] = None,
+                 platformID: Optional[int] = None):
         self.title = title
         self.desc = desc
         self.creator = g.user.id

@@ -53,6 +53,5 @@ class Bug(Base):
         self.platformID = platformID
         self.tester = tester if tester else g.user.id
 
-
     def __repr__(self):
         return f"<{Bug.__name__} {self.title}>"

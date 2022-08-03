@@ -68,9 +68,10 @@ class Product(Base):
     # 用户跟产品是 多对多 绑定
     users = db.relationship("User", backref="products", lazy="dynamic", secondary=productUsers)
     # 版本跟产品是 多对一 关系
-    versions = db.relationship("Version", backref="v_product", lazy="dynamic")
+    versions = db.relationship("Version", backref="product", lazy="dynamic")
     # 用例 与 产品为一对多关系
-    cases = db.relationship("Cases", backref="c_product", lazy="dynamic")
+    cases = db.relationship("Cases", backref="product", lazy="dynamic")
+    parts = db.relationship("CasePart", backref="product", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr,
                  projectID: int):
@@ -141,13 +142,21 @@ class Product(Base):
         :param page: page
         :return:Pagination
         """
-        pass
+        return self.cases.my_paginate(**kwargs)
 
     def page_version(self, **kwargs) -> Pagination:
         """
         查询版本分页
         """
         return self.versions.my_paginate(**kwargs)
+
+    def page_casePart(self, **kwargs) -> Pagination:
+        """
+        查询用例分组分页
+        :param kwargs:
+        :return:
+        """
+        return self.parts.my_paginate(**kwargs)
 
     def __repr__(self):
         return f"<{Product.__name__} {self.name}>"

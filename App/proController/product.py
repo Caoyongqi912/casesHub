@@ -11,7 +11,7 @@ from App import auth
 from App.proController import proBP
 from Comment import MyResponse
 from Utils import MyRequestParseUtil
-from Models import Project, Product
+from Models import Project, Product, CasePart, Version
 
 
 class ProductController(Resource):
@@ -98,16 +98,30 @@ class QueryVersionController(Resource):
         :param productID: 产品ID
         :return: MyResponse
         """
-        from Models.ProjectModel.versions import Version
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
         parse.add(name="by", target=Version, required=False)
-        res = Product.get(productID, "productID").page_version(**parse.parse_args())
-        return MyResponse.success(res)
+        return MyResponse.success(Product.get(productID, "productID").page_version(**parse.parse_args()))
+
+
+class QueryCasePartController(Resource):
+
+    @auth.login_required
+    def get(self, productID: AnyStr) -> MyResponse:
+        """
+        查询casePart by productID
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="page", default="1")
+        parse.add(name="limit", default="20")
+        parse.add(name="by", target=CasePart, required=False)
+        return MyResponse.success(Product.get(productID, "productID").page_casePart(**parse.parse_args()))
 
 
 api_script = Api(proBP)
 api_script.add_resource(ProductController, "/product/opt")
 api_script.add_resource(QueryCaseController, "/product/<string:productID>/page_cases")
 api_script.add_resource(QueryVersionController, "/product/<string:productID>/page_versions")
+api_script.add_resource(QueryCasePartController, '/product/<string:productID>/page_casePart')
