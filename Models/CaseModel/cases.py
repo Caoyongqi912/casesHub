@@ -5,7 +5,7 @@
 # @Desc: 用例实体
 import json
 from typing import AnyStr, Dict, List, Any, Optional
-from Comment import ParamException
+from Comment.myException import ParamException
 from Enums import ResponseMsg
 from Models.base import Base
 from App import db
@@ -21,13 +21,13 @@ class CasePart(Base):
     partName = db.Column(db.String(20), comment="用例模块")
 
     # 用例模块与产品是多对一关系
-    productID = db.Column(db.INTEGER, db.ForeignKey("product.id"), nullable=True, comment="所属产品")
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属产品")
     # 模块与用例是一对多关系
     cases = db.relationship("Cases", backref='case_part', lazy='dynamic')
 
-    def __init__(self, partName: AnyStr, productID: int):
+    def __init__(self, partName: AnyStr, projectID: int):
         self.partName = partName
-        self.productID = productID
+        self.projectID = projectID
 
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"
@@ -50,12 +50,14 @@ class Cases(Base):
     # case 与 模块 属于多对一 关系
     partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="模块")
     # case 与 product 是多对一关系 、产品删除、用例productID 置为null
-    productID = db.Column(db.INTEGER, db.ForeignKey("product.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
     # case与platform 是多对一关系、平台删除、字段置为空、可无平台
     platformID = db.Column(db.INTEGER, db.ForeignKey('platform.id', ondelete="SET NUll"), nullable=True, comment="所属平台")
+    # version yu case 是1vn
+    versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True, comment="所属版本")
+
     # bug 与 用例是一对多关系
     bugs = db.relationship("Bug", backref="case", lazy="dynamic")
-
     creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
 
@@ -63,14 +65,16 @@ class Cases(Base):
                  case_level: AnyStr = "QUEUE", case_type: Optional[str] = None,
                  status: Optional[str] = None, setup: Optional[str] = None, mark: Optional[str] = None,
                  partID: Optional[int] = None,
-                 productID: Optional[int] = None,
-                 platformID: Optional[int] = None):
+                 projectID: Optional[int] = None,
+                 platformID: Optional[int] = None,
+                 versionID: Optional[int] = None):
         self.title = title
         self.desc = desc
         self.creator = g.user.id
         self.status = status
-        self.productID = productID
+        self.projectID = projectID
         self.platformID = platformID
+        self.versionID = versionID
         self.partID = partID
         self.case_type = case_type
         self.case_level = case_level

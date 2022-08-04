@@ -2,14 +2,13 @@
 # @Author : cyq
 # @File : bug.py 
 # @Software: PyCharm
-# @Desc:
+# @Desc:bugView
 from flask_restful import Resource, Api
-
 from App import auth
 from App.caseController import caseBP
-from Comment import MyResponse
-from Models import Bug
-from Utils import MyRequestParseUtil
+from Comment.myException import MyResponse
+from Models.CaseModel.bugs import Bug
+from Utils.myRequestParseUtil import MyRequestParseUtil
 
 
 class BugController(Resource):

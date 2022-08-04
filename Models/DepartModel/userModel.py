@@ -12,7 +12,7 @@ import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mappin
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from Comment import ParamException
+from Comment.myException import ParamException
 from Enums import ResponseMsg
 from Utils import MyLog
 

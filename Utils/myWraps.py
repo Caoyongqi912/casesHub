@@ -57,7 +57,7 @@ def simpleCase(func):
     """
 
     @wraps(func)
-    def d(cls, page, limit, by, *args):
+    def case(cls, page, limit, by, *args):
         info = func(cls, page, limit, by, *args)
         results = {
             "items": [{
@@ -66,7 +66,9 @@ def simpleCase(func):
                 "desc": i.desc,
                 "creator": i.creator,
                 "case_level": i.case_level,
-                "create_time": i.create_time
+                "create_time": i.create_time,
+                "update_time": i.update_time
+
             } for i in info.items],
             "pageInfo": {
                 "total": info.total,
@@ -77,4 +79,30 @@ def simpleCase(func):
         }
         return results
 
-    return d
+    return case
+
+
+def simpleUser(func):
+    @wraps(func)
+    def user(cls, page, limit, by, *args):
+        info = func(cls, page, limit, by, *args)
+        results = {
+            "items": [{
+                "id": i.id,
+                "username": i.username,
+                "email": i.email,
+                "phone": i.phone,
+                "gender": i.gender,
+                "tag": i.tag,
+                "create_time": i.create_time,
+                "update_time": i.update_time
+            } for i in info.items],
+            "pageInfo": {
+                "total": info.total,
+                "pages": info.pages,
+                "page": info.page,
+                "limit": info.per_page
+            }
+        }
+        return results
+    return user

@@ -8,7 +8,7 @@ from typing import AnyStr
 from flask import g
 from App import auth
 from Comment.myException import AuthException
-from Models import User
+from Models.DepartModel.userModel import User
 
 
 @auth.verify_password

@@ -1,9 +1,9 @@
 from typing import Union, NoReturn
 from flask import request, Response
-from Comment import MyResponse
+from Comment.myResponse import MyResponse
 from Utils import MyLog
 
-log = MyLog().get_log(__file__)
+log = MyLog.get_log(__file__)
 
 
 def logWrite() -> NoReturn:

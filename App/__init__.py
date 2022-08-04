@@ -43,7 +43,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     from .DepartController import userBP
     app.register_blueprint(userBP)
 
-    from .proController import proBP
+    from .projectController import proBP
     app.register_blueprint(proBP)
 
     from .caseController import caseBP

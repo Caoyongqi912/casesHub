@@ -3,6 +3,3 @@
 # @File : __init__.py.py 
 # @Software: PyCharm
 # @Desc:
-
-from .userModel import User
-from .departModel import Department

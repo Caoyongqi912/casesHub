@@ -8,9 +8,9 @@ from flask_restful import Resource, Api
 from App import auth
 from App.DepartController import userBP
 from App.myAuth import is_admin
-from Comment import MyResponse
-from Utils import MyRequestParseUtil
-from Models import Department
+from Comment.myException import MyResponse
+from Utils.myRequestParseUtil import MyRequestParseUtil
+from Models.DepartModel.departModel import Department
 
 
 class DepartmentController(Resource):

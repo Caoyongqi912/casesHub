@@ -29,7 +29,6 @@ nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列�
 default	为这列定义默认值
 """
 
-
 """
 关系表参数
 
@@ -57,15 +56,13 @@ articles = relationship("Article",cascade="save-update,delete")
 
 """
 from typing import List, AnyStr, Dict, NoReturn
-
 from flask_sqlalchemy import Pagination
 from sqlalchemy import asc
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
-from Utils.myLog import MyLog
+from Utils import MyLog, UUID
 from Comment.myException import MyException, ParamException
-from Utils.myUid import UUID
 
 log = MyLog.get_log(__file__)
 

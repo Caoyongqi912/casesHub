@@ -9,9 +9,11 @@ from flask import g, request, Response
 from flask_restful import Resource, Api
 from App import auth
 from App.DepartController import userBP
-from Comment import MyResponse
-from Utils import getAvatarPath, MyRequestParseUtil, MyLog
-from Models import User, Department
+from Comment.myException import MyResponse
+from Models.DepartModel.departModel import Department
+from Models.DepartModel.userModel import User
+from Utils import getAvatarPath, MyLog
+from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
 
 log = MyLog.get_log(__file__)
@@ -27,7 +29,7 @@ class AddAdmin(Resource):
         """
         parse = MyRequestParseUtil()
         parse.add(name="username", type=str, unique=User, required=True)
-        parse.add(name="password", type=str, unique=User, required=True)
+        parse.add(name="password", type=str, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
         parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
         User(**parse.parse_args()).addAdmin()

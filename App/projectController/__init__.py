@@ -6,6 +6,6 @@
 
 from flask import Blueprint
 
-proBP = Blueprint("project", __name__, url_prefix="/api")
+proBP = Blueprint("project", __name__, url_prefix="/api/project")
 
-from . import project, product, version
+from . import project, version

@@ -5,7 +5,7 @@
 # @Desc:  自定义参数校验
 from typing import AnyStr, Dict, Any, List
 from flask import request
-from Comment import ResponseMsg,ParamException
+from Comment.myException import ResponseMsg,ParamException
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)

@@ -7,9 +7,9 @@ import json
 from flask import Response
 from werkzeug.exceptions import HTTPException
 from typing import Dict, AnyStr
-from Comment import MyResponse, ParamError, AuthError
 from Enums import ResponseCode
 from Utils import MyLog
+from .myResponse import *
 
 log = MyLog.get_log(__file__)
 

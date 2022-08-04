@@ -6,7 +6,7 @@
 from typing import Any
 from flask_mail import Mail, Message
 from App import create_app
-from Models import Report
+from Models.ProjectModel.reports import Report
 
 
 class SendMail:

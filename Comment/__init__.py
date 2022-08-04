@@ -4,5 +4,3 @@
 # @Software: PyCharm
 # @Desc:
 
-from .myResponse import *
-from .myException import *
