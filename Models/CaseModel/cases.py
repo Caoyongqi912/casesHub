@@ -6,7 +6,7 @@
 import json
 from typing import AnyStr, Dict, List, Any, Optional
 from Comment.myException import ParamException
-from Enums import ResponseMsg
+from Enums import ResponseMsg, CaseLevel, CaseTag, CaseType, CaseStatus
 from Models.base import Base
 from App import db
 from Utils import MyLog, simpleBug
@@ -36,13 +36,12 @@ class CasePart(Base):
 class Cases(Base):
     __tablename__ = "cases"
     title = db.Column(db.String(20), nullable=False, comment="用例名称")
-    tag = db.Column(db.Enum('常规', '冒烟'), server_default='常规', comment="用例标签")
+    tag = db.Column(db.Enum(CaseTag), comment="用例标签")
     desc = db.Column(db.String(100), nullable=False, comment="用例描述")
-    case_level = db.Column(db.Enum('P1', 'P2', 'P3', 'P4'), comment="用例等级")
+    case_level = db.Column(db.Enum(CaseLevel), comment="用例等级")
     # 暂时全是功能用例 、接口性能未定义
-    case_type = db.Column(db.Enum('功能', '接口', '性能'), server_default='功能', comment="用例类型")
-    status = db.Column(db.Enum("QUEUE", "TESTING", "BLOCK", "SKIP", "PASS", "FAIL", "CLOSE"), server_default="QUEUE",
-                       comment="用例状态")
+    case_type = db.Column(db.Enum(CaseType), comment="用例类型")
+    status = db.Column(db.Enum(CaseStatus), comment="用例状态")
     setup = db.Column(db.String(40), nullable=True, comment='用例前置')
     info = db.Column(db.JSON, nullable=False, comment="用例步骤与预期结果")
     mark = db.Column(db.String(100), nullable=True, comment="用例备注")

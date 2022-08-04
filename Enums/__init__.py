@@ -5,3 +5,4 @@
 # @Desc:
 
 from .errorCode import *
+from .myEnum import *

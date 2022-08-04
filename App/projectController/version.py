@@ -81,6 +81,7 @@ class PageCases(Resource):
         parse.add(name="by", target=Version, required=False)
         return MyResponse.success(Version.get(versionID, "versionID").page_cases(**parse.parse_args()))
 
+
 class PageBugs(Resource):
 
     @auth.login_required
@@ -95,6 +96,7 @@ class PageBugs(Resource):
         parse.add(name="limit", default="20")
         parse.add(name="by", target=Cases, required=False)
         return MyResponse.success(Version.get(versionID, "versionID").page_bugs(**parse.parse_args()))
+
 
 api_script = Api(proBP)
 api_script.add_resource(VersionController, "/version")

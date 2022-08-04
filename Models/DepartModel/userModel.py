@@ -13,7 +13,7 @@ import jwt  # py3.10+ 需要修改   from collections.abc  import Mappin
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException
-from Enums import ResponseMsg
+from Enums import ResponseMsg, Gender, UserTag
 from Utils import MyLog
 
 log = MyLog().get_log(__file__)
@@ -26,10 +26,10 @@ class User(Base):
     phone = db.Column(db.String(12), unique=True, comment="手机")
     password = db.Column(db.String(200), comment="密码")
     email = db.Column(db.String(40), unique=True, comment="邮箱")
-    gender = db.Column(db.Enum("MALE", "FEMALE"), comment="性别")
+    gender = db.Column(db.Enum(Gender), comment="性别")
     avatar = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
-    tag = db.Column(db.Enum("QA", "PR", "DEV", "ADMIN"), comment="标签")
+    tag = db.Column(db.Enum(UserTag), comment="标签")
     departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
 
     def __init__(self, username: AnyStr, phone: AnyStr, gender: AnyStr,

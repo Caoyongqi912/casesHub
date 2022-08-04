@@ -7,6 +7,7 @@ from typing import AnyStr
 
 from flask import g
 
+from Enums import BugLevel, BugType, BugStatus
 from Models.base import Base
 from App import db
 from Utils import MyLog
@@ -22,9 +23,9 @@ class Bug(Base):
     tester = db.Column(db.String(20), nullable=False, comment="测试人")
     developer = db.Column(db.String(20), comment="开发")
     pr = db.Column(db.String(20), comment="产品")
-    bug_type = db.Column(db.Enum('线上问题', '优化', '缺陷'), comment='bug类型')
-    level = db.Column(db.Enum("P1", "P2", "P3", "P4"), comment="BUG等级")
-    status = db.Column(db.Enum("OPEN", "CLOSE", "BLOCK"), server_default="OPEN", comment="BUG状态")
+    type = db.Column(db.Enum(BugType), comment='bug类型')
+    level = db.Column(db.Enum(BugLevel), comment="BUG等级")
+    status = db.Column(db.Enum(BugStatus), server_default=BugStatus.OPEN, comment="BUG状态")
     file = db.Column(db.String(50), nullable=True, comment="附件地址")
     mark = db.Column(db.String(100), nullable=True, comment="BUG备注")
     # bug与platform 是多对一关系、平台删除、字段置为空、可无平台
@@ -43,7 +44,7 @@ class Bug(Base):
         self.desc = desc
         self.developer = developer
         self.pr = pr
-        self.bug_type = bug_type
+        self.type = bug_type
         self.level = level
         self.versionID = versionID
         self.caseID = caseID
