@@ -1,25 +1,25 @@
-import enum
+from enum import Enum
 
 
-class CaseLevel(enum.Enum):
+class CaseLevel(Enum):
     P1 = "P1"
     P2 = "P2"
     P3 = "P3"
     P4 = "P4"
 
 
-class CaseTag(enum.Enum):
+class CaseTag(Enum):
     COMMENT = "常规"
     SMOCK = "冒烟"
 
 
-class CaseType(enum.Enum):
+class CaseType(Enum):
     COMMENT = "功能"
     API = "接口"
     PERF = "性能"
 
 
-class CaseStatus(enum.Enum):
+class CaseStatus(Enum):
     QUEUE = 1
     TESTING = 2
     BLOCK = 3
@@ -29,31 +29,31 @@ class CaseStatus(enum.Enum):
     CLOSE = 7
 
 
-class BugLevel(enum.Enum):
+class BugLevel(Enum):
     P1 = "P1"
     P2 = "P2"
     P3 = "P3"
     P4 = "P4"
 
 
-class BugType(enum.Enum):
+class BugType(Enum):
     ONLINE = 1
     OPTIMIZE = 2
     FAIL = 3
 
 
-class BugStatus(enum.Enum):
+class BugStatus(Enum):
     OPEN = 1
     CLOSE = 2
     BLOCK = 3
 
 
-class Gender(enum.Enum):
+class Gender(Enum):
     MALE = 1
     FEMALE = 0
 
 
-class UserTag(enum.Enum):
+class UserTag(Enum):
     QA = 1
     PR = 2
     DEV = 3

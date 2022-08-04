@@ -25,7 +25,7 @@ class Bug(Base):
     pr = db.Column(db.String(20), comment="产品")
     type = db.Column(db.Enum(BugType), comment='bug类型')
     level = db.Column(db.Enum(BugLevel), comment="BUG等级")
-    status = db.Column(db.Enum(BugStatus), server_default=BugStatus.OPEN, comment="BUG状态")
+    status = db.Column(db.Enum(BugStatus) , comment="BUG状态")
     file = db.Column(db.String(50), nullable=True, comment="附件地址")
     mark = db.Column(db.String(100), nullable=True, comment="BUG备注")
     # bug与platform 是多对一关系、平台删除、字段置为空、可无平台
