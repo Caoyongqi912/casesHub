@@ -5,6 +5,10 @@
 # @Desc: caseBP
 
 from flask import Blueprint
+from flask_restx import Api
 
 caseBP = Blueprint("caseBP", __name__, url_prefix="/api/case")
-from . import case, bug
+apiBP = Api(caseBP)
+
+from .case import ns
+apiBP.add_namespace(ns)

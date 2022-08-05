@@ -10,8 +10,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-
-from Comment.myException import MyException
+from flask_restx import Api
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils.myJsonSerialize import JSONEncoder
@@ -19,6 +18,7 @@ from Utils.myJsonSerialize import JSONEncoder
 catch = Cache()
 db = SQLAlchemy(query_class=MyBaseQuery)
 auth = HTTPBasicAuth()
+api = Api()
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -38,13 +38,14 @@ def create_app(configName: AnyStr = "default") -> Flask:
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
+    api.init_app(app,doc="/api/case", version='1.0', title='caseHub API')  # restx
     CORS(app, supports_credentials=True)
-
-    from .DepartController import userBP
-    app.register_blueprint(userBP)
-
-    from .projectController import proBP
-    app.register_blueprint(proBP)
+    #
+    # from .DepartController import userBP
+    # app.register_blueprint(userBP)
+    #
+    # from .projectController import proBP
+    # app.register_blueprint(proBP)
 
     from .caseController import caseBP
     app.register_blueprint(caseBP)

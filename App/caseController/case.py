@@ -3,15 +3,12 @@
 # @File : case.py 
 # @Software: PyCharm
 # @Desc: case view
-import json
-from typing import AnyStr
 
 from flask import request, g
-from flask_restful import Resource, Api
+from flask_restx import Resource, Namespace, fields
 
 from App import auth
 from Comment.myException import MyResponse, ParamError
-from App.caseController import caseBP
 from Enums.errorCode import ResponseMsg
 from Models.CaseModel.cases import CasePart, Cases
 from Models.CaseModel.platforms import Platform
@@ -19,12 +16,19 @@ from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
-class CasePartController(Resource):
+ns = Namespace("casePart", description="用例模块")
 
+
+@ns.route("/opt", strict_slashes=False)
+@ns.doc('asdada')
+class CasePartController(Resource):
+    RequestDTO = ns.model("RequestDTO", {"id": fields.String})
+
+    @ns.doc(body=RequestDTO)
     @auth.login_required
     def post(self) -> MyResponse:
         """
-        用例模块
+        添加项目模块
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
@@ -33,8 +37,9 @@ class CasePartController(Resource):
         CasePart(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @auth.login_required
+    # @auth.login_required
     def get(self) -> MyResponse:
+        return MyResponse.success()
         """
         通过casePartID
         :return:MyResponse
@@ -167,9 +172,9 @@ class ExcelPut(Resource):
         except Exception as e:
             return ParamError.error(ResponseMsg.ERROR_EXCEL)
 
-
-api_script = Api(caseBP)
-api_script.add_resource(CaseController, "/opt")
-api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
-api_script.add_resource(CasePartController, "/part/opt")
-api_script.add_resource(ExcelPut, "/upload/excel")
+#
+# api_script = Api(caseBP)
+# api_script.add_resource(CaseController, "/opt")
+# api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
+# api_script.add_resource(CasePartController, "/part/opt")
+# api_script.add_resource(ExcelPut, "/upload/excel")
