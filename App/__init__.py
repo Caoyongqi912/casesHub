@@ -38,7 +38,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
-    api.init_app(app,doc="/api/case", version='1.0', title='caseHub API')  # restx
+    api.init_app(app,terms_url="/api/case/", version='1.0', title='caseHub API')  # restx
     CORS(app, supports_credentials=True)
     #
     # from .DepartController import userBP

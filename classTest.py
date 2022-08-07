@@ -27,4 +27,4 @@ class Test:
 if __name__ == '__main__':
     import uuid
     print(uuid.uuid4())
-    print(uuid.uuid4())
+    print(__file__)

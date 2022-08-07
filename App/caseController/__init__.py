@@ -6,9 +6,10 @@
 
 from flask import Blueprint
 from flask_restx import Api
-
+from flask_restx import reqparse
 caseBP = Blueprint("caseBP", __name__, url_prefix="/api/case")
 apiBP = Api(caseBP)
 
 from .case import ns
+
 apiBP.add_namespace(ns)

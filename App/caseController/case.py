@@ -15,20 +15,21 @@ from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
+from Swagger import CasePartSwagger
 
-ns = Namespace("casePart", description="用例模块")
+ns = Namespace("CasePartController", description="用例模块")
 
 
 @ns.route("/opt", strict_slashes=False)
-@ns.doc('asdada')
 class CasePartController(Resource):
-    RequestDTO = ns.model("RequestDTO", {"id": fields.String})
+    swagger = CasePartSwagger(ns)
 
-    @ns.doc(body=RequestDTO)
+    @ns.doc(body=swagger.post)
+    @ns.response(**swagger.success)
     @auth.login_required
     def post(self) -> MyResponse:
         """
-        添加项目模块
+        添加用例模块
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
@@ -37,11 +38,12 @@ class CasePartController(Resource):
         CasePart(**parse.parse_args()).save()
         return MyResponse.success()
 
-    # @auth.login_required
+    @auth.login_required
+    @ns.doc(params=swagger.get)
+    @ns.response(**swagger.success)
     def get(self) -> MyResponse:
-        return MyResponse.success()
         """
-        通过casePartID
+        通过casePartID 获取用例集
         :return:MyResponse
         """
         target = "casePartID"
@@ -50,18 +52,22 @@ class CasePartController(Resource):
         return MyResponse.success(CasePart.get(parse.parse_args().get(target), target))
 
     @auth.login_required
+    @ns.doc(body=swagger.put)
+    @ns.response(**swagger.success)
     def put(self) -> MyResponse:
         """
         更新
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
+        parse.add(name='id', type=int, required=True)
         parse.add(name="partName", type=str, required=False)
-        parse.add(name="projectID", type=int, required=True)
         CasePart.update(**parse.parse_args())
         return MyResponse.success()
 
     @auth.login_required
+    @ns.doc(body=swagger.delete)
+    @ns.response(**swagger.success)
     def delete(self) -> MyResponse:
         """
         删除
