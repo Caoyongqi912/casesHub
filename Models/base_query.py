@@ -3,8 +3,7 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc: MyBaseQuery
-from typing import Any, AnyStr, ClassVar
-
+from typing import AnyStr
 from flask_sqlalchemy import BaseQuery, Pagination
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg

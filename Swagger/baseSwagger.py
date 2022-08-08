@@ -5,7 +5,6 @@
 # @Desc:
 
 from flask_restx import Namespace, fields
-from Enums import ResponseCode, ResponseMsg
 
 
 class BaseSwagger:

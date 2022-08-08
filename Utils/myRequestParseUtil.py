@@ -3,9 +3,12 @@
 # @File : myRequestParseUtil.py
 # @Software: PyCharm
 # @Desc:  自定义参数校验
+import enum
 from typing import AnyStr, Dict, Any, List
 from flask import request
-from Comment.myException import ResponseMsg,ParamException
+from Comment.myException import ParamException
+from Enums.errorCode import ResponseMsg
+
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
@@ -50,11 +53,8 @@ class MyRequestParseUtil:
         参数校验
         :return: self.body
         """
-
         self.body = dict(self.body)
         for kw in self.args:
-
-
             #  必传
             if kw['required'] is True:
                 self.__verify_empty(self.body.get(kw["name"]), kw["name"])
@@ -79,6 +79,10 @@ class MyRequestParseUtil:
                 cls = kw.get("unique")
                 cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
 
+            # 枚举校验
+            if kw.get("enum"):
+                self.body[kw['name']] = self.__verify_enum(kw['enum'], self.body.get(kw["name"]))
+
             # 分页数据
             if kw["name"] == "page":
                 self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
@@ -87,6 +91,12 @@ class MyRequestParseUtil:
             if kw['name'] == "by":
                 self.__verify_by(self.body.get(kw['name']), kw.get("target"))
         return self.body
+
+    def __verify_enum(self, ENUM: enum, value: int):
+        vs = [v.value for v in ENUM]
+        if value not in vs:
+            raise ParamException(ResponseMsg.error_val(value, vs))
+        return ENUM.e(value)
 
     def __verify_by(self, by: AnyStr, cls: Any):
         """
@@ -130,7 +140,7 @@ class MyRequestParseUtil:
         if target is None or target == "":
             raise ParamException(ResponseMsg.empty(filed))
 
-    def __verify_type(self, target: Any, t: type, ):
+    def __verify_type(self, target: Any, t: type):
         """
         校验类型
         :param target: 目标值

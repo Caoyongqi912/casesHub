@@ -6,7 +6,8 @@
 import json
 from typing import AnyStr, Dict, List, Any, Optional
 from Comment.myException import ParamException
-from Enums import ResponseMsg, CaseLevel, CaseTag, CaseType, CaseStatus
+from Enums.myEnum import CaseLevel, CaseTag, CaseType, CaseStatus
+from Enums.errorCode import ResponseMsg
 from Models.base import Base
 from App import db
 from Utils import MyLog, simpleBug

@@ -1,10 +1,10 @@
 from enum import Enum
-
 import sqlalchemy as sql
 
 
 class IntEnum(sql.types.TypeDecorator):
     impl = sql.Integer
+    cache_ok = True
 
     def __init__(self, enumType, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,28 +14,41 @@ class IntEnum(sql.types.TypeDecorator):
         return value.value
 
     def process_result_value(self, value, dialect):
-        return self.__enumType(value)
+        return self.__enumType(value).value
 
 
-class CaseLevel(Enum):
-    P1 = "P1"
-    P2 = "P2"
-    P3 = "P3"
-    P4 = "P4"
+class Base(Enum):
+
+    @classmethod
+    def e(cls, value: int) -> Enum:
+        for k, v in cls.__members__.items():
+            if v.value == value:
+                return v
+
+    @classmethod
+    def values(cls):
+        return [v.value for v in cls]
 
 
-class CaseTag(Enum):
-    COMMENT = "常规"
-    SMOCK = "冒烟"
+class CaseLevel(Base):
+    P1 = 1
+    P2 = 2
+    P3 = 3
+    P4 = 4
 
 
-class CaseType(Enum):
-    COMMENT = "功能"
-    API = "接口"
-    PERF = "性能"
+class CaseTag(Base):
+    COMMENT = 1
+    SMOCK = 2
 
 
-class CaseStatus(Enum):
+class CaseType(Base):
+    COMMENT = 1
+    API = 2
+    PERF = 3
+
+
+class CaseStatus(Base):
     QUEUE = 1
     TESTING = 2
     BLOCK = 3
@@ -45,36 +58,32 @@ class CaseStatus(Enum):
     CLOSE = 7
 
 
-class BugLevel(Enum):
-    P1 = "P1"
-    P2 = "P2"
-    P3 = "P3"
-    P4 = "P4"
+class BugLevel(Base):
+    P1 = 1
+    P2 = 2
+    P3 = 3
+    P4 = 4
 
 
-class BugType(Enum):
+class BugType(Base):
     ONLINE = 1
     OPTIMIZE = 2
     FAIL = 3
 
 
-class BugStatus(Enum):
+class BugStatus(Base):
     OPEN = 1
     CLOSE = 2
     BLOCK = 3
 
 
-class Gender(Enum):
+class Gender(Base):
     MALE = 1
     FEMALE = 0
 
 
-class UserTag(Enum):
+class UserTag(Base):
     QA = 1
     PR = 2
     DEV = 3
     ADMIN = 0
-
-
-if __name__ == '__main__':
-    print(Gender.MALE.value)

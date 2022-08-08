@@ -31,7 +31,6 @@ class AddAdmin(Resource):
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="password", type=str, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
-        parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
         User(**parse.parse_args()).addAdmin()
         return MyResponse.success()
 
@@ -57,10 +56,13 @@ class UserOpt(Resource):
         管理員添加用戶
         :return: jsonify
         """
+
+        from Enums.myEnum import Gender, UserTag
         parse = MyRequestParseUtil()
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
-        parse.add(name="gender", type=str, choices=["MALE", "FEMALE"], required=True)
+        parse.add(name="gender", type=int, enum=Gender, required=True)
+        parse.add(name="tag", type=int, enum=UserTag, required=True)
         parse.add(name="departmentID", type=int, isExist=Department, required=True)
         User(**parse.parse_args()).addUser()
         return MyResponse.success()
@@ -127,16 +129,6 @@ class UserController(Resource):
         parse = MyRequestParseUtil()
         parse.add(name="userID", type=int, required=True)
         return MyResponse.success(User.get(parse.parse_args().get("userID")))
-
-    @auth.login_required
-    def get(self) -> MyResponse:
-        """
-        解析token getinfo
-        :return: MyResponse
-        """
-        from flask import g
-
-        return MyResponse.success(User.get(**{"ident": g.user.id}))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -210,14 +202,28 @@ class QueryUserByTag(Resource):
         :param tag:  ["QA", "PR", "DEV", "ADMIN"]
         :return: MyResponse
         """
+
         return MyResponse.success(User.query_by_tag(tag))
+
+
+class CurrentUser(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        CurrentUserInfo
+        :return: MyResponse
+        """
+        from flask import g
+
+        return MyResponse.success(User.get(**{"ident": g.user.id}))
 
 
 api_script = Api(userBP)
 api_script.add_resource(AddAdmin, "/admin")
 api_script.add_resource(UserOpt, "/opt")
 api_script.add_resource(SetPassword, "/setpassword")
-
+api_script.add_resource(CurrentUser, '/current')
 api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")

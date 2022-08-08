@@ -4,5 +4,5 @@
 # @Software: PyCharm
 # @Desc:
 
-from .errorCode import *
-from .myEnum import *
+from .errorCode import ResponseCode, ResponseMsg
+from .myEnum import CaseTag, CaseType, CaseStatus, CaseLevel, Gender, UserTag, BugType, BugStatus, BugLevel

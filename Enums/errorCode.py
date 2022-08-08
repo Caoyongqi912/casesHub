@@ -3,7 +3,6 @@
 # @File : errorCode.py
 # @Software: PyCharm
 # @Desc: response data
-from enum import Enum
 from typing import AnyStr, Any, List
 
 

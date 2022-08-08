@@ -81,7 +81,7 @@ class Base(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as e:
-            log.error(f"{self.__name__}  [ {e} ]")
+            log.error(f"save error:  [ {repr(e)} ]")
             db.session.rollback()
             raise MyException()
 

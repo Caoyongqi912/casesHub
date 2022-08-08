@@ -4,16 +4,16 @@
 # @Software: PyCharm
 # @Desc: 用户模型类
 
-from typing import Dict
+from typing import Dict, NoReturn
 from Models.base import Base
 from App import db
 from typing import AnyStr, Union
 import time
-import jwt  # py3.10+ 需要修改   from collections.abc  import Mappin
+import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException
-from Enums import ResponseMsg, Gender, UserTag, IntEnum
+from Enums.myEnum import Gender, UserTag, IntEnum
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)
@@ -22,7 +22,7 @@ log = MyLog.get_log(__file__)
 class User(Base):
     __tablename__ = "user"
     _mail = "@caseHub.com"
-    username = db.Column(db.String(20), unique=True, comment="用户名")
+    username = db.Column(db.String(20), comment="用户名")
     phone = db.Column(db.String(12), unique=True, comment="手机")
     password = db.Column(db.String(200), comment="密码")
     email = db.Column(db.String(40), unique=True, comment="邮箱")
@@ -32,7 +32,7 @@ class User(Base):
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
     departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
 
-    def __init__(self, username: AnyStr, phone: AnyStr, gender: Gender,
+    def __init__(self, username: AnyStr, phone: AnyStr, gender: Gender = Gender.MALE,
                  tag: UserTag = None, isAdmin: bool = False,
                  departmentID: int = None,
                  password: AnyStr = None):
@@ -49,7 +49,7 @@ class User(Base):
 
         self.departmentID = departmentID
 
-    def addAdmin(self):
+    def addAdmin(self) -> NoReturn:
         """
         添加管理员
         isAdmin = True
@@ -59,16 +59,18 @@ class User(Base):
         self.tag = UserTag.ADMIN
         self.save()
 
-    def addUser(self):
+    def addUser(self) -> NoReturn:
         """
         管理员添加用户
         password = username
         email = username + self.mail
         isAdmin = False
+        :param gender 枚举转换
+        :param tag 枚举转换
         """
         self.isAdmin = False
         self.hash_password(self.username)
-        self.email = self.username + self.mail
+        self.email = self.username + self._mail
         self.save()
 
     def hash_password(self, password: AnyStr):
@@ -89,10 +91,13 @@ class User(Base):
 
     @classmethod
     def query_by_tag(cls, tag: AnyStr):
-        if tag not in ["QA", "PR", "DEV", "ADMIN"]:
-            raise ParamException(ResponseMsg.error_val(tag, ["QA", "PR", "DEV", "ADMIN"]))
-
-        return cls.query.filter(User.tag == tag).all()
+        """
+        通过tag
+        :param tag:
+        :return:
+        """
+        t = UserTag.e(int(tag))
+        return cls.query.filter(User.tag == t).all()
 
     @staticmethod
     def verify_token(token: AnyStr) -> Union[None,]:
@@ -143,8 +148,6 @@ class User(Base):
         """
         res = super(User, User).to_json(obj)
         res.pop("password")
-        res['gender'] = res['gender'].value
-        res['tag'] = res['tag'].value
         return res
 
     def __repr__(self):

@@ -10,41 +10,12 @@ CREATE TABLE department
     PRIMARY KEY (id),
     UNIQUE (name)
 );
+
+
 INSERT INTO department (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (1, 'sWyPruqCGakgjwedMItN', '2022-07-31', '2022-07-31', 'QA', 'QA team', 1);
+VALUES (1, 'qygKojXzJkOFElKendjU', '2022-08-08', '2022-08-08', 'DEV', 'DEV team', 1);
 INSERT INTO department (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (2, 'mUAFYnxNHKolWUcMziui', '2022-07-31', '2022-07-31', 'DEV', 'DEV team', 1);
-
-
-
-CREATE TABLE user
-(
-    id             INTEGER NOT NULL AUTO_INCREMENT,
-    uid            VARCHAR(50) COMMENT '唯一标识',
-    create_time    DATE COMMENT '创建时间',
-    update_time    DATE COMMENT '修改时间',
-    username       VARCHAR(20) COMMENT '用户名',
-    phone          VARCHAR(12) COMMENT '手机',
-    password       VARCHAR(200) COMMENT '密码',
-    email          VARCHAR(40) COMMENT '邮箱',
-    gender         ENUM ('MALE','FEMALE') COMMENT '性别' DEFAULT 'MALE',
-    avatar         VARCHAR(400) COMMENT '头像',
-    isAdmin        BOOL COMMENT '管理',
-    tag            ENUM ('QA','PR','DEV','ADMIN') COMMENT '标签',
-    `departmentID` INTEGER COMMENT '所属部门',
-    PRIMARY KEY (id),
-    UNIQUE (username),
-    UNIQUE (phone),
-    UNIQUE (email),
-    FOREIGN KEY (`departmentID`) REFERENCES department (id)
-);
-
-#添加管理员
-INSERT INTO user (uid, create_time, update_time, username, phone, password, email, gender, avatar, `isAdmin`, tag,
-                  `departmentID`)
-VALUES ('4e111a28-e68c-429c-95f6-2f7370a4fbdd', '2022-07-31', '2022-07-31', 'ADMIN', '17612395915',
-        'pbkdf2:sha256:260000$7dfUoYrnI6Ko3mDu$0c86e80f77259c2b6589c36e6f63ce323ecc28a96f05f72814406b4d5e1bb4e4',
-        'ADMIN@caseHub.com', 'MALE', null, TRUE, 1, null);
+VALUES (2, 'ZjIcsbULvhGxhWEbyToL', '2022-08-08', '2022-08-08', 'QA', 'QA team', 1);
 
 
 
@@ -60,60 +31,6 @@ CREATE TABLE project
     PRIMARY KEY (id),
     UNIQUE (name)
 );
-INSERT INTO project (id, uid, create_time, update_time, name, `desc`, `adminID`)
-VALUES (1, 'MuLaJydzZlrSPPGSENEa', '2022-07-31', '2022-07-31', 'P1', 'xxxxxxxxxxxxxxxxxxxxxxx', 1);
-
-
-CREATE TABLE product
-(
-    id          INTEGER NOT NULL AUTO_INCREMENT,
-    uid         VARCHAR(50) COMMENT '唯一标识',
-    create_time DATE COMMENT '创建时间',
-    update_time DATE COMMENT '修改时间',
-    name        VARCHAR(20) COMMENT '产品名称',
-    `desc`      VARCHAR(100) COMMENT '产品描述',
-    `projectID` INTEGER NOT NULL COMMENT '所属项目',
-    PRIMARY KEY (id),
-    UNIQUE (name),
-    FOREIGN KEY (`projectID`) REFERENCES project (id)
-);
-INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
-VALUES (1, 'ZsWBjEgGrRQijRZKzpZA', '2022-08-01', '2022-08-01', 'pro1', 'pro1 desc', 2);
-INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
-VALUES (2, 'yyuiZSdSmHvwjUslsOHv', '2022-08-01', '2022-08-01', 'pro2', 'pro2 for project 1', 2);
-INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
-VALUES (3, 'YXSVrSgQxowjjtlnPfFI', '2022-08-01', '2022-08-01', 'pro3', 'pro3 desc', 2);
-INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
-VALUES (4, 'bfvMFjEpLdxbQuoMxvLL', '2022-08-01', '2022-08-01', 'pro4', 'pro4 desc', 3);
-INSERT INTO product (id, uid, create_time, update_time, name, `desc`, projectID)
-VALUES (5, 'eJpUgXNBrCfAYiKWJyxL', '2022-08-01', '2022-08-01', 'pro5', 'pro5 desc', 3);
-
-CREATE TABLE product_user
-(
-    `productID` INTEGER,
-    `userID`    INTEGER,
-    FOREIGN KEY (`productID`) REFERENCES product (id),
-    FOREIGN KEY (`userID`) REFERENCES user (id)
-);
-
-CREATE TABLE version
-(
-    id          INTEGER NOT NULL AUTO_INCREMENT,
-    uid         VARCHAR(50) COMMENT '唯一标识',
-    create_time DATE COMMENT '创建时间',
-    update_time DATE COMMENT '修改时间',
-    name        VARCHAR(20) COMMENT '版本名称',
-    `desc`      VARCHAR(100) COMMENT '版本描述',
-    `productID` INTEGER COMMENT '所属产品',
-    PRIMARY KEY (id),
-    FOREIGN KEY (`productID`) REFERENCES product (id) ON DELETE CASCADE
-);
-INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
-VALUES (1, 'eErlYCZXtbolWXSFlWtD', '2022-08-01', '2022-08-01', '1.0', null, 4);
-INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
-VALUES (2, 'vmGwQrCzDxSLrTDivkTl', '2022-08-01', '2022-08-01', '1.0', null, 5);
-INSERT INTO version (id, uid, create_time, update_time, name, `desc`, productID)
-VALUES (3, 'qQbpCRnmROuxhutwLFGS', '2022-08-01', '2022-08-01', '1.1', null, 5);
 
 CREATE TABLE platform
 (
@@ -124,14 +41,37 @@ CREATE TABLE platform
     name        ENUM ('IOS','ANDROID','WEB','PC') COMMENT '平台名称',
     PRIMARY KEY (id)
 );
-INSERT INTO platform (id, uid, create_time, update_time, name)
-VALUES (1, 'XwrnNjNsHrKSrXWsoTqj', '2022-08-02', '2022-08-02', 'IOS');
-INSERT INTO platform (id, uid, create_time, update_time, name)
-VALUES (2, 'wkDKNwEcZxHAODJPbSHJ', '2022-08-02', '2022-08-02', 'ANDROID');
-INSERT INTO platform (id, uid, create_time, update_time, name)
-VALUES (3, 'ThlPwvBcfWOdioeNQPgO', '2022-08-02', '2022-08-02', 'PC');
-INSERT INTO platform (id, uid, create_time, update_time, name)
-VALUES (4, 'EQhfXBJxtxVDAXLZXcYH', '2022-08-02', '2022-08-02', 'WEB');
+
+CREATE TABLE user
+(
+    id             INTEGER NOT NULL AUTO_INCREMENT,
+    uid            VARCHAR(50) COMMENT '唯一标识',
+    create_time    DATE COMMENT '创建时间',
+    update_time    DATE COMMENT '修改时间',
+    username       VARCHAR(20) COMMENT '用户名',
+    phone          VARCHAR(12) COMMENT '手机',
+    password       VARCHAR(200) COMMENT '密码',
+    email          VARCHAR(40) COMMENT '邮箱',
+    gender         INTEGER COMMENT '性别',
+    tag            INTEGER COMMENT '标签',
+    avatar         VARCHAR(400) COMMENT '头像',
+    `isAdmin`      BOOL COMMENT '管理',
+    `departmentID` INTEGER COMMENT '所属部门',
+    PRIMARY KEY (id),
+    UNIQUE (phone),
+    UNIQUE (email),
+    FOREIGN KEY (`departmentID`) REFERENCES department (id)
+);
+INSERT INTO user (id, uid, create_time, update_time, username, phone, password, email, gender, tag, avatar, `isAdmin`,
+                  `departmentID`)
+VALUES (1, 'OAzksgGicHcwpqgRgXZU', '2022-08-08', '2022-08-08', 'ADMIN', '17612395915',
+        'pbkdf2:sha256:260000$jSVPQ77vpnkERsSE$6187321158c003e28cdfe32383b19423e7fa64f2c68cde7c55b830a720e07a3e',
+        'ADMIN@caseHub.com', 1, 0, null, 1, null);
+INSERT INTO user (id, uid, create_time, update_time, username, phone, password, email, gender, tag, avatar, `isAdmin`,
+                  `departmentID`)
+values (2, 'cxpKyEisuRZoepPFQGaO', '2022-08-08', '2022-08-08', 'dawa', '17612395913',
+        'pbkdf2:sha256:260000$jIOla04MKwhl61L2$78e44f053a2bc19734538e36bd16e349ceb1d643356756cd5a5257da9ec9509f',
+        'dawa@caseHub.com', 1, 1, null, 0, 1);
 
 CREATE TABLE case_part
 (
@@ -140,9 +80,22 @@ CREATE TABLE case_part
     create_time DATE COMMENT '创建时间',
     update_time DATE COMMENT '修改时间',
     `partName`  VARCHAR(20) COMMENT '用例模块',
-    `productID` INTEGER COMMENT '所属产品',
+    `projectID` INTEGER COMMENT '所属产品',
     PRIMARY KEY (id),
-    FOREIGN KEY (`productID`) REFERENCES product (id)
+    FOREIGN KEY (`projectID`) REFERENCES project (id)
+);
+
+CREATE TABLE version
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    name        VARCHAR(20) COMMENT '版本名称',
+    `desc`      VARCHAR(100) COMMENT '版本描述',
+    `projectID` INTEGER COMMENT '所属产品',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE CASCADE
 );
 
 CREATE TABLE cases
@@ -152,23 +105,34 @@ CREATE TABLE cases
     create_time  DATE COMMENT '创建时间',
     update_time  DATE COMMENT '修改时间',
     title        VARCHAR(20)  NOT NULL COMMENT '用例名称',
-    tag          ENUM ('常规','冒烟') COMMENT '用例标签'                                              DEFAULT '常规',
+    tag          ENUM ('COMMENT','SMOCK') COMMENT '用例标签',
     `desc`       VARCHAR(100) NOT NULL COMMENT '用例描述',
     case_level   ENUM ('P1','P2','P3','P4') COMMENT '用例等级',
-    case_type    ENUM ('功能','接口','性能') COMMENT '用例类型'                                         DEFAULT '功能',
-    status       ENUM ('QUEUE','TESTING','BLOCK','SKIP','PASS','FAIL','CLOSE') COMMENT '用例状态' DEFAULT 'QUEUE',
+    case_type    ENUM ('COMMENT','API','PERF') COMMENT '用例类型',
+    status       ENUM ('QUEUE','TESTING','BLOCK','SKIP','PASS','FAIL','CLOSE') COMMENT '用例状态',
     setup        VARCHAR(40) COMMENT '用例前置',
     info         JSON         NOT NULL COMMENT '用例步骤与预期结果',
     mark         VARCHAR(100) COMMENT '用例备注',
     `partID`     INTEGER COMMENT '模块',
-    `productID`  INTEGER COMMENT '所属产品',
+    `projectID`  INTEGER COMMENT '所属产品',
     `platformID` INTEGER COMMENT '所属平台',
+    `versionID`  INTEGER COMMENT '所属版本',
     creator      INTEGER      NOT NULL COMMENT '创建人',
     updater      INTEGER COMMENT '修改人',
     PRIMARY KEY (id),
     FOREIGN KEY (`partID`) REFERENCES case_part (id) ON DELETE SET NULL,
-    FOREIGN KEY (`productID`) REFERENCES product (id) ON DELETE SET NULL,
-    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll
+    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE SET NULL,
+    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll,
+    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NUll
+);
+
+CREATE TABLE project_user
+(
+    project_id INTEGER NOT NULL,
+    user_id    INTEGER NOT NULL,
+    PRIMARY KEY (project_id, user_id),
+    FOREIGN KEY (project_id) REFERENCES project (id),
+    FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
 CREATE TABLE bug
@@ -183,9 +147,9 @@ CREATE TABLE bug
     tester       VARCHAR(20) NOT NULL COMMENT '测试人',
     developer    VARCHAR(20) COMMENT '开发',
     pr           VARCHAR(20) COMMENT '产品',
-    bug_type     ENUM ('线上问题','优化','缺陷') COMMENT 'bug类型',
+    type         ENUM ('ONLINE','OPTIMIZE','FAIL') COMMENT 'bug类型',
     level        ENUM ('P1','P2','P3','P4') COMMENT 'BUG等级',
-    status       ENUM ('OPEN','CLOSE','BLOCK') COMMENT 'BUG状态' DEFAULT 'OPEN',
+    status       ENUM ('OPEN','CLOSE','BLOCK') COMMENT 'BUG状态',
     file         VARCHAR(50) COMMENT '附件地址',
     mark         VARCHAR(100) COMMENT 'BUG备注',
     `platformID` INTEGER COMMENT '所属平台',
