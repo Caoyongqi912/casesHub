@@ -13,31 +13,31 @@ import jwt  # py3.10+ 需要修改   from collections.abc  import Mappin
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException
-from Enums import ResponseMsg, Gender, UserTag
+from Enums import ResponseMsg, Gender, UserTag, IntEnum
 from Utils import MyLog
 
-log = MyLog().get_log(__file__)
+log = MyLog.get_log(__file__)
 
 
 class User(Base):
-    mail = "@caseHub.com"
     __tablename__ = "user"
+    _mail = "@caseHub.com"
     username = db.Column(db.String(20), unique=True, comment="用户名")
     phone = db.Column(db.String(12), unique=True, comment="手机")
     password = db.Column(db.String(200), comment="密码")
     email = db.Column(db.String(40), unique=True, comment="邮箱")
-    gender = db.Column(db.Enum(Gender), comment="性别")
+    gender = db.Column(IntEnum(Gender), comment="性别")
+    tag = db.Column(IntEnum(UserTag), comment="标签")
     avatar = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin = db.Column(db.Boolean, default=False, comment="管理")
-    tag = db.Column(db.Enum(UserTag), comment="标签")
     departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
 
-    def __init__(self, username: AnyStr, phone: AnyStr, gender: AnyStr,
-                 tag: AnyStr = None, isAdmin: bool = False,
+    def __init__(self, username: AnyStr, phone: AnyStr, gender: Gender,
+                 tag: UserTag = None, isAdmin: bool = False,
                  departmentID: int = None,
                  password: AnyStr = None):
         self.username = username
-        self.email = self.username + self.mail
+        self.email = self.username + self._mail
         self.gender = gender
         self.phone = phone
         self.tag = tag
@@ -56,7 +56,7 @@ class User(Base):
         tag = ADMIN
         """
         self.isAdmin = True
-        self.tag = "ADMIN"
+        self.tag = UserTag.ADMIN
         self.save()
 
     def addUser(self):
@@ -143,6 +143,8 @@ class User(Base):
         """
         res = super(User, User).to_json(obj)
         res.pop("password")
+        res['gender'] = res['gender'].value
+        res['tag'] = res['tag'].value
         return res
 
     def __repr__(self):

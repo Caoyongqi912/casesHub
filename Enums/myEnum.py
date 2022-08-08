@@ -1,5 +1,21 @@
 from enum import Enum
 
+import sqlalchemy as sql
+
+
+class IntEnum(sql.types.TypeDecorator):
+    impl = sql.Integer
+
+    def __init__(self, enumType, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__enumType = enumType
+
+    def process_bind_param(self, value, dialect):
+        return value.value
+
+    def process_result_value(self, value, dialect):
+        return self.__enumType(value)
+
 
 class CaseLevel(Enum):
     P1 = "P1"
@@ -58,3 +74,7 @@ class UserTag(Enum):
     PR = 2
     DEV = 3
     ADMIN = 0
+
+
+if __name__ == '__main__':
+    print(Gender.MALE.value)

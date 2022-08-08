@@ -4,4 +4,4 @@
 # @Software: PyCharm
 # @Desc:
 
-from .Case import CasePartSwagger
+from .Case import CasePartSwagger,CaseSwagger

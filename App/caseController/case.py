@@ -15,17 +15,17 @@ from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Swagger import CasePartSwagger
+from Swagger import CasePartSwagger,CaseSwagger
+casePartNamespace = Namespace("CasePartController", description="用例模块")
+caseNamespace = Namespace("CaseController", description="测试用例")
 
-ns = Namespace("CasePartController", description="用例模块")
 
-
-@ns.route("/opt", strict_slashes=False)
+@casePartNamespace.route("/part/opt", strict_slashes=False)
 class CasePartController(Resource):
-    swagger = CasePartSwagger(ns)
+    swagger = CasePartSwagger(casePartNamespace)
 
-    @ns.doc(body=swagger.post)
-    @ns.response(**swagger.success)
+    @casePartNamespace.doc(body=swagger.post)
+    @casePartNamespace.response(**swagger.success)
     @auth.login_required
     def post(self) -> MyResponse:
         """
@@ -39,8 +39,8 @@ class CasePartController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    @ns.doc(params=swagger.get)
-    @ns.response(**swagger.success)
+    @casePartNamespace.doc(params=swagger.get)
+    @casePartNamespace.response(**swagger.success)
     def get(self) -> MyResponse:
         """
         通过casePartID 获取用例集
@@ -52,8 +52,8 @@ class CasePartController(Resource):
         return MyResponse.success(CasePart.get(parse.parse_args().get(target), target))
 
     @auth.login_required
-    @ns.doc(body=swagger.put)
-    @ns.response(**swagger.success)
+    @casePartNamespace.doc(body=swagger.put)
+    @casePartNamespace.response(**swagger.success)
     def put(self) -> MyResponse:
         """
         更新
@@ -66,8 +66,8 @@ class CasePartController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    @ns.doc(body=swagger.delete)
-    @ns.response(**swagger.success)
+    @casePartNamespace.doc(body=swagger.delete)
+    @casePartNamespace.response(**swagger.success)
     def delete(self) -> MyResponse:
         """
         删除
@@ -79,9 +79,13 @@ class CasePartController(Resource):
         return MyResponse.success()
 
 
+@caseNamespace.route("/opt")
 class CaseController(Resource):
+    swagger = CaseSwagger(caseNamespace)
 
     @auth.login_required
+    @caseNamespace.doc(body=swagger.post)
+    @caseNamespace.response(**swagger.success)
     def post(self) -> MyResponse:
         """
         新增用例

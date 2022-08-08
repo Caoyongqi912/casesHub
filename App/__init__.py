@@ -41,11 +41,11 @@ def create_app(configName: AnyStr = "default") -> Flask:
     api.init_app(app,terms_url="/api/case/", version='1.0', title='caseHub API')  # restx
     CORS(app, supports_credentials=True)
     #
-    # from .DepartController import userBP
-    # app.register_blueprint(userBP)
-    #
-    # from .projectController import proBP
-    # app.register_blueprint(proBP)
+    from .DepartController import userBP
+    app.register_blueprint(userBP)
+
+    from .projectController import proBP
+    app.register_blueprint(proBP)
 
     from .caseController import caseBP
     app.register_blueprint(caseBP)

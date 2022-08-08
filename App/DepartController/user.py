@@ -40,6 +40,18 @@ class UserOpt(Resource):
 
     @auth.login_required
     @is_admin
+    def get(self) -> MyResponse:
+        """
+        通userID 获取info
+        :return:
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="userID", required=True)
+        info = User.get(parse.parse_args().get("userID"), "userID")
+        return MyResponse.success(info)
+
+    @auth.login_required
+    @is_admin
     def post(self) -> MyResponse:
         """
         管理員添加用戶
@@ -202,7 +214,7 @@ class QueryUserByTag(Resource):
 
 
 api_script = Api(userBP)
-# api_script.add_resource(AddAdmin, "/admin")
+api_script.add_resource(AddAdmin, "/admin")
 api_script.add_resource(UserOpt, "/opt")
 api_script.add_resource(SetPassword, "/setpassword")
 
@@ -210,7 +222,6 @@ api_script.add_resource(QueryUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 
-api_script.add_resource(UserController, "/info")
 api_script.add_resource(QueryUserByTag, "/tag/<string:tag>")
 
 api_script.add_resource(AvatarController, "/avatar")

@@ -15,9 +15,9 @@ from Utils import MyLog, simpleCase, simpleUser
 log = MyLog.get_log(__file__)
 
 projectUser = db.Table(
-    "product_user",
-    db.Column("projectID", db.INTEGER, db.ForeignKey("product.id"), primary_key=True),
-    db.Column("userID", db.INTEGER, db.ForeignKey("user.id"), primary_key=True)
+    "project_user",
+    db.Column("project_id", db.INTEGER, db.ForeignKey("project.id"), primary_key=True),
+    db.Column("user_id", db.INTEGER, db.ForeignKey("user.id"), primary_key=True)
 
 )
 
@@ -92,3 +92,4 @@ class Project(Base):
 
     def __repr__(self):
         return f"<{Project.__name__} {self.name}>"
+

@@ -53,7 +53,7 @@ expunge:移除操作的时候，会将相关联的对象也进行移除。这个
 all:是对save-update，merge，refresh-expire，expunge，delete几种的填写
 比如
 articles = relationship("Article",cascade="save-update,delete")
-
+with_entities
 """
 from typing import List, AnyStr, Dict, NoReturn
 from flask_sqlalchemy import Pagination
