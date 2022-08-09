@@ -25,7 +25,7 @@ class MyException(HTTPException):
         if response:
             self._response = response
         else:
-            self._response = MyResponse.error(ResponseCode.SERVER_ERROR)
+            self._response = MyResponse.server_error()
         super(MyException, self).__init__(response=self.__make_response())
 
     def __make_response(self) -> Response:

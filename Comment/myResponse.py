@@ -3,7 +3,7 @@
 # @File : myResponse.py
 # @Software: PyCharm
 # @Desc: 返回自定义
-from typing import Any
+from typing import Any, Dict
 from flask import jsonify
 from Enums import ResponseCode, ResponseMsg
 
@@ -21,6 +21,10 @@ class MyResponse:
     @staticmethod
     def error(code: ResponseCode) -> make_response:
         return make_response(code, None, ResponseMsg.ERROR)
+
+    @staticmethod
+    def server_error() -> Dict:
+        return {"code": ResponseCode.SERVER_ERROR, "data": None, "msg": ResponseMsg.ERROR}
 
     @staticmethod
     def not_find() -> make_response:
@@ -47,6 +51,3 @@ class AuthError:
     def error() -> dict:
         return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseMsg.AUTH_ERROR}
 
-
-if __name__ == '__main__':
-    print(AuthError.error())

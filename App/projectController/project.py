@@ -134,9 +134,26 @@ class QueryUserController(Resource):
         return MyResponse.success(Project.get(projectID, "projectID").page_user(**parse.parse_args()))
 
 
+class AddUser(Resource):
+
+    @auth.login_required
+    def post(self) -> MyResponse:
+        """
+        添加用户
+        :return:MyResponse
+        """
+        parse = MyRequestParseUtil()
+        parse.add(name="projectID", type=int, required=True)
+        parse.add(name="userIds", type=list, required=True)
+        info = parse.parse_args()
+        Project.get(info['projectID'], "projectID").addUsers(info['userIds'])
+        return MyResponse.success()
+
+
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
 api_script.add_resource(QueryCaseController, "/<string:projectID>/page_cases")
 api_script.add_resource(QueryVersionController, "/<string:projectID>/page_versions")
 api_script.add_resource(QueryCasePartController, '/<string:projectID>/page_casePart')
 api_script.add_resource(QueryUserController, '/<string:projectID>/page_user')
+api_script.add_resource(AddUser, "/addUser")

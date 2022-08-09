@@ -5,9 +5,12 @@
 # @Desc: 产品实体
 
 
-from typing import AnyStr, List
+from typing import AnyStr, List, NoReturn
 from flask_sqlalchemy import Pagination
-from Comment.myException import AuthException
+from Comment.myException import AuthException, ParamException
+from Comment.myResponse import ParamError
+from Enums import ResponseMsg
+from Models.DepartModel.userModel import User
 from Models.base import Base
 from App import db
 from Utils import MyLog, simpleCase, simpleUser
@@ -40,6 +43,25 @@ class Project(Base):
         self.name = name
         self.desc = desc
         self.adminID = adminID
+
+    def addUsers(self, users: List[int]) -> NoReturn:
+        """
+        批量添加用户
+        必须是admin or adminID可添加
+        需要校验是否已经添加过
+        :param users:
+        :raise ParamError
+        """
+        self.__verify_auth()
+
+        uids = [u.id for u in self.users.all()]
+        for id in users:
+            u = User.get(id, f"uid {id}")
+            if self.search(uids, u.id):
+                raise ParamException(ResponseMsg.already_exist(str(id)))
+            else:
+                self.users.append(u)
+        self.save()
 
     @classmethod
     def update(cls, **kwargs):
@@ -90,6 +112,14 @@ class Project(Base):
         """
         return self.users.my_paginate(**kwargs)
 
+    def __verify_auth(self) -> NoReturn:
+        """
+        权限校验
+        :raise:  AuthException
+        """
+        from flask import g
+        if not g.user.isAdmin and not g.user.id == self.adminID:
+            raise AuthException()
+
     def __repr__(self):
         return f"<{Project.__name__} {self.name}>"
-
