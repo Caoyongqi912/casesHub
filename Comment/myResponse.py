@@ -50,4 +50,3 @@ class AuthError:
     @staticmethod
     def error() -> dict:
         return {"code": ResponseCode.AUTH_ERROR, "data": None, "msg": ResponseMsg.AUTH_ERROR}
-

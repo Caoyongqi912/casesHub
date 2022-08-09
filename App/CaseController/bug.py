@@ -3,16 +3,14 @@
 # @File : bug.py 
 # @Software: PyCharm
 # @Desc:bugView
-from flask_restx import Resource, Namespace
+from flask_restful import Api, Resource
 from App import auth
+from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Models.CaseModel.bugs import Bug
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
-bugNamespace = Namespace("bugController")
 
-
-@bugNamespace.route("/bug")
 class BugController(Resource):
 
     @auth.login_required
@@ -45,7 +43,8 @@ class FindBug(Resource):
         bug = Bug.get(bugID, "bugID")
         return MyResponse.success(bug)
 
+
 #
-# api_script = Api(caseBP)
-# api_script.add_resource(BugController, "/bug")
-# api_script.add_resource(FindBug, "/bug/<string:bugID>")
+api_script = Api(caseBP)
+api_script.add_resource(BugController, "/bug")
+api_script.add_resource(FindBug, "/bug/<string:bugID>")

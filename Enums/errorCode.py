@@ -7,7 +7,6 @@ from typing import AnyStr, Any, List
 
 
 class ResponseCode:
-    DATA = None
     SUCCESS = 0
     SERVER_ERROR = 500
     PARAMS_ERROR = 1000
@@ -21,7 +20,7 @@ class ResponseMsg:
     REQUEST_BODY_ERROR = "request body error !"
     AUTH_ERROR = "auth error No permission !"
     ERROR_EXCEL = "check ur excel param !"
-    NOT_FOUND = "not found"
+    NOT_FOUND = "not found !"
 
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:

@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from App import create_app, db
-from Models import *
+from Models.CaseModel import bugs,cases
 if __name__ == '__main__':
     create_app().app_context().push()
     db.create_all()

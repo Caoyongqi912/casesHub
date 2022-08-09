@@ -31,6 +31,11 @@ CREATE TABLE project
     PRIMARY KEY (id),
     UNIQUE (name)
 );
+insert into project (id, uid, create_time, update_time, name, `desc`, adminID)
+values (1, 'SFqIOVNUIxWUGHjyZVAT', '2022-08-09', '2022-08-09', 'p1', 'xxxxxxxxxxxxxxxxxxxxxxx', 1);
+insert into project (id, uid, create_time, update_time, name, `desc`, adminID)
+values (2, 'lTdDWeAvmBMFsHXmqlcC', '2022-08-09', '2022-08-09', 'p2', 'xxxxxxxxxxxxxxxxxxxxxxx', 2);
+
 
 CREATE TABLE platform
 (
@@ -41,6 +46,10 @@ CREATE TABLE platform
     name        ENUM ('IOS','ANDROID','WEB','PC') COMMENT '平台名称',
     PRIMARY KEY (id)
 );
+INSERT INTO platform(id, uid, create_time, update_time, name)
+VALUES (1, 'yGlrWVBxHBYFiHLOkntk', '2022-08-09', '2022-08-09', 'IOS');
+INSERT INTO platform(id, uid, create_time, update_time, name)
+VALUES (2, 'SgKpUtQZrfcAoeAZGwSk', '2022-08-09', '2022-08-09', 'ANDROID');
 
 CREATE TABLE user
 (
@@ -79,11 +88,15 @@ CREATE TABLE case_part
     uid         VARCHAR(50) COMMENT '唯一标识',
     create_time DATE COMMENT '创建时间',
     update_time DATE COMMENT '修改时间',
-    `partName`  VARCHAR(20) COMMENT '用例模块',
+    `partName`  VARCHAR(20) UNIQUE COMMENT '用例模块',
     `projectID` INTEGER COMMENT '所属产品',
     PRIMARY KEY (id),
     FOREIGN KEY (`projectID`) REFERENCES project (id)
 );
+insert into case_part(id, uid, create_time, update_time, partName, projectID)
+VALUES (1, 'awpTEztUPovjrtbwoJGt', '2022-08-09', '2022-08-09', 'part1', 1);
+
+
 
 CREATE TABLE version
 (
@@ -98,33 +111,12 @@ CREATE TABLE version
     FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE CASCADE
 );
 
-CREATE TABLE cases
-(
-    id           INTEGER      NOT NULL AUTO_INCREMENT,
-    uid          VARCHAR(50) COMMENT '唯一标识',
-    create_time  DATE COMMENT '创建时间',
-    update_time  DATE COMMENT '修改时间',
-    title        VARCHAR(20)  NOT NULL COMMENT '用例名称',
-    tag          ENUM ('COMMENT','SMOCK') COMMENT '用例标签',
-    `desc`       VARCHAR(100) NOT NULL COMMENT '用例描述',
-    case_level   ENUM ('P1','P2','P3','P4') COMMENT '用例等级',
-    case_type    ENUM ('COMMENT','API','PERF') COMMENT '用例类型',
-    status       ENUM ('QUEUE','TESTING','BLOCK','SKIP','PASS','FAIL','CLOSE') COMMENT '用例状态',
-    setup        VARCHAR(40) COMMENT '用例前置',
-    info         JSON         NOT NULL COMMENT '用例步骤与预期结果',
-    mark         VARCHAR(100) COMMENT '用例备注',
-    `partID`     INTEGER COMMENT '模块',
-    `projectID`  INTEGER COMMENT '所属产品',
-    `platformID` INTEGER COMMENT '所属平台',
-    `versionID`  INTEGER COMMENT '所属版本',
-    creator      INTEGER      NOT NULL COMMENT '创建人',
-    updater      INTEGER COMMENT '修改人',
-    PRIMARY KEY (id),
-    FOREIGN KEY (`partID`) REFERENCES case_part (id) ON DELETE SET NULL,
-    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE SET NULL,
-    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll,
-    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NUll
-);
+insert into version(id, uid, create_time, update_time, name, `desc`, projectID)
+values (1, 'gYPeeSKTZAnJrDPveQgJ', '2022-08-09', '2022-08-09', 'version 1.0', 'v1 banben', 1);
+insert into version(id, uid, create_time, update_time, name, `desc`, projectID)
+values (1, 'xlpogVbnHvKLyMfhPYDL', '2022-08-09', '2022-08-09', 'version 1.0', 'v1 banben', 2);
+
+
 
 CREATE TABLE project_user
 (
@@ -147,9 +139,9 @@ CREATE TABLE bug
     tester       VARCHAR(20) NOT NULL COMMENT '测试人',
     developer    VARCHAR(20) COMMENT '开发',
     pr           VARCHAR(20) COMMENT '产品',
-    type         ENUM ('ONLINE','OPTIMIZE','FAIL') COMMENT 'bug类型',
-    level        ENUM ('P1','P2','P3','P4') COMMENT 'BUG等级',
-    status       ENUM ('OPEN','CLOSE','BLOCK') COMMENT 'BUG状态',
+    type         INTEGER COMMENT 'bug类型',
+    level        INTEGER COMMENT 'BUG等级',
+    status       INTEGER COMMENT 'BUG状态',
     file         VARCHAR(50) COMMENT '附件地址',
     mark         VARCHAR(100) COMMENT 'BUG备注',
     `platformID` INTEGER COMMENT '所属平台',
@@ -160,3 +152,60 @@ CREATE TABLE bug
     FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NULL,
     FOREIGN KEY (`caseID`) REFERENCES cases (id) ON DELETE SET NULL
 );
+
+CREATE TABLE cases
+(
+    id           INTEGER      NOT NULL AUTO_INCREMENT,
+    uid          VARCHAR(50) COMMENT '唯一标识',
+    create_time  DATE COMMENT '创建时间',
+    update_time  DATE COMMENT '修改时间',
+    title        VARCHAR(20)  NOT NULL COMMENT '用例名称',
+    `desc`       VARCHAR(100) NOT NULL COMMENT '用例描述',
+    tag          INTEGER COMMENT '用例标签',
+    case_level   INTEGER COMMENT '用例等级',
+    case_type    INTEGER COMMENT '用例类型',
+    status       INTEGER COMMENT '用例状态',
+    setup        VARCHAR(40) COMMENT '用例前置',
+    info         JSON         NOT NULL COMMENT '用例步骤与预期结果',
+    mark         VARCHAR(100) COMMENT '用例备注',
+    `partID`     INTEGER COMMENT '模块',
+    `projectID`  INTEGER COMMENT '所属产品',
+    `platformID` INTEGER COMMENT '所属平台',
+    `versionID`  INTEGER COMMENT '所属版本',
+    creator      INTEGER      NOT NULL COMMENT '创建人',
+    updater      INTEGER COMMENT '修改人',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`partID`) REFERENCES case_part (id) ON DELETE SET NULL,
+    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE SET NULL,
+    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll,
+    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NUll
+);
+insert into cases(id, uid, create_time, update_time, title, `desc`, tag, case_level, case_type, status, setup, info,
+                  mark, partID, projectID, platformID, versionID, creator, updater)
+VALUES (1, 'vCesTlgzDczVubtBjABF', '2022-08-09', '2022-08-09', 'case1', 'case1 desc', 1, 4, 1, 1, null, '[
+  {
+    "do": "sdfdsfdsfdsfsdf",
+    "exp": "dasasas",
+    "step": 1
+  },
+  {
+    "do": "fdsfsdfsdfsddsfsdf",
+    "exp": "dasdasdasnnf",
+    "step": 2
+  }
+]', null, 1, 1, 1, 1, 1, null);
+
+insert into cases(id, uid, create_time, update_time, title, `desc`, tag, case_level, case_type, status, setup, info,
+                  mark, partID, projectID, platformID, versionID, creator, updater)
+values (3, 'tSDptJEdrGPgLNvqdEkx', '2022-08-09', '2022-08-09', 'case2', 'case2 desc', 1, 4, 1, 1, null, '[
+  {
+    "do": "xxx",
+    "exp": "xxx",
+    "step": 1
+  },
+  {
+    "do": "xxx",
+    "exp": "xxxx",
+    "step": 2
+  }
+]', null, 1, 1, 1, 1, 1, null);

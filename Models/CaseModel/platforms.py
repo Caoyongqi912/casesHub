@@ -17,7 +17,7 @@ from Utils import simpleCase
 class Platform(Base):
     __tablename__ = "platform"
 
-    name = db.Column(db.Enum("IOS", "ANDROID", "WEB", "PC"), comment="平台名称")
+    name = db.Column(db.String(30), unique=True, comment="平台名称")
     cases = db.relationship("Cases", backref="platform", lazy="dynamic")
 
     def __init__(self, name: AnyStr):

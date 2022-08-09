@@ -6,11 +6,11 @@
 from typing import AnyStr
 
 from flask_restful import Resource, Api
-from App.projectController import proBP
+from App.ProjectController import proBP
 from App import auth
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
-from Models.CaseModel.cases import CasePart
+from Models.CaseModel.cases import CasePart, Cases
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -72,7 +72,7 @@ class ProjectController(Resource):
         return MyResponse.success()
 
 
-class QueryCaseController(Resource):
+class PageCaseController(Resource):
 
     @auth.login_required
     def get(self, projectID: AnyStr) -> MyResponse:
@@ -84,7 +84,7 @@ class QueryCaseController(Resource):
         parse = MyRequestParseUtil("values")
         parse.add(name="page", default="1")
         parse.add(name="limit", default="20")
-        parse.add(name="by", target=Project, required=False)
+        parse.add(name="by", target=Cases, required=False)
         return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.parse_args()))
 
 
@@ -152,7 +152,7 @@ class AddUser(Resource):
 
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
-api_script.add_resource(QueryCaseController, "/<string:projectID>/page_cases")
+api_script.add_resource(PageCaseController, "/<string:projectID>/page_cases")
 api_script.add_resource(QueryVersionController, "/<string:projectID>/page_versions")
 api_script.add_resource(QueryCasePartController, '/<string:projectID>/page_casePart')
 api_script.add_resource(QueryUserController, '/<string:projectID>/page_user')

@@ -6,7 +6,7 @@
 import json
 from typing import AnyStr, Dict, List, Any, Optional
 from Comment.myException import ParamException
-from Enums.myEnum import CaseLevel, CaseTag, CaseType, CaseStatus
+from Enums.myEnum import CaseLevel, CaseTag, CaseType, CaseStatus, IntEnum
 from Enums.errorCode import ResponseMsg
 from Models.base import Base
 from App import db
@@ -19,7 +19,7 @@ log = MyLog.get_log(__file__)
 
 class CasePart(Base):
     __tablename__ = 'case_part'
-    partName = db.Column(db.String(20), comment="用例模块")
+    partName = db.Column(db.String(20), unique=True, comment="用例模块")
 
     # 用例模块与产品是多对一关系
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属产品")
@@ -37,12 +37,13 @@ class CasePart(Base):
 class Cases(Base):
     __tablename__ = "cases"
     title = db.Column(db.String(20), nullable=False, comment="用例名称")
-    tag = db.Column(db.Enum(CaseTag), comment="用例标签")
     desc = db.Column(db.String(100), nullable=False, comment="用例描述")
-    case_level = db.Column(db.Enum(CaseLevel), comment="用例等级")
-    # 暂时全是功能用例 、接口性能未定义
-    case_type = db.Column(db.Enum(CaseType), comment="用例类型")
-    status = db.Column(db.Enum(CaseStatus), comment="用例状态")
+
+    tag = db.Column(IntEnum(CaseTag), comment="用例标签")
+    case_level = db.Column(IntEnum(CaseLevel), comment="用例等级")
+    case_type = db.Column(IntEnum(CaseType), comment="用例类型")
+    status = db.Column(IntEnum(CaseStatus), comment="用例状态")
+
     setup = db.Column(db.String(40), nullable=True, comment='用例前置')
     info = db.Column(db.JSON, nullable=False, comment="用例步骤与预期结果")
     mark = db.Column(db.String(100), nullable=True, comment="用例备注")
@@ -61,9 +62,9 @@ class Cases(Base):
     creator = db.Column(db.INTEGER, nullable=False, comment="创建人")
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
 
-    def __init__(self, title: AnyStr, desc: AnyStr, info: List[Dict], tag: Optional[str] = None,
-                 case_level: AnyStr = "QUEUE", case_type: Optional[str] = None,
-                 status: Optional[str] = None, setup: Optional[str] = None, mark: Optional[str] = None,
+    def __init__(self, title: AnyStr, desc: AnyStr, info: List[Dict], tag: CaseTag = CaseTag.COMMENT,
+                 case_level: CaseLevel = CaseLevel.P4, case_type: CaseType = CaseType.COMMENT,
+                 status: CaseStatus = CaseStatus.QUEUE, setup: Optional[str] = None, mark: Optional[str] = None,
                  partID: Optional[int] = None,
                  projectID: Optional[int] = None,
                  platformID: Optional[int] = None,

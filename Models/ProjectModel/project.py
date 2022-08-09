@@ -83,13 +83,12 @@ class Project(Base):
         """
         return self.versions.all()
 
-    @simpleCase
     def page_case(self, **kwargs) -> Pagination:
         """
         查询用例分页
-        :param limit: limit
-        :param page: page
-        :return:Pagination
+        :param kwargs: limit
+        :param kwargs:  page
+        :return: Pagination
         """
         return self.cases.my_paginate(**kwargs)
 
@@ -105,7 +104,6 @@ class Project(Base):
         """
         return self.parts.my_paginate(**kwargs)
 
-    @simpleUser
     def page_user(self, **kwargs) -> Pagination:
         """
         分页查询用户分页

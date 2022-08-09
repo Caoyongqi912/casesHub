@@ -38,18 +38,19 @@ def create_app(configName: AnyStr = "default") -> Flask:
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
-    api.init_app(app,terms_url="/api/case/", version='1.0', title='caseHub API')  # restx
+    api.init_app(app, version='1.0', title='caseHub API')  # restx
     CORS(app, supports_credentials=True)
     #
     from .DepartController import userBP
     app.register_blueprint(userBP)
 
-    from .projectController import proBP
+    from .ProjectController import proBP
     app.register_blueprint(proBP)
 
-    from .caseController import caseBP
+    from .CaseController import caseBP
     app.register_blueprint(caseBP)
-    from .platformController import platformBP
+
+    from .PlatformController import platformBP
     app.register_blueprint(platformBP)
 
     from .reqhook import logWrite, resp

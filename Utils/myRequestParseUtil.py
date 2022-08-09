@@ -39,6 +39,11 @@ class MyRequestParseUtil:
         :param kwargs: choices
         :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
         :param kwargs: unique  put 不要添加
+        :param kwargs: enum 枚举字段 返回其枚举值
+        :param kwargs: page 页
+        :param kwargs: limit 数量
+        :param kwargs: target 类
+
         """
         # 默认类型为字符
         if not kwargs.get("type"):
@@ -90,9 +95,16 @@ class MyRequestParseUtil:
                 self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
             if kw['name'] == "by":
                 self.__verify_by(self.body.get(kw['name']), kw.get("target"))
+
         return self.body
 
     def __verify_enum(self, ENUM: enum, value: int):
+        """
+        校验枚举值
+        :param ENUM: 枚举类
+        :param value: 整形值
+        :return: enum
+        """
         vs = [v.value for v in ENUM]
         if value not in vs:
             raise ParamException(ResponseMsg.error_val(value, vs))

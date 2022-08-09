@@ -5,27 +5,20 @@
 # @Desc: case view
 
 from flask import request, g
-from flask_restx import Resource, Namespace, fields
-
+from flask_restful import Api, Resource
 from App import auth
+from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
+from Enums import CaseTag, CaseLevel, CaseType
 from Enums.errorCode import ResponseMsg
 from Models.CaseModel.cases import CasePart, Cases
 from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Swagger import CasePartSwagger,CaseSwagger
-casePartNamespace = Namespace("CasePartController", description="用例模块")
-caseNamespace = Namespace("CaseController", description="测试用例")
 
 
-@casePartNamespace.route("/part/opt", strict_slashes=False)
 class CasePartController(Resource):
-    swagger = CasePartSwagger(casePartNamespace)
-
-    @casePartNamespace.doc(body=swagger.post)
-    @casePartNamespace.response(**swagger.success)
     @auth.login_required
     def post(self) -> MyResponse:
         """
@@ -33,14 +26,12 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="partName", type=str, required=True)
+        parse.add(name="partName", type=str, unique=CasePart, required=True)
         parse.add(name="projectID", type=int, isExist=Project, required=True)
         CasePart(**parse.parse_args()).save()
         return MyResponse.success()
 
     @auth.login_required
-    @casePartNamespace.doc(params=swagger.get)
-    @casePartNamespace.response(**swagger.success)
     def get(self) -> MyResponse:
         """
         通过casePartID 获取用例集
@@ -48,12 +39,10 @@ class CasePartController(Resource):
         """
         target = "casePartID"
         parse = MyRequestParseUtil("values")
-        parse.add(name=target, type=str, isExist=CasePart, required=True)
+        parse.add(name=target, isExist=CasePart, required=True)
         return MyResponse.success(CasePart.get(parse.parse_args().get(target), target))
 
     @auth.login_required
-    @casePartNamespace.doc(body=swagger.put)
-    @casePartNamespace.response(**swagger.success)
     def put(self) -> MyResponse:
         """
         更新
@@ -66,8 +55,6 @@ class CasePartController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    @casePartNamespace.doc(body=swagger.delete)
-    @casePartNamespace.response(**swagger.success)
     def delete(self) -> MyResponse:
         """
         删除
@@ -79,13 +66,9 @@ class CasePartController(Resource):
         return MyResponse.success()
 
 
-@caseNamespace.route("/opt")
 class CaseController(Resource):
-    swagger = CaseSwagger(caseNamespace)
 
     @auth.login_required
-    @caseNamespace.doc(body=swagger.post)
-    @caseNamespace.response(**swagger.success)
     def post(self) -> MyResponse:
         """
         新增用例
@@ -93,13 +76,17 @@ class CaseController(Resource):
         """
         parse = MyRequestParseUtil()
         parse.add(name="title", type=str, required=True)
-        parse.add(name="tag", type=str, choices=['常规', '冒烟'], default="常规", required=False)
         parse.add(name="desc", type=str, required=True)
-        parse.add(name="case_level", type=str, choices=["P1", "P2", "P3", "P4"], required=True)
-        parse.add(name="case_type", type=str, choices=["功能", "接口", "性能"], default="功能", required=False)
-        parse.add(name="platformID", type=int, target=Platform, required=True)
-        parse.add(name="projectID", type=int, isExist=Project, required=True)
-        parse.add(name="partID", type=int, isExist=CasePart, required=True)
+        parse.add(name="setup", type=str, required=False)
+
+        parse.add(name="tag", type=int, enum=CaseTag, required=True)
+        parse.add(name="case_level", type=int, enum=CaseLevel, required=True)
+        parse.add(name="case_type", type=int, enum=CaseType, required=False)
+
+        parse.add(name="platformID", type=int, isExist=Platform, required=False)
+        parse.add(name="projectID", type=int, isExist=Project, required=False)
+        parse.add(name="partID", type=int, isExist=CasePart, required=False)
+        parse.add(name="versionID", type=int, isExist=Version, required=False)
         parse.add(name="info", type=list, required=True)
         Cases(**parse.parse_args()).save()
         return MyResponse.success()
@@ -144,8 +131,8 @@ class CaseController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="id", type=int, required=True, isExist=Cases)
-        return MyResponse.success(Cases.get(parse.parse_args().get("id"), "caseID"))
+        parse.add(name="caseID", required=True, isExist=Cases)
+        return MyResponse.success(Cases.get(parse.parse_args().get("caseID"), "caseID"))
 
 
 class QueryBugs(Resource):
@@ -182,9 +169,21 @@ class ExcelPut(Resource):
         except Exception as e:
             return ParamError.error(ResponseMsg.ERROR_EXCEL)
 
-#
-# api_script = Api(caseBP)
-# api_script.add_resource(CaseController, "/opt")
-# api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
-# api_script.add_resource(CasePartController, "/part/opt")
-# api_script.add_resource(ExcelPut, "/upload/excel")
+
+class PageCasePart(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        parse = MyRequestParseUtil("values")
+        parse.add(name="page", default="1")
+        parse.add(name="limit", default="20")
+
+        return MyResponse.success(CasePart.page(**parse.parse_args()))
+
+
+api_script = Api(caseBP)
+api_script.add_resource(CaseController, "/opt")
+api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
+api_script.add_resource(CasePartController, "/part/opt")
+api_script.add_resource(PageCasePart, "/part/page")
+api_script.add_resource(ExcelPut, "/upload/excel")

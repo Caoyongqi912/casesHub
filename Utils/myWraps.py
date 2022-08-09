@@ -57,8 +57,8 @@ def simpleCase(func):
     """
 
     @wraps(func)
-    def case(cls, page, limit, by, *args):
-        info = func(cls, page, limit, by, *args)
+    def decorator(self, **kwargs):
+        info = func(self, **kwargs)
         results = {
             "items": [{
                 "id": i.id,
@@ -79,13 +79,13 @@ def simpleCase(func):
         }
         return results
 
-    return case
+    return decorator
 
 
 def simpleUser(func):
     @wraps(func)
     def user(cls, page, limit, by, *args):
-        info = func(cls, page, limit, by, *args)
+        info = func(cls, page, limit, by=None, *args)
         results = {
             "items": [{
                 "id": i.id,
@@ -105,4 +105,5 @@ def simpleUser(func):
             }
         }
         return results
+
     return user

@@ -8,7 +8,7 @@ from flask import Response
 from werkzeug.exceptions import HTTPException
 from typing import Dict, AnyStr
 from Utils import MyLog
-from .myResponse import MyResponse, ResponseCode, ParamError, AuthError
+from .myResponse import MyResponse, ParamError, AuthError
 
 log = MyLog.get_log(__file__)
 

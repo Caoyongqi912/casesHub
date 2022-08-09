@@ -6,7 +6,7 @@
 from flask_restful import Resource, Api
 
 from App import auth
-from App.projectController import proBP
+from App.ProjectController import proBP
 from Comment.myException import MyResponse
 from Models.CaseModel.cases import Cases
 from Models.ProjectModel.project import Project
@@ -61,9 +61,9 @@ class VersionController(Resource):
         get
         :return: MyResponse
         """
-        parse = MyRequestParseUtil("value")
-        parse.add(name="id", type=str, required=True)
-        return MyResponse.success(Version.get(parse.parse_args().get("id"), "id"))
+        parse = MyRequestParseUtil("values")
+        parse.add(name="versionID", type=str, required=True)
+        return MyResponse.success(Version.get(parse.parse_args().get("versionID"), "versionID"))
 
 
 class PageCases(Resource):
@@ -85,7 +85,7 @@ class PageCases(Resource):
 class PageBugs(Resource):
 
     @auth.login_required
-    def get(self, versionID: Version.id) -> MyResponse:
+    def get(self, versionID: Version) -> MyResponse:
         """
         查询版本用例分页
         :param versionID:Version.id
@@ -99,5 +99,6 @@ class PageBugs(Resource):
 
 
 api_script = Api(proBP)
-api_script.add_resource(VersionController, "/version")
+api_script.add_resource(VersionController, "/version/opt")
 api_script.add_resource(PageCases, "/version/<string:versionID>/page_case")
+api_script.add_resource(PageBugs, "/version/<string:versionID>/page_bugs")

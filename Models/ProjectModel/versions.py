@@ -31,9 +31,9 @@ class Version(Base):
         self.name = name
         self.desc = desc
         self.projectID = projectID
-        self.__unionName()
+        self.__uniqueName()
 
-    def __unionName(self) -> NoReturn:
+    def __uniqueName(self) -> NoReturn:
         """
         表设置不重名 但是产品下的不可重名 不同产品的版本重名
         :raise:  ParamError

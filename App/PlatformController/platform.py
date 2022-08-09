@@ -4,10 +4,9 @@
 # @Software: PyCharm
 # @Desc:
 from flask_restful import Resource, Api
-
 from App import auth
 from Comment.myException import MyResponse
-from App.platformController import platformBP
+from App.PlatformController import platformBP
 from Models.CaseModel.cases import Cases
 from Models.CaseModel.platforms import Platform
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -22,7 +21,8 @@ class PlatformController(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil()
-        parse.add(name="name", required=True, type=str)
+        parse.add(name="name", required=True, unique=Platform,
+                  type=str)
         Platform(**parse.parse_args()).save()
         return MyResponse.success()
 
@@ -59,7 +59,7 @@ class PlatformController(Resource):
 class PageCases(Resource):
 
     @auth.login_required
-    def get(self, platformID: Platform.id) -> MyResponse:
+    def get(self, platformID: Platform) -> MyResponse:
         """
         查询用例分页
         :param platformID:
@@ -74,4 +74,4 @@ class PageCases(Resource):
 
 api_script = Api(platformBP)
 api_script.add_resource(PlatformController, "/opt")
-api_script.add_resource(PageCases, "/<string:platformID>/page-case")
+api_script.add_resource(PageCases, "/<string:platformID>/page_case")

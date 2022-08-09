@@ -12,10 +12,6 @@ class Test:
     name = "cyq"
     desc = "desc"
 
-    def __init__(self, name, desc):
-        self.name = name
-        self.desc = desc
-
     # def __str__(self):
     #     return json.dumps({"name": self.name,
     #                        "desc": self.desc})
@@ -37,6 +33,8 @@ class Test:
                 left = mid + 1
         return False
 
-
+    def test(self,a,b,c=None):
+        print("PL")
 if __name__ == '__main__':
-    print(Test(1,2).search([1,2,3],4))
+    A = {"a":1,"b":2}
+    Test().test(**A)
