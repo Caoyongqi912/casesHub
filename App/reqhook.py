@@ -13,7 +13,7 @@ def logWrite() -> NoReturn:
     :return:
     """
     log.info(
-        f"[request ip = {request.remote_addr} \n| request url = {request.url} \n| request Host = {request.host} \n| request Method = {request.method} \n| headers = {request.headers}]")
+        f"[\n| request ip = {request.remote_addr} \n| request url = {request.url} \n| request Host = {request.host} \n| request Method = {request.method} ")
 
 
 def resp(response: Response) -> Union[MyResponse, Response]:
