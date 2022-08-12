@@ -39,11 +39,11 @@ class ProjectController(Resource):
         分页查询
         :return:
         """
+
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=Project, required=False)
-        res = Project.page(**parse.parse_args())
+        p = parse.page(cls=Project)
+
+        res = Project.page(**p)
         return MyResponse.success(res)
 
     @auth.login_required

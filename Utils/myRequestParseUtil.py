@@ -25,6 +25,7 @@ class MyRequestParseUtil:
         self.args = []
         try:
             self.body = getattr(request, self.location, {})
+            # print("========"+self.body)
         except Exception as e:
             log.error(e)
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
@@ -52,6 +53,23 @@ class MyRequestParseUtil:
         if not kwargs.get("required"):
             kwargs.setdefault("required", False)
         self.args.append(kwargs)
+
+    def page(self, cls: Any):
+        """
+        分页
+        :param by  通过目标值排序
+        :param filter 查询字段后排序
+        :return:
+        """
+        # 分页数据
+        page = self.body.get("page", 1)
+        limit = self.body.get("limit", 10)
+        by = self.body.get("by", None)
+        filter = self.body.get("filter", None)
+        self.__verify_page(page)
+        self.__verify_limit(limit)
+
+        return dict(self.body)
 
     def parse_args(self) -> Dict:
         """

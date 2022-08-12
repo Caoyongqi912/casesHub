@@ -12,6 +12,7 @@ def logWrite() -> NoReturn:
     请求钩子  日志写入请求参数
     :return:
     """
+    log.info("args==========", request.args)
     log.info(
         f"[\n| request ip = {request.remote_addr} \n| request url = {request.url} \n| request Host = {request.host} \n| request Method = {request.method} ")
 
@@ -24,6 +25,9 @@ def resp(response: Response) -> Union[MyResponse, Response]:
     """
     log.info(
         f"[ response status_code = {response.status_code}]")
+    log.info(
+        f"[ response body = {response.json} ]"
+    )
     # if response.status_code == 404:
     #     return jsonify(MyResponse.not_find())
     # elif response.status_code == 500:

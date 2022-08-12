@@ -3,7 +3,7 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc: MyBaseQuery
-from typing import AnyStr
+from typing import AnyStr, Dict
 from flask_sqlalchemy import BaseQuery, Pagination
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
@@ -40,14 +40,15 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, page: AnyStr, limit: AnyStr, by: AnyStr = None) -> Pagination:
+    def my_paginate(self, page: AnyStr, limit: AnyStr, by: AnyStr = None, filter: Dict = None) -> Pagination:
         """
         paginate
-        :param by: order_by
+        :param by: order_by {key:acs|desc|}
+        :param filter: filter {key:val}
         :param page:  page
         :param limit: limit
         :return: Pagination
         """
-        items = self.order_by(by).limit(limit).offset((page - 1) * limit).all()
-        total = self.order_by(by).count()
+        items = self.filter(**filter).order_by(by).limit(limit).offset((page - 1) * limit).all()
+        total = self.filter(**filter).order_by(by).count()
         return Pagination(self, page, limit, total, items)

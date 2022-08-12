@@ -151,6 +151,7 @@ class Base(db.Model):
         :param page: 页
         :param limit: 数量
         :param by: filed
+        :param filter:filter
         :return:
         """
         return cls.query.my_paginate(**kwargs)
