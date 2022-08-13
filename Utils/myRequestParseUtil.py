@@ -4,11 +4,10 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
-from typing import AnyStr, Dict, Any, List
+from typing import AnyStr, Dict, Any, List, Union
 from flask import request
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
-
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
@@ -16,7 +15,7 @@ log = MyLog.get_log(__file__)
 
 class MyRequestParseUtil:
 
-    def __init__(self, location: AnyStr = "json"):
+    def __init__(self, location: str = "json"):
         """
         :param location:  "json" -> application/json | "values"  -> query default json
         """
@@ -25,7 +24,6 @@ class MyRequestParseUtil:
         self.args = []
         try:
             self.body = getattr(request, self.location, {})
-            # print("========"+self.body)
         except Exception as e:
             log.error(e)
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
@@ -54,22 +52,26 @@ class MyRequestParseUtil:
             kwargs.setdefault("required", False)
         self.args.append(kwargs)
 
-    def page(self, cls: Any):
+    def page(self, cls: Any) -> Dict:
         """
-        分页
-        :param by  通过目标值排序
-        :param filter 查询字段后排序
-        :return:
+        分页参数校验
+        :param pageSize:    pageSize
+        :param current:    current
+        :param sort:    order_by(sort)
+        :param filter:  filter_by(** filter_key)
+        :return: Dict
         """
-        # 分页数据
-        page = self.body.get("page", 1)
-        limit = self.body.get("limit", 10)
-        by = self.body.get("by", None)
-        filter = self.body.get("filter", None)
-        self.__verify_page(page)
-        self.__verify_limit(limit)
-
-        return dict(self.body)
+        body = dict(self.body)
+        pageSize = body.pop("pageSize") if body.get("pageSize") else 10
+        current = body.pop("current") if body.get("current") else 1
+        sort = body.pop("sort") if body.get("sort") else 1
+        pageInfo = {
+            "pageSize": self.__verify_pageSize(pageSize),
+            "current": self.__verify_current(current),
+            "sort": self.__verify_sort(sort, cls),
+            "filter_key": self.__verify_filterKey(body, cls)
+        }
+        return pageInfo
 
     def parse_args(self) -> Dict:
         """
@@ -105,18 +107,10 @@ class MyRequestParseUtil:
             # 枚举校验
             if kw.get("enum"):
                 self.body[kw['name']] = self.__verify_enum(kw['enum'], self.body.get(kw["name"]))
-
-            # 分页数据
-            if kw["name"] == "page":
-                self.body[kw["name"]] = self.__verify_page(self.body.get(kw['name'], kw.get("default")))
-            if kw['name'] == "limit":
-                self.body[kw["name"]] = self.__verify_limit(self.body.get(kw["name"], kw.get("default")))
-            if kw['name'] == "by":
-                self.__verify_by(self.body.get(kw['name']), kw.get("target"))
-
         return self.body
 
-    def __verify_enum(self, ENUM: enum, value: int):
+    @staticmethod
+    def __verify_enum(ENUM: enum, value: int):
         """
         校验枚举值
         :param ENUM: 枚举类
@@ -128,39 +122,8 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.error_val(value, vs))
         return ENUM.e(value)
 
-    def __verify_by(self, by: AnyStr, cls: Any):
-        """
-        orderby columns 字段校验 如果不存在 返回None
-        :param by: filed
-        :param cls: entity
-        :return:
-        """
-        columns = [c.name for c in cls.__table__.columns]
-        if by not in columns:
-            return None
-
-    def __verify_page(self, page: AnyStr) -> int:
-        """
-        page校验
-        :param page: 页
-        :raise: ParamException
-        :return page
-        """
-        if int(page) < 1:
-            raise ParamException(ResponseMsg.error_param("page", "must > 0"))
-        return int(page)
-
-    def __verify_limit(self, limit: AnyStr) -> int:
-        """
-        limit 校验
-        :param limit: 行
-        :return: limit
-        """
-        if int(limit) < 0:
-            raise ParamException(ResponseMsg.error_param("limit", "must > 0"))
-        return int(limit)
-
-    def __verify_empty(self, target: AnyStr, filed: AnyStr):
+    @staticmethod
+    def __verify_empty(target: AnyStr, filed: AnyStr):
         """
         校验参数是否为空
         :param target:  目标值
@@ -170,7 +133,8 @@ class MyRequestParseUtil:
         if target is None or target == "":
             raise ParamException(ResponseMsg.empty(filed))
 
-    def __verify_type(self, target: Any, t: type):
+    @staticmethod
+    def __verify_type(target: Any, t: type):
         """
         校验类型
         :param target: 目标值
@@ -180,7 +144,8 @@ class MyRequestParseUtil:
         if not isinstance(target, t):
             raise ParamException(ResponseMsg.error_type(target, t))
 
-    def __verify_choices(self, target: Any, choices: List, filedName: AnyStr):
+    @staticmethod
+    def __verify_choices(target: Any, choices: List, filedName: AnyStr):
         """
         区间校验
         :param target: 目标值
@@ -190,3 +155,57 @@ class MyRequestParseUtil:
 
         if target not in choices:
             raise ParamException(ResponseMsg.error_val(filedName, choices))
+
+    @staticmethod
+    def __verify_current(current: int | str) -> int:
+        """
+        page校验
+        :param current: 页
+        :raise: ParamException
+        :return current
+        """
+        if isinstance(current, str):
+            current = int(current)
+        if current < 1:
+            raise ParamException(ResponseMsg.error_param("current", "must > 0"))
+        return current
+
+    @staticmethod
+    def __verify_pageSize(pageSize: int | str) -> int:
+        """
+        pageSize 校验
+        :param pageSize: 行
+        :return: pageSize
+        """
+        if isinstance(pageSize, str):
+            pageSize = int(pageSize)
+        if pageSize < 0:
+            raise ParamException(ResponseMsg.error_param("pageSize", "must > 0"))
+        return pageSize
+
+    @staticmethod
+    def __verify_sort(sort: str, cls: Any) -> Union[None, str]:
+        columns = [c.name for c in cls.__table__.columns]
+        if sort not in columns:
+            return None
+        return sort
+
+    @staticmethod
+    def __verify_filterKey(key: Dict | None, cls: Any) -> Union[Dict, None]:
+        """
+        :key like {username:"ADMIN,tag:"xx",other:"",} => {username:"ADMIN}
+        :param key:
+        :param cls:
+        :return:
+        """
+        if not key:
+            return key
+
+        columns = [c.name for c in cls.__table__.columns]
+        from copy import deepcopy
+        kk = deepcopy(key)
+        for k, v in kk.items():
+            if k not in columns or v == "":
+                key.pop(k)
+
+        return key

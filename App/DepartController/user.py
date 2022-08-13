@@ -97,12 +97,7 @@ class QueryUserController(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=User, required=False)
-        info = parse.parse_args()
-        res = User.page(**info)
-        return MyResponse.success(res)
+        return MyResponse.success(User.page(**parse.page(User)))
 
 
 class LoginController(Resource):

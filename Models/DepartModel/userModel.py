@@ -56,7 +56,7 @@ class User(Base):
         tag = ADMIN
         """
         self.isAdmin = True
-        self.tag = UserTag.ADMIN
+        self.tag = UserTag.ADMIN.value
         self.save()
 
     def addUser(self) -> NoReturn:
@@ -100,7 +100,7 @@ class User(Base):
         return cls.query.filter(User.tag == t).all()
 
     @staticmethod
-    def verify_token(token: AnyStr) -> Union[None,]:
+    def verify_token(token: AnyStr) -> Union[None]:
         """
         token 解密
         :param token:

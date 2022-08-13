@@ -8,6 +8,7 @@ from flask_restful import Resource, Api
 from App import auth
 from App.ProjectController import proBP
 from Comment.myException import MyResponse
+from Models.CaseModel.bugs import Bug
 from Models.CaseModel.cases import Cases
 from Models.ProjectModel.project import Project
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -76,10 +77,7 @@ class PageCases(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=Version, required=False)
-        return MyResponse.success(Version.get(versionID, "versionID").page_cases(**parse.parse_args()))
+        return MyResponse.success(Version.get(versionID, "versionID").page_cases(**parse.page(Cases)))
 
 
 class PageBugs(Resource):
@@ -92,10 +90,7 @@ class PageBugs(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=Cases, required=False)
-        return MyResponse.success(Version.get(versionID, "versionID").page_bugs(**parse.parse_args()))
+        return MyResponse.success(Version.get(versionID, "versionID").page_bugs(**parse.page(Bug)))
 
 
 api_script = Api(proBP)

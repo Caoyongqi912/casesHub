@@ -61,7 +61,7 @@ from sqlalchemy import asc
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
-from Utils import MyLog, UUID
+from Utils import MyLog, UUID, pageSerialize
 from Comment.myException import MyException, ParamException
 
 log = MyLog.get_log(__file__)
@@ -146,15 +146,21 @@ class Base(db.Model):
         return {c.name: getattr(obj, c.name, None) for c in obj.__table__.columns}
 
     @classmethod
-    def page(cls, **kwargs) -> Pagination:
+    @pageSerialize
+    def page(cls, pageSize: int, current: int, sort: str = None, filter_key: Dict = None) -> Pagination:
         """
-        :param page: 页
-        :param limit: 数量
-        :param by: filed
-        :param filter:filter
-        :return:
+        paginate
+        :param filter_key:  filter_by(**filter_key)
+        :param pageSize:    pageSize
+        :param current:    current
+        :param sort:    order_by(sort)
+        :return:    Pagination
         """
-        return cls.query.my_paginate(**kwargs)
+        _fk = filter_key if filter_key else {}
+        items = db.session.query(cls).filter_by(**_fk).order_by(sort).limit(pageSize).offset(
+            (current - 1) * pageSize).all()
+        total = db.session.query(cls).filter_by(**_fk).order_by(sort).count()
+        return Pagination(cls, current, pageSize, total, items)
 
     def search(self, nums: List[int], target: int) -> bool:
         """

@@ -1,7 +1,6 @@
 from typing import Union, NoReturn
-from flask import request, Response, jsonify
-from Comment.myResponse import MyResponse, AuthError
-from Enums import ResponseCode
+from flask import request, Response
+from Comment.myResponse import MyResponse
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)
@@ -12,7 +11,6 @@ def logWrite() -> NoReturn:
     请求钩子  日志写入请求参数
     :return:
     """
-    log.info("args==========", request.args)
     log.info(
         f"[\n| request ip = {request.remote_addr} \n| request url = {request.url} \n| request Host = {request.host} \n| request Method = {request.method} ")
 

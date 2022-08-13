@@ -11,6 +11,7 @@ from App import auth
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Models.CaseModel.cases import CasePart, Cases
+from Models.DepartModel.userModel import User
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -41,10 +42,7 @@ class ProjectController(Resource):
         """
 
         parse = MyRequestParseUtil("values")
-        p = parse.page(cls=Project)
-
-        res = Project.page(**p)
-        return MyResponse.success(res)
+        return MyResponse.success(Project.page(**parse.page(cls=Project)))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -82,10 +80,7 @@ class PageCaseController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=Cases, required=False)
-        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.parse_args()))
+        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.page(Cases)))
 
 
 class QueryVersionController(Resource):
@@ -98,10 +93,7 @@ class QueryVersionController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=Version, required=False)
-        return MyResponse.success(Project.get(projectID, "projectID").page_version(**parse.parse_args()))
+        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.page(Version)))
 
 
 class QueryCasePartController(Resource):
@@ -113,10 +105,7 @@ class QueryCasePartController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=CasePart, required=False)
-        return MyResponse.success(Project.get(projectID, "projectID").page_casePart(**parse.parse_args()))
+        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.page(CasePart)))
 
 
 class QueryUserController(Resource):
@@ -126,12 +115,8 @@ class QueryUserController(Resource):
         查询casePart by projectID
         :return: MyResponse
         """
-        from Models.DepartModel.userModel import User
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        parse.add(name="by", target=User, required=False)
-        return MyResponse.success(Project.get(projectID, "projectID").page_user(**parse.parse_args()))
+        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.page(User)))
 
 
 class AddUser(Resource):

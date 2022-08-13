@@ -2,20 +2,6 @@ from enum import Enum
 import sqlalchemy as sql
 
 
-class IntEnum(sql.types.TypeDecorator):
-    impl = sql.Integer
-    cache_ok = True
-
-    def __init__(self, enumType, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__enumType = enumType
-
-    def process_bind_param(self, value, dialect):
-        return value.value
-
-    def process_result_value(self, value, dialect):
-        return self.__enumType(value).value
-
 
 class Base(Enum):
 
@@ -87,3 +73,29 @@ class UserTag(Base):
     PR = 2
     DEV = 3
     ADMIN = 0
+
+
+class IntEnum(sql.types.TypeDecorator):
+    impl = sql.Integer
+    cache_ok = True
+
+    def __init__(self, enumType, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__enumType = enumType
+
+    def process_bind_param(self, value, dialect):
+        """
+        :param value:
+        :param dialect:
+        :return:
+        """
+        return value
+
+    def process_result_value(self, value, dialect):
+        """
+        :param value: Enum value
+        :param dialect:
+        :return: Enum name
+        """
+        return self.__enumType(value).name
+

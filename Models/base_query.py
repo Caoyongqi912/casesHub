@@ -5,6 +5,8 @@
 # @Desc: MyBaseQuery
 from typing import AnyStr, Dict
 from flask_sqlalchemy import BaseQuery, Pagination
+from sqlalchemy import desc, func
+
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
 from Utils.myWraps import pageSerialize
@@ -40,15 +42,15 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, page: AnyStr, limit: AnyStr, by: AnyStr = None, filter: Dict = None) -> Pagination:
+    def my_paginate(self, pageSize: int, current: int, sort: str = None, filter_key=None) -> Pagination:
         """
         paginate
-        :param by: order_by {key:acs|desc|}
-        :param filter: filter {key:val}
-        :param page:  page
-        :param limit: limit
-        :return: Pagination
+        :param pageSize:    pageSize
+        :param current:    current
+        :param sort:    order_by(sort)
+        :return:    Pagination
         """
-        items = self.filter(**filter).order_by(by).limit(limit).offset((page - 1) * limit).all()
-        total = self.filter(**filter).order_by(by).count()
-        return Pagination(self, page, limit, total, items)
+
+        items = self.order_by(sort).limit(pageSize).offset((current - 1) * pageSize).all()
+        total = self.order_by(sort).count()
+        return Pagination(self, current, pageSize, total, items)

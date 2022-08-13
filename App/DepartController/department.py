@@ -52,10 +52,7 @@ class DepartmentController(Resource):
         :return:MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-        res = Department.page(**parse.parse_args())
-        return MyResponse.success(res)
+        return MyResponse.success(Department.page)((parse.page(Department)))
 
     @auth.login_required
     @is_admin

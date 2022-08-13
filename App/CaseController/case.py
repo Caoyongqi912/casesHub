@@ -175,10 +175,7 @@ class PageCasePart(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
-        parse.add(name="page", default="1")
-        parse.add(name="limit", default="20")
-
-        return MyResponse.success(CasePart.page(**parse.parse_args()))
+        return MyResponse.success(CasePart.page)((parse.page(CasePart)))
 
 
 api_script = Api(caseBP)
