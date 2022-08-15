@@ -15,15 +15,15 @@ f = Faker(locale="zh_CN")
 
 class MyRequest:
     Host = "http://127.0.0.1:5000/"
+    host = "https://sit-beijing.nhcbs.5i5j.com/nhapigw/uam-api/zuul/baseData/findDictByType.json?dictType=PROJECT_APPROVE_STATUS"
 
     def __init__(self):
         pass
 
-    def go(self, method, url, params=None, headers=None, body=None, files=None, auth=("cyq", "123")):
+    def go(self, method="GET", url="", params=None, headers=None, body=None, files=None, auth=None):
 
         if method == "GET":
-            return requests.get(url=self.Host + url, params=params, json=body, auth=auth)
-
+            return requests.get(url=self.host + url, params=params, json=body, auth=auth)
         elif method == "POST":
             resp = requests.post(url=self.Host + url, params=params, json=body, auth=auth, files=files, headers=headers)
             return resp
@@ -77,7 +77,15 @@ class MyRequest:
         res = self.go(method="POST", url="v1/api/case/upload/excel", params=b, files=files)
         print(res.text)
 
+    def t(self):
+        headers = {
+            "Authorization": 'eyJhbGciOiJSUzUxMiJ9.eyJqb2JJZCI6IjgzMTIxIiwiY29tcElkIjoiMSIsImNpdHlDb2RlIjoiMTEwMTAwIiwidHlwZSI6IkFQUCIsInVzZXJJZCI6IjE1MDc3Iiwib3JnSWQiOiIxMTgiLCJ1c2VybmFtZSI6IjE1MDc3IiwidG9rZW4iOiI0MjY4YzRkNDYyYzc0MGVhODRmZGQ4OGExZWMwNzFkMyJ9.GjeyWZ4bgt2tTnqbdiI5zY_3H5CmC0dRG3OsiHzEwM3Qm6FSUilAvEU5RJvdshpcgZPNA_0EiPL7V7ezJRyjvp5NmAjLSx7X2k33wik0QK63q0euuO37ZKDVc2w3jQdRGC8hszTLIy5M8wxZjjdqvk--AL1JCaSkVyEoLFFPGp4',
+            "Cookie": "sidebarStatus=1; suid=ac9b412c-738d-40c0-9a61-99541c3f95f0; Admin-Token=eyJhbGciOiJSUzUxMiJ9.eyJqb2JJZCI6IjgzMTIxIiwiY29tcElkIjoiMSIsImNpdHlDb2RlIjoiMTEwMTAwIiwidHlwZSI6IkFQUCIsInVzZXJJZCI6IjE1MDc3Iiwib3JnSWQiOiIxMTgiLCJ1c2VybmFtZSI6IjE1MDc3IiwidG9rZW4iOiI0MjY4YzRkNDYyYzc0MGVhODRmZGQ4OGExZWMwNzFkMyJ9.GjeyWZ4bgt2tTnqbdiI5zY_3H5CmC0dRG3OsiHzEwM3Qm6FSUilAvEU5RJvdshpcgZPNA_0EiPL7V7ezJRyjvp5NmAjLSx7X2k33wik0QK63q0euuO37ZKDVc2w3jQdRGC8hszTLIy5M8wxZjjdqvk--AL1JCaSkVyEoLFFPGp4; clid=cd946ee5-631c-4d22-9864-c9143beb8432"
+        }
+
+        resp = self.go(headers=headers)
+        print(resp.text)
+
 
 if __name__ == '__main__':
-    m = MyRequest()
-    m.addExcel()
+    print("哈"*100)

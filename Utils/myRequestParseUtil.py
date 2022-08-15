@@ -4,13 +4,16 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
-from typing import AnyStr, Dict, Any, List, Union
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic
 from flask import request
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
+from Models.base import Base
 from Utils.myLog import MyLog
 
 log = MyLog.get_log(__file__)
+
+clsType = TypeVar("clsType", bound=Base)
 
 
 class MyRequestParseUtil:
@@ -52,9 +55,10 @@ class MyRequestParseUtil:
             kwargs.setdefault("required", False)
         self.args.append(kwargs)
 
-    def page(self, cls: Any) -> Dict:
+    def page(self, cls: Generic[clsType]) -> Dict:
         """
         分页参数校验
+        :param cls: 目标类
         :param pageSize:    pageSize
         :param current:    current
         :param sort:    order_by(sort)
@@ -64,7 +68,7 @@ class MyRequestParseUtil:
         body = dict(self.body)
         pageSize = body.pop("pageSize") if body.get("pageSize") else 10
         current = body.pop("current") if body.get("current") else 1
-        sort = body.pop("sort") if body.get("sort") else 1
+        sort = body.pop("sort") if body.get("sort") else None
         pageInfo = {
             "pageSize": self.__verify_pageSize(pageSize),
             "current": self.__verify_current(current),
@@ -184,7 +188,9 @@ class MyRequestParseUtil:
         return pageSize
 
     @staticmethod
-    def __verify_sort(sort: str, cls: Any) -> Union[None, str]:
+    def __verify_sort(sort: str | None, cls: Any) -> Union[None, str]:
+        if not sort:
+            return sort
         columns = [c.name for c in cls.__table__.columns]
         if sort not in columns:
             return None

@@ -57,7 +57,7 @@ with_entities
 """
 from typing import List, AnyStr, Dict, NoReturn
 from flask_sqlalchemy import Pagination
-from sqlalchemy import asc
+from sqlalchemy import asc, Column
 from App import db
 from datetime import datetime
 from Enums.errorCode import ResponseMsg
@@ -69,15 +69,15 @@ log = MyLog.get_log(__file__)
 
 class Base(db.Model):
     __abstract__ = True
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time = db.Column(db.Date, default=datetime.now, comment="创建时间")
-    update_time = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
+    id: Column = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid: Column = db.Column(db.String(50), index=True, comment="唯一标识")
+    create_time: Column = db.Column(db.Date, default=datetime.now, comment="创建时间")
+    update_time: Column = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
     def save(self) -> NoReturn:
         """save"""
         try:
-            self.uid = UUID().getUId
+            self.uid: str = UUID().getUId
             db.session.add(self)
             db.session.commit()
         except Exception as e:
