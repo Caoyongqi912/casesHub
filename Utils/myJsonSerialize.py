@@ -5,7 +5,6 @@
 # @Desc:
 import datetime
 import decimal
-
 from flask.json import JSONEncoder as BaseJSONEncoder
 
 

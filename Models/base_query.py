@@ -3,10 +3,7 @@
 # @File : base_query.py
 # @Software: PyCharm
 # @Desc: MyBaseQuery
-from typing import AnyStr, Dict
 from flask_sqlalchemy import BaseQuery, Pagination
-from sqlalchemy import desc, func
-
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
 from Utils.myWraps import pageSerialize
@@ -27,7 +24,7 @@ class MyBaseQuery(BaseQuery):
     #     kwargs.setdefault('status', 1)
     #     return super().filter_by(**kwargs)
 
-    def get_or_NoFound(self, ident, name):
+    def get_or_NoFound(self, ident: int | str, name: str) -> BaseQuery:
         """
         get self by id
         :param ident: id
@@ -42,7 +39,7 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, pageSize: int, current: int, sort: str = None, filter_key=None) -> Pagination:
+    def my_paginate(self, pageSize: int, current: int, sort: str = None) -> Pagination:
         """
         paginate
         :param pageSize:    pageSize

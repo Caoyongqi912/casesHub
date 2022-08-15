@@ -54,10 +54,10 @@ class Project(Base):
         """
         self.__verify_auth()
 
-        uids = [u.id for u in self.users.all()]
-        for id in users:
-            u = User.get(id, f"uid {id}")
-            if self.search(uids, u.id):
+        uIds: List[int] = [u.id for u in self.users.all()]
+        for uid in users:
+            u: User = User.get(uid, f"uid {uid}")
+            if self.search(uIds, u.id):
                 raise ParamException(ResponseMsg.already_exist(str(id)))
             else:
                 self.users.append(u)

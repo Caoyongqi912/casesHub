@@ -8,9 +8,8 @@ from typing import AnyStr, List, Dict
 
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
-
 from App import create_app
-from Models import Cases
+from Models.CaseModel.cases import Cases
 
 
 class MyExcel:

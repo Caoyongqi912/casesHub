@@ -7,6 +7,7 @@ from flask_restful import Api, Resource
 from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
+from Enums import BugLevel, BugStatus
 from Models.CaseModel.bugs import Bug
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
@@ -20,15 +21,15 @@ class BugController(Resource):
         :return: MyResponse
         """
         from Models.CaseModel.cases import Cases
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="caseID", type=int, required=True, isExist=Cases)
         parse.add(name="title", type=str, required=True, unique=Bug)
         parse.add(name="desc", type=str, required=True)
         parse.add(name="tester", type=str, required=True)
         parse.add(name="developer", type=str, required=True)
         parse.add(name="pr", type=str, required=True)
-        parse.add(name="level", type=str, required=True, choices=["P1", "P2", "P3", "P4"])
-        parse.add(name="status", type=str, required=True, choices=["OPEN", "CLOSE", "BLOCK"])
+        parse.add(name="level", type=str, required=True, enum=BugLevel)
+        parse.add(name="status", type=str, required=True, enum=BugStatus)
         Bug(**parse.parse_args()).save()
         return MyResponse.success()
 

@@ -1,6 +1,7 @@
 from enum import Enum
-import sqlalchemy as sql
+from typing import TypeVar, Generic, Union
 
+import sqlalchemy as sql
 
 
 class Base(Enum):
@@ -75,21 +76,27 @@ class UserTag(Base):
     ADMIN = 0
 
 
+enumType = TypeVar("enumType", bound=Base)
+
+
 class IntEnum(sql.types.TypeDecorator):
     impl = sql.Integer
     cache_ok = True
 
-    def __init__(self, enumType, *args, **kwargs):
+    def __init__(self, enumType: Generic[enumType], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__enumType = enumType
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect) -> Union[Enum, int]:
         """
         :param value:
         :param dialect:
         :return:
         """
-        return value
+        if isinstance(value, self.__enumType):
+            return value.value
+        else:
+            return value
 
     def process_result_value(self, value, dialect):
         """
@@ -98,4 +105,3 @@ class IntEnum(sql.types.TypeDecorator):
         :return: Enum name
         """
         return self.__enumType(value).name
-

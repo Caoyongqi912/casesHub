@@ -4,7 +4,6 @@
 # @Software: PyCharm
 # @Desc: 注册controller
 from typing import AnyStr
-
 from flask import g, request, Response
 from flask_restful import Resource, Api
 from App import auth
@@ -12,14 +11,12 @@ from App.DepartController import userBP
 from Comment.myException import MyResponse
 from Models.DepartModel.departModel import Department
 from Models.DepartModel.userModel import User
-from Utils import getAvatarPath, MyLog
+from Utils import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
 
-log = MyLog.get_log(__file__)
 
-
-class AddAdmin(Resource):
+class AddAdminController(Resource):
 
     def post(self) -> MyResponse:
         """
@@ -27,7 +24,7 @@ class AddAdmin(Resource):
         :return: MyResponse
         :raise: ParamException
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="password", type=str, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
@@ -35,7 +32,7 @@ class AddAdmin(Resource):
         return MyResponse.success()
 
 
-class UserOpt(Resource):
+class UserOptController(Resource):
 
     @auth.login_required
     @is_admin
@@ -58,7 +55,7 @@ class UserOpt(Resource):
         """
 
         from Enums.myEnum import Gender, UserTag
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
         parse.add(name="gender", type=int, enum=Gender, required=True)
@@ -70,7 +67,7 @@ class UserOpt(Resource):
     @auth.login_required
     @is_admin
     def delete(self) -> MyResponse:
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=str, required=True)
         User.delete_by_id(**parse.parse_args())
         return MyResponse.success()
@@ -87,7 +84,7 @@ class GetTokenController(Resource):
         return MyResponse.success(t)
 
 
-class QueryUserController(Resource):
+class PageUserController(Resource):
 
     @auth.login_required
     @is_admin
@@ -96,7 +93,7 @@ class QueryUserController(Resource):
         分页查询用户
         :return:MyResponse
         """
-        parse = MyRequestParseUtil("values")
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
         return MyResponse.success(User.page(**parse.page(User)))
 
 
@@ -107,7 +104,7 @@ class LoginController(Resource):
         登录
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="username", type=str, required=True)
         parse.add(name="password", type=str, required=True)
         return MyResponse.success(User.login(**parse.parse_args()))
@@ -121,7 +118,7 @@ class UserController(Resource):
         通过userID 查询单个用户Info、
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="userID", type=int, required=True)
         return MyResponse.success(User.get(parse.parse_args().get("userID")))
 
@@ -131,7 +128,7 @@ class UserController(Resource):
         修改密码
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="password", type=str, required=True)
         u = User.get(g.user.id, "")
         u.hash_password(parse.parse_args().get("password"))
@@ -141,40 +138,32 @@ class UserController(Resource):
 class AvatarController(Resource):
 
     @auth.login_required
-    def post(self) -> MyResponse:
+    async def post(self) -> MyResponse:
         """
         上传头像
         :return:
         """
-        from werkzeug.utils import secure_filename
-        from faker import Faker
-        f = Faker()
-        file = request.files.get("file")
-        user = g.user
-
-        fileName = f.pystr() + '_' + secure_filename(file.filename)  # 头像名称
-        filePath = getAvatarPath(fileName)  # 头像路径
-        file.save(filePath)  # 存储头像
-
-        user.avatar = fileName
-        user.save()  # 入库
+        from werkzeug.datastructures import FileStorage
+        file: FileStorage = request.files.get("file")
+        await User.save_or_update_avatar(file)
         return MyResponse.success()
 
 
 class GetAvatarController(Resource):
-    def get(self, filename: AnyStr):
+    @auth.login_required
+    def get(self, filename: AnyStr) -> Response:
         """
         返回头像
         :param filename: 头像名
-        :return:
+        :return: Response
         """
-        path = getAvatarPath(filename)
+        path: AnyStr = getAvatarPath(filename)
         with open(path, "rb") as f:
-            avatar = f.read()
+            avatar: AnyStr = f.read()
         return Response(avatar, mimetype="image/jpeg")
 
 
-class SetPassword(Resource):
+class SetPasswordController(Resource):
 
     @auth.login_required
     def post(self) -> MyResponse:
@@ -182,27 +171,14 @@ class SetPassword(Resource):
         用户修改密码
         :return: MyResponse
         """
-        user = g.user
-        parse = MyRequestParseUtil()
+        user: User = g.user
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="password", type=str, required=True)
         user.hash_password(**parse.parse_args()).save()
         return MyResponse.success()
 
 
-class QueryUserByTag(Resource):
-
-    def get(self, tag: AnyStr) -> MyResponse:
-        """
-        通过Tag 过滤
-        :param tag:  ["QA", "PR", "DEV", "ADMIN"]
-        :return: MyResponse
-        """
-
-        return MyResponse.success(User.query_by_tag(tag))
-
-
-class CurrentUser(Resource):
-
+class CurrentUserController(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         """
@@ -210,20 +186,16 @@ class CurrentUser(Resource):
         :return: MyResponse
         """
         from flask import g
-
-        return MyResponse.success(User.get(**{"ident": g.user.id}))
+        return MyResponse.success(User.get(g.user.id))
 
 
 api_script = Api(userBP)
-api_script.add_resource(AddAdmin, "/admin")
-api_script.add_resource(UserOpt, "/opt")
-api_script.add_resource(SetPassword, "/setpassword")
-api_script.add_resource(CurrentUser, '/current')
-api_script.add_resource(QueryUserController, "/page")
+api_script.add_resource(AddAdminController, "/admin")
+api_script.add_resource(UserOptController, "/opt")
+api_script.add_resource(SetPasswordController, "/setpassword")
+api_script.add_resource(CurrentUserController, '/current')
+api_script.add_resource(PageUserController, "/page")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
-
-api_script.add_resource(QueryUserByTag, "/tag/<string:tag>")
-
 api_script.add_resource(AvatarController, "/avatar")
 api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")

@@ -21,7 +21,7 @@ class ReportController(Resource):
         添加报告
         :return:
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="title", type=str, unique=Report, required=True)
         parse.add(name="version", type=str, required=True)
         parse.add(name="online", type=str, required=True)
@@ -40,7 +40,7 @@ class ReportController(Resource):
         修改
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, isExcist=Report, required=True)
         parse.add(name="title", type=str, required=False)
         parse.add(name="version", type=str, required=False)
@@ -69,7 +69,7 @@ class ReportController(Resource):
         删除
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         Report.delete_by_id(**parse.parse_args())
         return MyResponse.success()
@@ -81,7 +81,7 @@ class SendReport(Resource):
     def post(self) -> MyResponse:
         from Utils.myMail import SendMail
 
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         report = Report.get(parse.parse_args().get("id"), "id")
         SendMail().sendReport(report)

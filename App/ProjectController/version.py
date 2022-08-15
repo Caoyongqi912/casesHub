@@ -25,7 +25,7 @@ class VersionController(Resource):
         不打算做权限校验
         :return:
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name='name', required=True, type=str)
         parse.add(name="projectID", required=True, type=int, isExist=Project)
         parse.add(name="desc", required=False, type=str)
@@ -39,7 +39,7 @@ class VersionController(Resource):
         delete
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         Version.delete_by_id(**parse.parse_args())
         return MyResponse.success()
@@ -49,7 +49,7 @@ class VersionController(Resource):
         """
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name='name', required=False, type=str)
         parse.add(name="desc", required=False, type=str)

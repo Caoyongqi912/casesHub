@@ -20,10 +20,10 @@ class MyRequest:
     def __init__(self):
         pass
 
-    def go(self, method="GET", url="", params=None, headers=None, body=None, files=None, auth=None):
+    def go(self, method="GET", url="", params=None, headers=None, body=None, files=None, auth=("dawa", "dawa")):
 
         if method == "GET":
-            return requests.get(url=self.host + url, params=params, json=body, auth=auth)
+            return requests.get(url=self.Host + url, params=params, json=body, auth=auth)
         elif method == "POST":
             resp = requests.post(url=self.Host + url, params=params, json=body, auth=auth, files=files, headers=headers)
             return resp
@@ -64,7 +64,7 @@ class MyRequest:
         files = {'file': open("../resource/casesHub.png", 'rb')}
         # 请求的地址，这个地址中规定请求文件的参数必须是file
         # 用files参数接收 PFbUdtKZfSMYTdeOdUYJ_casesHub.png
-        res = self.go(method="POST", url="v1/api/user/avatar", files=files)
+        res = self.go(method="POST", url="/api/user/avatar", files=files)
         print(res.text)
 
     def addExcel(self):
@@ -88,4 +88,4 @@ class MyRequest:
 
 
 if __name__ == '__main__':
-    print("哈"*100)
+    MyRequest().addAvatar()

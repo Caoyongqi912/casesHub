@@ -23,7 +23,7 @@ class DepartmentController(Resource):
         :return: MyResponse
         """
         from Models.DepartModel.userModel import User
-        parse = MyRequestParseUtil()
+        parse:  MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Department, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, isExist=User, required=False)
@@ -37,7 +37,7 @@ class DepartmentController(Resource):
         :return:MyResponse
         """
         from Models.DepartModel.userModel import User
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
@@ -61,7 +61,7 @@ class DepartmentController(Resource):
         根据departID删除数据
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         Department.delete_by_id(parse.parse_args().get("id"))
         return MyResponse.success()

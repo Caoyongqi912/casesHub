@@ -4,7 +4,10 @@
 # @Software: PyCharm
 # @Desc: 用户模型类
 
-from typing import Dict, NoReturn
+from typing import Dict, NoReturn, Mapping
+
+from werkzeug.datastructures import FileStorage
+
 from Models.base import Base
 from App import db
 from typing import AnyStr, Union
@@ -14,49 +17,47 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException
 from Enums.myEnum import Gender, UserTag, IntEnum
-from Utils import MyLog
+from Utils import MyLog, delAvatar
 
 log = MyLog.get_log(__file__)
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__: str = "user"
     _mail = "@caseHub.com"
-    username = db.Column(db.String(20), comment="用户名")
-    phone = db.Column(db.String(12), unique=True, comment="手机")
-    password = db.Column(db.String(200), comment="密码")
-    email = db.Column(db.String(40), unique=True, comment="邮箱")
-    gender = db.Column(IntEnum(Gender), comment="性别")
-    tag = db.Column(IntEnum(UserTag), comment="标签")
-    avatar = db.Column(db.String(400), nullable=True, comment="头像")
-    isAdmin = db.Column(db.Boolean, default=False, comment="管理")
-    departmentID = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
+    username: str = db.Column(db.String(20), comment="用户名")
+    phone: str = db.Column(db.String(12), unique=True, comment="手机")
+    password: str = db.Column(db.String(200), comment="密码")
+    email: str = db.Column(db.String(40), unique=True, comment="邮箱")
+    gender: Gender = db.Column(IntEnum(Gender), comment="性别")
+    tag: UserTag = db.Column(IntEnum(UserTag), comment="标签")
+    avatar: str = db.Column(db.String(400), nullable=True, comment="头像")
+    isAdmin: bool = db.Column(db.Boolean, default=False, comment="管理")
+    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
 
-    def __init__(self, username: AnyStr, phone: AnyStr, gender: Gender = Gender.MALE,
+    def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
                  tag: UserTag = None, isAdmin: bool = False,
                  departmentID: int = None,
-                 password: AnyStr = None):
-        self.username = username
-        self.email = self.username + self._mail
-        self.gender = gender
-        self.phone = phone
-        self.tag = tag
-        self.isAdmin = isAdmin
+                 password: str = None):
+        self.username: str = username
+        self.email: str = self.username + self._mail
+        self.gender: Gender = gender
+        self.phone: str = phone
+        self.tag: UserTag = tag
+        self.isAdmin: bool = isAdmin
         if password:
             self.hash_password(password)
         else:
             self.hash_password(username)
 
-        self.departmentID = departmentID
+        self.departmentID: int = departmentID
 
     def addAdmin(self) -> NoReturn:
         """
         添加管理员
-        isAdmin = True
-        tag = ADMIN
         """
-        self.isAdmin = True
-        self.tag = UserTag.ADMIN.value
+        self.isAdmin: bool = True
+        self.tag: UserTag = UserTag.ADMIN
         self.save()
 
     def addUser(self) -> NoReturn:
@@ -65,51 +66,39 @@ class User(Base):
         password = username
         email = username + self.mail
         isAdmin = False
-        :param gender 枚举转换
-        :param tag 枚举转换
         """
-        self.isAdmin = False
+        self.isAdmin: bool = False
         self.hash_password(self.username)
-        self.email = self.username + self._mail
+        self.email: str = self.username + self._mail
         self.save()
 
-    def hash_password(self, password: AnyStr):
+    def hash_password(self, password: AnyStr) -> NoReturn:
         """
         密码加密
         :param password:  password
         """
-        self.password = generate_password_hash(password)
+        self.password: str = generate_password_hash(password)
 
-    def generate_token(self, expires_time: int = 3600 * 24):
+    def generate_token(self, expires_time: int = 3600 * 24) -> bytes:
         """
         生成token
         :param expires_time: 过期时间 默认 一天
         :return: token
         """
-        token = {"id": self.id, "expires_time": time.time() + expires_time}
+        token: Mapping[str, float | db.Column] = {"id": self.id, "expires_time": time.time() + expires_time}
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
-
-    @classmethod
-    def query_by_tag(cls, tag: AnyStr):
-        """
-        通过tag
-        :param tag:
-        :return:
-        """
-        t = UserTag.e(int(tag))
-        return cls.query.filter(User.tag == t).all()
 
     @staticmethod
     def verify_token(token: AnyStr) -> Union[None]:
         """
         token 解密
         :param token:
-        :return: None or user
+        :return: Union[None]
         """
         try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
+            data: Mapping[str, bytes] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
         except Exception as e:
-            log.error(e)
+            log.error(f"校验token 失效： {repr(e)}")
             return None
         return User.query.get(data['id'])
 
@@ -129,7 +118,7 @@ class User(Base):
         return self.isAdmin
 
     @classmethod
-    def login(cls, username: AnyStr, password: AnyStr):
+    def login(cls, username: AnyStr, password: AnyStr) -> AnyStr:
         user = cls.query.filter(User.username == username).first()
         if user:
             if user.verify_password(password):
@@ -149,6 +138,29 @@ class User(Base):
         res = super(User, User).to_json(obj)
         res.pop("password")
         return res
+
+    @staticmethod
+    async def save_or_update_avatar(file: FileStorage) -> NoReturn:
+        """
+        存储头像
+        更新 delAvatar 删除本地原头像
+        """
+        from faker import Faker
+        from Utils import getAvatarPath
+        from werkzeug.utils import secure_filename
+        from flask import g
+        f: Faker = Faker()
+
+        user: User = g.user
+        if user.avatar:
+            delAvatar(user.avatar)
+
+        fileName: AnyStr = f.pystr() + '_' + secure_filename(file.filename)  # 头像名称
+        filePath: AnyStr = getAvatarPath(fileName)  # 头像路径
+        file.save(filePath)  # 存储头像
+
+        avatar: str = "/api/user/avatar/" + fileName
+        User.update(**{"avatar": avatar, "id": g.user.id})
 
     def __repr__(self):
         return f"<{User.__name__} {self.username}>"

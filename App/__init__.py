@@ -13,12 +13,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Api
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
-from Utils.myJsonSerialize import JSONEncoder
+from Utils import JSONEncoder
 
-catch = Cache()
-db = SQLAlchemy(query_class=MyBaseQuery)
-auth = HTTPBasicAuth()
-api = Api()
+catch: Cache = Cache()
+db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
+aut: HTTPBasicAuth = HTTPBasicAuth()
+api: Api = Api()
 
 
 def create_app(configName: AnyStr = "default") -> Flask:

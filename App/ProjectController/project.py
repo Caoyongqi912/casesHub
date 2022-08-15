@@ -27,7 +27,7 @@ class ProjectController(Resource):
         :return: MyResponse
         """
         from Models.DepartModel.userModel import User
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Project, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, isExist=User, required=True)
@@ -51,7 +51,7 @@ class ProjectController(Resource):
         维护
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
@@ -65,7 +65,7 @@ class ProjectController(Resource):
         删除
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         Project.delete_by_id(parse.parse_args().get("id"))
         return MyResponse.success()
@@ -128,7 +128,7 @@ class AddUser(Resource):
         添加用户
         :return:MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="projectID", type=int, required=True)
         parse.add(name="userIds", type=list, required=True)
         info = parse.parse_args()

@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, Mapping
 from flask import request
 from Comment.myException import ParamException
 from Enums.errorCode import ResponseMsg
@@ -23,8 +23,8 @@ class MyRequestParseUtil:
         :param location:  "json" -> application/json | "values"  -> query default json
         """
 
-        self.location = location
-        self.args = []
+        self.location: str = location
+        self.args: List = []
         try:
             self.body = getattr(request, self.location, {})
         except Exception as e:
@@ -55,14 +55,15 @@ class MyRequestParseUtil:
             kwargs.setdefault("required", False)
         self.args.append(kwargs)
 
-    def page(self, cls: Generic[clsType]) -> Dict:
+    def page(self, cls: Generic[clsType]) -> Dict[str, int | Dict]:
         """
         分页参数校验
+        pageSize ： if request get pageSize  else 10
+        current ： if request get current  else 10
+        sort : if request get sort  else None
+        like select * from cls order by (sort)
+        filter_key : __verify_filterKey
         :param cls: 目标类
-        :param pageSize:    pageSize
-        :param current:    current
-        :param sort:    order_by(sort)
-        :param filter:  filter_by(** filter_key)
         :return: Dict
         """
         body = dict(self.body)
@@ -188,30 +189,38 @@ class MyRequestParseUtil:
         return pageSize
 
     @staticmethod
-    def __verify_sort(sort: str | None, cls: Any) -> Union[None, str]:
+    def __verify_sort(sort: str | None, cls: Generic[clsType]) -> Union[None, str]:
+        """
+
+        verify sort value in  cls.__table__.columns if not return None
+        :param sort: str | None  Generic[clsType]
+        :param cls: Generic[clsType
+        :return:  Union[None, str]
+        """
         if not sort:
             return sort
-        columns = [c.name for c in cls.__table__.columns]
-        if sort not in columns:
+        if sort not in cls.columns():
             return None
         return sort
 
     @staticmethod
-    def __verify_filterKey(key: Dict | None, cls: Any) -> Union[Dict, None]:
+    def __verify_filterKey(key: Dict[str, str] | None, cls: Generic[clsType]) -> Union[Dict[str, str], None]:
         """
-        :key like {username:"ADMIN,tag:"xx",other:"",} => {username:"ADMIN}
-        :param key:
-        :param cls:
-        :return:
+        request get tag=1&gender=0 => {tag:1,gender:0}
+        verify: pop key
+        1.key not  in cls.__table__.columns
+        2.value == "" or None
+        :param key:  Mapping[str, str]
+        :param cls: Generic[clsType]
+        :return: Union[Mapping[str, str], None]
         """
         if not key:
             return key
 
-        columns = [c.name for c in cls.__table__.columns]
+        columns = cls.columns()
         from copy import deepcopy
-        kk = deepcopy(key)
-        for k, v in kk.items():
+        deepKEY = deepcopy(key)
+        for k, v in deepKEY.items():
             if k not in columns or v == "":
                 key.pop(k)
-
         return key

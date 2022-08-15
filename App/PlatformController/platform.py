@@ -20,7 +20,7 @@ class PlatformController(Resource):
         添加平台
         :return:MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", required=True, unique=Platform,
                   type=str)
         Platform(**parse.parse_args()).save()
@@ -39,7 +39,7 @@ class PlatformController(Resource):
         """
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
         Platform.delete_by_id(**parse.parse_args())
         return MyResponse.success()
@@ -49,7 +49,7 @@ class PlatformController(Resource):
         """
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name='id', required=True, type=int)
         parse.add(name="name", required=False, type=str)
         Platform.update(**parse.parse_args())

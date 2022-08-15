@@ -8,3 +8,4 @@ from .myLog import MyLog
 from .myUid import UUID
 from .myWraps import *
 from .myPath import *
+from .myJsonSerialize import JSONEncoder

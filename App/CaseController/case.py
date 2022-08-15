@@ -25,7 +25,7 @@ class CasePartController(Resource):
         添加用例模块
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="partName", type=str, unique=CasePart, required=True)
         parse.add(name="projectID", type=int, isExist=Project, required=True)
         CasePart(**parse.parse_args()).save()
@@ -48,7 +48,7 @@ class CasePartController(Resource):
         更新
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name='id', type=int, required=True)
         parse.add(name="partName", type=str, required=False)
         CasePart.update(**parse.parse_args())
@@ -60,7 +60,7 @@ class CasePartController(Resource):
         删除
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         CasePart.delete_by_id(**parse.parse_args())
         return MyResponse.success()
@@ -74,7 +74,7 @@ class CaseController(Resource):
         新增用例
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="title", type=str, required=True)
         parse.add(name="desc", type=str, required=True)
         parse.add(name="setup", type=str, required=False)
@@ -98,7 +98,7 @@ class CaseController(Resource):
         :return: MyResponse
         """
 
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True, isExist=Cases)
         parse.add(name="part", type=str, required=False)
         parse.add(name="title", type=str, required=False)
@@ -119,7 +119,7 @@ class CaseController(Resource):
         通过id删除
         :return: MyResponse
         """
-        parse = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True, isExist=Cases)
         Cases.delete_by_id(**parse.parse_args())
         return MyResponse.success()

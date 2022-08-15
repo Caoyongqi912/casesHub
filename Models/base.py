@@ -69,10 +69,10 @@ log = MyLog.get_log(__file__)
 
 class Base(db.Model):
     __abstract__ = True
-    id: Column = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid: Column = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time: Column = db.Column(db.Date, default=datetime.now, comment="创建时间")
-    update_time: Column = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
+    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid: str = db.Column(db.String(50), index=True, comment="唯一标识")
+    create_time: str = db.Column(db.Date, default=datetime.now, comment="创建时间")
+    update_time: str = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
     def save(self) -> NoReturn:
         """save"""
@@ -111,7 +111,7 @@ class Base(db.Model):
         通过kwargs.get('id') 获得实例 修改
         """
         target = cls.get(kwargs.pop('id'))
-        c = [i.name for i in cls.__table__.columns]
+        c = cls.columns()
         for k, v in kwargs.items():
             if k in c:
                 setattr(target, k, v)
@@ -125,7 +125,7 @@ class Base(db.Model):
         return cls.query.filter_by().order_by(asc(cls.id)).all()
 
     @classmethod
-    def get(cls, ident: int, name: AnyStr = None):
+    def get(cls, ident: int | str, name: AnyStr = None):
         """
         get entity by id
         :param ident: field id
@@ -162,7 +162,8 @@ class Base(db.Model):
         total = db.session.query(cls).filter_by(**_fk).order_by(sort).count()
         return Pagination(cls, current, pageSize, total, items)
 
-    def search(self, nums: List[int], target: int) -> bool:
+    @staticmethod
+    def search(nums: List[int], target: int) -> bool:
         """
         二分查找 存在返回True 不存在返回False
         :param nums:
@@ -180,3 +181,7 @@ class Base(db.Model):
             else:
                 left = mid + 1
         return False
+
+    @classmethod
+    def columns(cls) -> List:
+        return [c.name for c in cls.__table__.columns]
