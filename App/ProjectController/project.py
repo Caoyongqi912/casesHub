@@ -35,14 +35,15 @@ class ProjectController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    def get(self) -> MyResponse:
+    async def get(self) -> MyResponse:
         """
         分页查询
         :return:
         """
 
         parse = MyRequestParseUtil("values")
-        return MyResponse.success(Project.page(**parse.page(cls=Project)))
+        info = await Project.page(**parse.page(cls=Project))
+        return MyResponse.success(infog)
 
     @auth.login_required
     def put(self) -> MyResponse:
