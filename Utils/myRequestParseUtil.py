@@ -4,16 +4,18 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, Mapping
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic
 from flask import request
 from Comment.myException import ParamException
-from Enums.errorCode import ResponseMsg
+from Enums import ResponseMsg
 from Models.base import Base
 from Utils.myLog import MyLog
+from Enums import Base as EnumBase
 
 log = MyLog.get_log(__file__)
 
 clsType = TypeVar("clsType", bound=Base)
+enumType = TypeVar("enumType", bound=EnumBase)
 
 
 class MyRequestParseUtil:
@@ -115,14 +117,14 @@ class MyRequestParseUtil:
         return self.body
 
     @staticmethod
-    def __verify_enum(ENUM: enum, value: int):
+    def __verify_enum(ENUM: Generic[enumType], value: int) -> enum.Enum:
         """
         校验枚举值
         :param ENUM: 枚举类
         :param value: 整形值
         :return: enum
         """
-        vs = [v.value for v in ENUM]
+        vs: List[int] = ENUM.values()
         if value not in vs:
             raise ParamException(ResponseMsg.error_val(value, vs))
         return ENUM.e(value)

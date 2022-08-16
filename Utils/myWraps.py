@@ -84,26 +84,9 @@ def simpleCase(func):
 
 def simpleUser(func):
     @wraps(func)
-    def user(cls, page, limit, by, *args):
-        info = func(cls, page, limit, by=None, *args)
-        results = {
-            "items": [{
-                "id": i.id,
-                "username": i.username,
-                "email": i.email,
-                "phone": i.phone,
-                "gender": i.gender,
-                "tag": i.tag,
-                "create_time": i.create_time,
-                "update_time": i.update_time
-            } for i in info.items],
-            "pageInfo": {
-                "total": info.total,
-                "pages": info.pages,
-                "page": info.page,
-                "limit": info.per_page
-            }
-        }
+    def user(cls, *args, **kwargs):
+        info = func(cls, *args, **kwargs)
+        results = [{"id": _[0], "uid": _[1], "username": _[2]} for _ in info]
         return results
 
     return user
