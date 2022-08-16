@@ -17,7 +17,7 @@ from Utils import JSONEncoder
 
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
-aut: HTTPBasicAuth = HTTPBasicAuth()
+auth: HTTPBasicAuth = HTTPBasicAuth()
 api: Api = Api()
 
 
