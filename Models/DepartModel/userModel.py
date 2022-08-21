@@ -80,13 +80,13 @@ class User(Base):
         """
         self.password: str = generate_password_hash(password)
 
-    def generate_token(self, expires_time: int = 3600 * 24) -> bytes:
+    def generate_token(self, expires_time: int = 3600 * 24) -> str:
         """
         生成token
         :param expires_time: 过期时间 默认 一天
         :return: token
         """
-        token: Mapping[str, float | db.Column] = {"id": self.id, "expires_time": time.time() + expires_time}
+        token: dict[str, int | str] = {"id": self.id, "expires_time": time.time() + expires_time}
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
     @classmethod
