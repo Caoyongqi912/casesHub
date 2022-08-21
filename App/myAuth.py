@@ -12,7 +12,7 @@ from Models.DepartModel.userModel import User
 
 
 @auth.verify_password
-def verify_password_or_token(username_or_token: AnyStr, password: AnyStr, ) -> bool:
+def verify_password_or_token(username_or_token: AnyStr, password: AnyStr) -> bool:
     """
     登录 密码 or token 校验
     :param password: 密码

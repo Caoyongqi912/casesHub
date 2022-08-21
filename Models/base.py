@@ -60,7 +60,7 @@ from flask_sqlalchemy import Pagination
 from sqlalchemy import asc, Column
 from App import db
 from datetime import datetime
-from Enums.errorCode import ResponseMsg
+from Enums import ResponseMsg
 from Utils import MyLog, UUID, pageSerialize
 from Comment.myException import MyException, ParamException
 

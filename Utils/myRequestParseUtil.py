@@ -4,13 +4,12 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn
 from flask import request
 from Comment.myException import ParamException
-from Enums import ResponseMsg
 from Models.base import Base
 from Utils.myLog import MyLog
-from Enums import Base as EnumBase
+from Enums import ResponseMsg, Base as EnumBase
 
 log = MyLog.get_log(__file__)
 
@@ -30,7 +29,7 @@ class MyRequestParseUtil:
         try:
             self.body = getattr(request, self.location, {})
         except Exception as e:
-            log.error(e)
+            log.error(repr(e))
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
 
     def add(self, **kwargs):
@@ -73,10 +72,10 @@ class MyRequestParseUtil:
         current = body.pop("current") if body.get("current") else 1
         sort = body.pop("sort") if body.get("sort") else None
         pageInfo = {
-            "pageSize": self.__verify_pageSize(pageSize),
-            "current": self.__verify_current(current),
-            "sort": self.__verify_sort(sort, cls),
-            "filter_key": self.__verify_filterKey(body, cls)
+            "pageSize": self._verify_pageSize(pageSize),
+            "current": self._verify_current(current),
+            "sort": self._verify_sort(sort, cls),
+            "filter_key": self._verify_filterKey(body, cls)
         }
         return pageInfo
 
@@ -89,7 +88,7 @@ class MyRequestParseUtil:
         for kw in self.args:
             #  必传
             if kw['required'] is True:
-                self.__verify_empty(self.body.get(kw["name"]), kw["name"])
+                self._verify_empty(self.body.get(kw["name"]), kw["name"])
             # 非必传
             else:
                 # 未传
@@ -98,10 +97,10 @@ class MyRequestParseUtil:
                         self.body[kw['name']] = kw.get('default')
                     else:
                         continue
-            self.__verify_type(self.body.get(kw["name"]), kw['type'])
+            self._verify_type(self.body.get(kw["name"]), kw['type'])
 
             if kw.get("choices"):
-                self.__verify_choices(self.body.get(kw["name"]), kw['choices'], kw['name'])
+                self._verify_choices(self.body.get(kw["name"]), kw['choices'], kw['name'])
             #  校验cls ID
             if kw.get("isExist"):
                 cls = kw.get("isExist")
@@ -117,7 +116,7 @@ class MyRequestParseUtil:
         return self.body
 
     @staticmethod
-    def __verify_enum(ENUM: Generic[enumType], value: int) -> enum.Enum:
+    def _verify_enum(ENUM: Generic[enumType], value: int) -> enum.Enum:
         """
         校验枚举值
         :param ENUM: 枚举类
@@ -130,7 +129,7 @@ class MyRequestParseUtil:
         return ENUM.e(value)
 
     @staticmethod
-    def __verify_empty(target: AnyStr, filed: AnyStr):
+    def _verify_empty(target: AnyStr, filed: AnyStr) -> NoReturn:
         """
         校验参数是否为空
         :param target:  目标值
@@ -141,7 +140,7 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.empty(filed))
 
     @staticmethod
-    def __verify_type(target: Any, t: type):
+    def _verify_type(target: Any, t: type) -> NoReturn:
         """
         校验类型
         :param target: 目标值
@@ -152,7 +151,7 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.error_type(target, t))
 
     @staticmethod
-    def __verify_choices(target: Any, choices: List, filedName: AnyStr):
+    def _verify_choices(target: Any, choices: List, filedName: AnyStr) -> NoReturn:
         """
         区间校验
         :param target: 目标值
@@ -164,7 +163,7 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.error_val(filedName, choices))
 
     @staticmethod
-    def __verify_current(current: int | str) -> int:
+    def _verify_current(current: int | str) -> int:
         """
         page校验
         :param current: 页
@@ -178,7 +177,7 @@ class MyRequestParseUtil:
         return current
 
     @staticmethod
-    def __verify_pageSize(pageSize: int | str) -> int:
+    def _verify_pageSize(pageSize: int | str) -> int:
         """
         pageSize 校验
         :param pageSize: 行
@@ -191,7 +190,7 @@ class MyRequestParseUtil:
         return pageSize
 
     @staticmethod
-    def __verify_sort(sort: str | None, cls: Generic[clsType]) -> Union[None, str]:
+    def _verify_sort(sort: str | None, cls: Generic[clsType]) -> Union[None, str]:
         """
 
         verify sort value in  cls.__table__.columns if not return None
@@ -206,7 +205,7 @@ class MyRequestParseUtil:
         return sort
 
     @staticmethod
-    def __verify_filterKey(key: Dict[str, str] | None, cls: Generic[clsType]) -> Union[Dict[str, str], None]:
+    def _verify_filterKey(key: Dict[str, str] | None, cls: Generic[clsType]) -> Union[Dict[str, str], None]:
         """
         request get tag=1&gender=0 => {tag:1,gender:0}
         verify: pop key

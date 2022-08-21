@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc: 用户模型类
 
-from typing import Dict, NoReturn, Mapping
+from typing import Dict, NoReturn, Mapping, TypeVar
 
 from werkzeug.datastructures import FileStorage
 
@@ -20,6 +20,7 @@ from Enums.myEnum import Gender, UserTag, IntEnum
 from Utils import MyLog, delAvatar
 
 log = MyLog.get_log(__file__)
+UserType = TypeVar("UserType", bound=Base)
 
 
 class User(Base):
@@ -88,19 +89,20 @@ class User(Base):
         token: Mapping[str, float | db.Column] = {"id": self.id, "expires_time": time.time() + expires_time}
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
-    @staticmethod
-    def verify_token(token: AnyStr) -> Union[None]:
+    @classmethod
+    def verify_token(cls, token: AnyStr) -> None | UserType:
         """
         token 解密
         :param token:
-        :return: Union[None]
+        :return: Union[None | user]
         """
         try:
-            data: Mapping[str, bytes] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
+            data: Dict[str, str | int] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
+            print(data)
         except Exception as e:
             log.error(f"校验token 失效： {repr(e)}")
             return None
-        return User.query.get(data['id'])
+        return cls.query.get(data['id'])
 
     def verify_password(self, password: AnyStr) -> bool:
         """

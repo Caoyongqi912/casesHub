@@ -5,12 +5,13 @@
 # @Desc: case view
 
 from flask import request, g
-from flask_restful import Api, Resource
+from flask_restful import  Resource
+from MyException import Api
 from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
 from Enums import CaseTag, CaseLevel, CaseType
-from Enums.errorCode import ResponseMsg
+from Enums import ResponseMsg
 from Models.CaseModel.cases import CasePart, Cases
 from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project

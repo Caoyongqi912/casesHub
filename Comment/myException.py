@@ -26,24 +26,24 @@ class MyException(HTTPException):
             self._response = response
         else:
             self._response = MyResponse.server_error()
-        super(MyException, self).__init__(response=self.__make_response())
+        super(MyException, self).__init__(response=self._make_response())
 
-    def __make_response(self) -> Response:
+    def _make_response(self) -> Response:
         """
         自定义返回 response
         :return: Response
         """
         log.error(self._response)
-        return Response(json.dumps(self._response), mimetype="application/json")
+        return Response(json.dumps(self._response), mimetype="application/json", status=500)
 
 
 class ParamException(HTTPException):
 
     def __init__(self, msg: AnyStr):
         self._response = ParamError.error(msg)
-        super(ParamException, self).__init__(response=self.__make_response())
+        super(ParamException, self).__init__(response=self._make_response())
 
-    def __make_response(self) -> Response:
+    def _make_response(self) -> Response:
         """
         自定义返回 response
         :return: Response
@@ -56,9 +56,9 @@ class AuthException(HTTPException):
 
     def __init__(self):
         self._response = AuthError.error()
-        super(AuthException, self).__init__(response=self.__make_response())
+        super(AuthException, self).__init__(response=self._make_response())
 
-    def __make_response(self) -> Response:
+    def _make_response(self) -> Response:
         """
         自定义返回 response
         :return: Response

@@ -5,7 +5,8 @@
 # @Desc: 项目view
 from typing import AnyStr
 
-from flask_restful import Resource, Api
+from flask_restful import Resource
+from MyException import Api
 from App.ProjectController import proBP
 from App import auth
 from App.myAuth import is_admin

@@ -4,13 +4,13 @@
 # @Software: PyCharm
 # @Desc:
 
-from flask_restful import Resource, Api
-
+from flask_restful import Resource
+from MyException import Api
 from App import auth
 from App.ProjectController import proBP
 from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models import Report
+from Models.ProjectModel.reports import Report
 
 
 class ReportController(Resource):

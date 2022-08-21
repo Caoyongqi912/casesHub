@@ -8,10 +8,10 @@ from typing import AnyStr, Any, List
 
 class ResponseCode:
     SUCCESS = 0
-    SERVER_ERROR = 500
-    PARAMS_ERROR = 1000
-    AUTH_ERROR = 2000
-    NOT_FOUND = 404
+    SERVER_ERROR = 1000
+    PARAMS_ERROR = 2000
+    AUTH_ERROR = 3000
+    NOT_FOUND = 4000
 
 
 class ResponseMsg:

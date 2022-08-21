@@ -9,7 +9,7 @@ from typing import AnyStr, NoReturn
 from flask_sqlalchemy import Pagination
 
 from Comment.myException import ParamException
-from Enums.errorCode import ResponseMsg
+from Enums import ResponseMsg
 from Models.ProjectModel.project import Project
 from Models.base import Base
 from App import db

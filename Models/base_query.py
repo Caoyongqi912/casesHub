@@ -5,7 +5,7 @@
 # @Desc: MyBaseQuery
 from flask_sqlalchemy import BaseQuery, Pagination
 from Comment.myException import ParamException
-from Enums.errorCode import ResponseMsg
+from Enums import ResponseMsg
 from Utils.myWraps import pageSerialize
 from Utils.myLog import MyLog
 

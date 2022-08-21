@@ -3,8 +3,8 @@
 # @File : version.py 
 # @Software: PyCharm
 # @Desc: version view
-from flask_restful import Resource, Api
-
+from flask_restful import Resource
+from MyException import Api
 from App import auth
 from App.ProjectController import proBP
 from Comment.myException import MyResponse
