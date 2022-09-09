@@ -50,9 +50,6 @@ def create_app(configName: AnyStr = "default") -> Flask:
     from .PlatformController import platformBP
     app.register_blueprint(platformBP)
 
-    from .NewHome import newHomeBP
-    app.register_blueprint(newHomeBP)
-
     from .reqhook import logWrite, resp
     app.before_request(logWrite)
     app.after_request(resp)
