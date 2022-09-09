@@ -5,7 +5,7 @@
 # @Desc: case view
 
 from flask import request, g
-from flask_restful import  Resource
+from flask_restful import Resource
 from MyException import Api
 from App import auth
 from App.CaseController import caseBP

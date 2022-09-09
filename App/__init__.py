@@ -10,7 +10,6 @@ from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from flask_restx import Api
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
@@ -18,7 +17,6 @@ from Utils import JSONEncoder
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 auth: HTTPBasicAuth = HTTPBasicAuth()
-api: Api = Api()
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -39,7 +37,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
-    #
+
     from .DepartController import userBP
     app.register_blueprint(userBP)
 
@@ -51,6 +49,9 @@ def create_app(configName: AnyStr = "default") -> Flask:
 
     from .PlatformController import platformBP
     app.register_blueprint(platformBP)
+
+    from .NewHome import newHomeBP
+    app.register_blueprint(newHomeBP)
 
     from .reqhook import logWrite, resp
     app.before_request(logWrite)

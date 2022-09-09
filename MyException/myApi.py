@@ -19,6 +19,7 @@ class Api(_Api):
         :param e: the raised Exception object
         :return:MyException
         """
+        log.error(e)
         if isinstance(e, AuthException | ParamException):
             return e
         return MyException()
