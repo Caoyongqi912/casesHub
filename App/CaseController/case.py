@@ -179,8 +179,18 @@ class PageCasePart(Resource):
         return MyResponse.success(CasePart.page)((parse.page(CasePart)))
 
 
+class CeleryTest(Resource):
+
+    def get(self):
+        from celery_task.tasks import add
+        res = add.delay(1, 2)
+        print(res)
+        return MyResponse.success(res)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
+api_script.add_resource(CeleryTest, "/celeryTest")
 api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
 api_script.add_resource(CasePartController, "/part/opt")
 api_script.add_resource(PageCasePart, "/part/page")

@@ -13,10 +13,13 @@ from flask_sqlalchemy import SQLAlchemy
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
+from celery import Celery
 
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 auth: HTTPBasicAuth = HTTPBasicAuth()
+
+celery = Celery(__name__, broker='redis://127.0.0.1:6379/0', backend='redis://127.0.0.1:6379/0')
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -37,6 +40,7 @@ def create_app(configName: AnyStr = "default") -> Flask:
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
     CORS(app, supports_credentials=True)
+    celery.conf.update(app.config)
 
     from .DepartController import userBP
     app.register_blueprint(userBP)

@@ -11,4 +11,5 @@ app = create_app()
 if __name__ == '__main__':
     # config = Config()
     # app.run(host=config.get_conf("domain", "host"), port=config.get_conf("domain", "port"))
+    # celery_cmd = "celery -A celery_task.tasks worker -l info -P eventlet"
     app.run(host="localhost", port=5000)
