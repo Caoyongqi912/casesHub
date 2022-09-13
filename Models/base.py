@@ -1,4 +1,4 @@
-# @Time : 2022/7/5 21:35 
+# @Time : 2022/7/5 21:35
 # @Author : cyq
 # @File : base.py
 # @Software: PyCharm
@@ -28,6 +28,7 @@ index	如果设为 True ,为这列创建索引,提升查询效率
 nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
 default	为这列定义默认值
 """
+from sqlalchemy.engine import CursorResult
 
 """
 关系表参数
@@ -125,6 +126,17 @@ class Base(db.Model):
         return cls.query.filter_by().order_by(asc(cls.id)).all()
 
     @classmethod
+    def search_like(cls, target: str, value: str):
+        """
+        模糊查询
+        :param target: username  cls.column
+        :param value:  search value
+        :return: execute_sql
+        """
+        sql = "select * from {} where {} like '{}%'".format(cls.__tablename__, target, value)
+        return Base.execute_sql(sql)
+
+    @classmethod
     def get(cls, ident: int | str, name: AnyStr = None):
         """
         get entity by id
@@ -183,5 +195,23 @@ class Base(db.Model):
         return False
 
     @classmethod
-    def columns(cls) -> List:
+    def columns(cls) -> List[str]:
+        """
+        返回 cls 下所有column
+        """
         return [c.name for c in cls.__table__.columns]
+
+    @staticmethod
+    def execute_sql(sql) -> List[Dict[str, str]] | None:
+        """
+        执行sql
+        :param sql: sql
+        :return: List[Dict[str, str]] | None
+        """
+
+        result: CursorResult = db.session.execute(sql)
+        cursor = result.cursor
+        if not cursor:
+            return
+        result_dict = [dict(zip([field[0].lower() for field in cursor.description], v)) for v in cursor.fetchall()]
+        return result_dict

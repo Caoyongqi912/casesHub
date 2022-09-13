@@ -190,7 +190,23 @@ class CurrentUserController(Resource):
         return MyResponse.success(User.get(g.user.id))
 
 
+class MoHuSearch(Resource):
+
+    @auth.login_required
+    def post(self) -> MyResponse:
+        """
+        模糊查询
+        :return:MyResponse
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name="target", type=str, required=True)
+        parse.add(name="value", type=str, required=True)
+        info = User.search_like(**parse.parse_args())
+        return MyResponse.success(info)
+
+
 api_script = Api(userBP)
+api_script.add_resource(MoHuSearch, "/search")
 api_script.add_resource(AddAdminController, "/admin")
 api_script.add_resource(UserOptController, "/opt")
 api_script.add_resource(SetPasswordController, "/setpassword")
