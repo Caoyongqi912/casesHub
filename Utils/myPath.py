@@ -58,5 +58,14 @@ def getExcelPath(file: AnyStr) -> AnyStr:
     return os.path.join(os.path.join(filePath, excel_path), file)
 
 
+def getCaseXlsx():
+    """
+    获取用例模板
+    :return:
+    """
+    filePath = os.path.join(get_cwd("resource"), "case.xlsx")
+    return filePath
+
+
 if __name__ == '__main__':
     delAvatar("/api/user/avatar/WZrDttjEPwafFwLvjFiS_casesHub.png")

@@ -1,13 +1,15 @@
 # @Time : 2022/7/16 17:27 
 # @Author : cyq
-# @File : case.py 
+# @File : caseController.py
 # @Software: PyCharm
 # @Desc: case view
 
 from flask import request, g
 from flask_restful import Resource
+
+from Models.CaseModel.caseExcel import CaseExcel
 from MyException import Api
-from App import auth
+from App import auth, siwa
 from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
 from Enums import CaseTag, CaseLevel, CaseType
@@ -17,6 +19,10 @@ from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
+from Swagger import CaseSwagger, BaseResponseSwagger
+from Utils import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class CasePartController(Resource):
@@ -70,6 +76,7 @@ class CasePartController(Resource):
 class CaseController(Resource):
 
     @auth.login_required
+    @siwa.doc(body=CaseSwagger, tags=['caseController'], resp=BaseResponseSwagger)
     def post(self) -> MyResponse:
         """
         新增用例
@@ -104,12 +111,11 @@ class CaseController(Resource):
         parse.add(name="part", type=str, required=False)
         parse.add(name="title", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="case_level", type=str, choices=["P1", "P2", "P3", "P4"], required=False)
-        parse.add(name="case_type", type=str, choices=["功能", "接口", "性能"], required=False)
-        parse.add(name="platform", type=str, choices=["IOS", "ANDROID", "WEB", "PC", "APP"], required=False)
-        parse.add(name="prd", type=str, required=False)
-        parse.add(name="project", type=int, isExist=Project, required=False)
-        parse.add(name="versionID", type=int, isExist=Version, required=False)
+        parse.add(name="case_level", type=str, enum=CaseLevel, required=False)
+        parse.add(name="case_type", type=str, enum=CaseType, required=False)
+        parse.add(name="platformID", type=int, required=False)
+        parse.add(name="projectID", type=int, required=False)
+        parse.add(name="versionID", type=int, required=False)
         parse.add(name="steps", type=list, required=False)
         Cases.update(**parse.parse_args())
         return MyResponse.success()
@@ -147,50 +153,37 @@ class QueryBugs(Resource):
         return MyResponse.success(case.bugs)
 
 
-class ExcelPut(Resource):
-
-    @auth.login_required
-    def post(self):
-        from werkzeug.utils import secure_filename
-        from faker import Faker
-        from Utils.myPath import getExcelPath
-        from Utils.myExcel import MyExcel
-        f = Faker()
-        file = request.files.get("file")
-        parse = MyRequestParseUtil("values")
-        parse.add(name="projectID", required=True, isExist=Project)
-        parse.add(name="versionID", required=True, isExist=Version)
-        parse.parse_args().setdefault('creator', g.user.id)
-        fileName = f.pystr() + '_' + secure_filename(file.filename)  # excel名称
-        filePath = getExcelPath(fileName)  # excel路径
-        file.save(filePath)  # 存储头像
-        try:
-            MyExcel(filePath).save(**parse.parse_args())
-            return MyResponse.success()
-        except Exception as e:
-            return ParamError.error(ResponseMsg.ERROR_EXCEL)
-
-
 class PageCasePart(Resource):
 
     @auth.login_required
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
-        return MyResponse.success(CasePart.page)((parse.page(CasePart)))
+        return MyResponse.success(CasePart.page(parse.page(CasePart)))
 
 
-class CeleryTest(Resource):
+class ExcelPut(Resource):
 
-    def get(self):
-        from celery_task.tasks import add
-        res = add.delay(1, 2)
-        print(res)
-        return MyResponse.success(res)
+    @auth.login_required
+    async def post(self) -> MyResponse:
+        """
+        excel
+        :return:
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name="projectID", type=int, required=True, isExist=Project)
+        parse.add(name="fileID", type=str, required=True)
+        fileID: str = parse.parse_args().get("fileID")
+        projectID: int = parse.parse_args().get("projectID")
+        file = CaseExcel.get_by_uid(fileID)
+        filePath: str = file.filePath
+        from Utils.myExcel import MyExcel
+        my = MyExcel(file_path=filePath)
+        await my.sheetReader(projectID, g.user.id)
+        return MyResponse.success()
 
 
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
-api_script.add_resource(CeleryTest, "/celeryTest")
 api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
 api_script.add_resource(CasePartController, "/part/opt")
 api_script.add_resource(PageCasePart, "/part/page")

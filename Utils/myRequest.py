@@ -69,13 +69,13 @@ class MyRequest:
     def addExcel(self):
         # 用open的方式打开文件，作为字典的值。file是请求规定的参数，每个请求都不一样。
 
-        files = {'file': open("../resource/case.xlsx", 'rb')}
+        files = {'file': open("../resource/下载.xlsx", 'rb')}
         # 请求的地址，这个地址中规定请求文件的参数必须是file
         # 用files参数接收 PFbUdtKZfSMYTdeOdUYJ_casesHub.png
-        b = {"versionID": 1, "productID": 1}
-        res = self.go(method="POST", url="v1/api/case/upload/excel", params=b, files=files)
+        # b = {"versionID": 1, "productID": 1}
+        res = self.go(method="POST", url="api/upload/", files=files)
         print(res.text)
 
 
 if __name__ == '__main__':
-    MyRequest().addAvatar()
+    MyRequest().addExcel()

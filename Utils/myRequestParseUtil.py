@@ -71,11 +71,12 @@ class MyRequestParseUtil:
         pageSize = body.pop("pageSize") if body.get("pageSize") else 10
         current = body.pop("current") if body.get("current") else 1
         sort = body.pop("sort") if body.get("sort") else None
+        self._verify_filterKey(body, cls)
+
         pageInfo = {
             "pageSize": self._verify_pageSize(pageSize),
             "current": self._verify_current(current),
-            "sort": self._verify_sort(sort, cls),
-            "filter_key": self._verify_filterKey(body, cls)
+            "sort": self._verify_sort(sort, cls)
         }
         return pageInfo
 
@@ -112,7 +113,7 @@ class MyRequestParseUtil:
 
             # 枚举校验
             if kw.get("enum"):
-                self.body[kw['name']] = self.__verify_enum(kw['enum'], self.body.get(kw["name"]))
+                self.body[kw['name']] = self._verify_enum(kw['enum'], self.body.get(kw["name"]))
         return self.body
 
     @staticmethod

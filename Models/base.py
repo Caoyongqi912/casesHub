@@ -147,6 +147,19 @@ class Base(db.Model):
         return cls.query.get_or_NoFound(ident, name)
 
     @classmethod
+    def get_by_uid(cls, uid):
+        """
+        通过uid 查询
+        :param uid: uid
+        :return:
+        :raise: ParamException
+        """
+        rv = cls.query.filter_by(uid=uid).first()
+        if not rv:
+            raise ParamException(ResponseMsg.ERROR)
+        return rv
+
+    @classmethod
     def verify_unique(cls, **kwargs) -> NoReturn:
         """verify_unique by field name"""
         rv = cls.query.filter_by(**kwargs).first()

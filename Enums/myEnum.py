@@ -104,4 +104,5 @@ class IntEnum(sql.types.TypeDecorator):
         :param dialect:
         :return: Enum name
         """
-        return self.__enumType(value).name
+        e = self.__enumType(value)
+        return e.name

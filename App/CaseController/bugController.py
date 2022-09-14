@@ -1,6 +1,6 @@
 # @Time : 2022/7/16 19:45 
 # @Author : cyq
-# @File : bug.py 
+# @File : bugController.py
 # @Software: PyCharm
 # @Desc:bugView
 from flask_restful import Resource

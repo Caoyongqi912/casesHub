@@ -209,3 +209,43 @@ values (3, 'tSDptJEdrGPgLNvqdEkx', '2022-08-09', '2022-08-09', 'case2', 'case2 d
     "step": 2
   }
 ]', null, 1, 1, 1, 1, 1, null);
+
+CREATE TABLE case_excel
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATE COMMENT '创建时间',
+    update_time DATE COMMENT '修改时间',
+    `fileName`  VARCHAR(50) COMMENT '附件名',
+    `filePath`  VARCHAR(200) COMMENT '附件路径',
+    PRIMARY KEY (id),
+    UNIQUE (`fileName`)
+);
+
+
+CREATE TABLE bug
+(
+    id           INTEGER     NOT NULL AUTO_INCREMENT,
+    uid          VARCHAR(50) COMMENT '唯一标识',
+    create_time  DATE COMMENT '创建时间',
+    update_time  DATE COMMENT '修改时间',
+    title        VARCHAR(20) COMMENT 'bug名称',
+    `desc`       VARCHAR(100) COMMENT 'bug描述',
+    tag          VARCHAR(30) COMMENT 'bug标签',
+    tester       VARCHAR(20) NOT NULL COMMENT '测试人',
+    developer    VARCHAR(20) COMMENT '开发',
+    pr           VARCHAR(20) COMMENT '产品',
+    type         INTEGER COMMENT 'bug类型',
+    level        INTEGER COMMENT 'BUG等级',
+    status       INTEGER COMMENT 'BUG状态',
+    file         VARCHAR(50) COMMENT '附件地址',
+    mark         VARCHAR(100) COMMENT 'BUG备注',
+    `platformID` INTEGER COMMENT '所属平台',
+    `versionID`  INTEGER COMMENT '所属版本',
+    `caseID`     INTEGER COMMENT '所属用例',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`platformID`) REFERENCES platform (id) ON DELETE SET NUll,
+    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NULL,
+    FOREIGN KEY (`caseID`) REFERENCES cases (id) ON DELETE SET NULL
+);
+

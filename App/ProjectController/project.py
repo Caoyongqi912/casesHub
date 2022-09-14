@@ -8,7 +8,7 @@ from typing import AnyStr
 from flask_restful import Resource
 from MyException import Api
 from App.ProjectController import proBP
-from App import auth
+from App import auth, siwa
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Models.CaseModel.cases import CasePart, Cases
@@ -16,12 +16,15 @@ from Models.DepartModel.userModel import User
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
+from Swagger import AddProjectSwagger, BaseResponseSwagger, PageSwagger, UpdateProjectSwagger, \
+    DeleteProjectSwagger
 
 
 class ProjectController(Resource):
 
     @auth.login_required
     @is_admin
+    @siwa.doc(body=AddProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def post(self) -> MyResponse:
         """
         添加项目
@@ -36,16 +39,18 @@ class ProjectController(Resource):
         return MyResponse.success()
 
     @auth.login_required
+    @siwa.doc(query=PageSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def get(self) -> MyResponse:
         """
         分页查询
-        :return:
+        :return: MyResponse
         """
 
         parse = MyRequestParseUtil("values")
         return MyResponse.success(Project.page(**parse.page(cls=Project)))
 
     @auth.login_required
+    @siwa.doc(body=UpdateProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def put(self) -> MyResponse:
         """
         维护
@@ -60,6 +65,7 @@ class ProjectController(Resource):
 
     @auth.login_required
     @is_admin
+    @siwa.doc(body=DeleteProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def delete(self) -> MyResponse:
         """
         删除
@@ -74,6 +80,7 @@ class ProjectController(Resource):
 class PageCaseController(Resource):
 
     @auth.login_required
+    @siwa.doc(query=PageSwagger, tags=['PageCaseController'], resp=BaseResponseSwagger)
     def get(self, projectID: AnyStr) -> MyResponse:
         """
         通过MyResponse 分页查询

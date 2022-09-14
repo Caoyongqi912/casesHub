@@ -4,6 +4,7 @@
 # @Software: PyCharm
 # @Desc: 处理excel
 import re
+import time
 from typing import AnyStr, List, Dict
 
 from openpyxl import load_workbook
@@ -14,45 +15,40 @@ from Models.CaseModel.cases import Cases
 
 class MyExcel:
 
-    def __init__(self, file_path: AnyStr, sheetName: AnyStr = None):
+    def __init__(self, file_path: AnyStr):
         self.file_path = file_path
         self.wb = load_workbook(self.file_path)
-        self.sheetName = sheetName
+        self.worker = self.wb.worksheets[0]
 
-    def save(self, **kwargs):
-        """
-        遍历sheet 读取info
-        :return:
-        """
-        if self.sheetName:
-            return self.sheetReader(self.wb[self.sheetName], **kwargs)
-        else:
-            return [self.sheetReader(sheet, **kwargs) for sheet in self.sheets]
-
-    def sheetReader(self, sheet: Worksheet, **kwargs):
+    async def sheetReader(self, projectID: int, creator: int):
         """
         [{title:xx,desc:xx,prd:xx,case_level:xx,status:xx,steps:"steps": [{step:1,do:xx,exp:xx}..]
-        :param sheet:
+        :param projectID:
+        :param creator:
         :return:
         """
-        MAX_ROW = sheet.max_row
-        MIN_ROW = sheet.min_row
-        MIN_COL = sheet.min_column
-        MAX_COL = sheet.max_column
+        MAX_ROW = self.worker.max_row
+        MIN_ROW = self.worker.min_row
+        MIN_COL = self.worker.min_column
+        MAX_COL = self.worker.max_column
         with create_app().app_context():
             for j in range(MIN_ROW + 1, MAX_ROW + 1):  # 第二行开始
-                d = {'part': None, 'title': None, 'desc': None, 'prd': None, 'case_level': None, 'status': None,
-                     'steps': [], "exp": None, "platform": None}
-                body = [sheet.cell(j, i).value for i in range(MIN_COL, MAX_COL + 1)]
+                d = {'part': None, 'title': None, 'desc': None, 'setup': None,
+                     'steps': [], "exp": None, "platform": None, 'case_level': None}
+                body = [self.worker.cell(j, i).value for i in range(MIN_COL, MAX_COL + 1)]
                 case = dict(zip(d, body))
-                case['steps'] = self.__steps(case.get("steps"), case.get("exp"))
-                case['productID'] = kwargs.get("productID")
-                case['versionID'] = kwargs.get("versionID")
-                case['creator'] = kwargs.get('creator')
+                case['steps'] = self._steps(case.get("steps"), case.get("exp"))
                 case.pop("exp")
-                Cases(**case).save()
 
-    def __steps(self, steps: AnyStr, exp: AnyStr) -> List[Dict]:
+                case['productID'] = projectID
+                case['creator'] = creator
+                # Cases(**case).save()
+                print(case)
+                time.sleep(10)
+                return
+
+    @staticmethod
+    def _steps(steps: AnyStr, exp: AnyStr) -> List[Dict]:
         """
         :param steps: {1.xxx,2.xxx,3.xxx}
         :param exp: {1.xxx,2.xxx,3.xxx}
@@ -70,17 +66,8 @@ class MyExcel:
 
         return _steps
 
-    @property
-    def sheets(self) -> List[Worksheet]:
-        """
-        获取所有sheet
-        :return: List[<Worksheet>,<Worksheet>]
-        """
-        return self.wb.worksheets
-
 
 if __name__ == '__main__':
     filepath = "../resource/case.xlsx"
     my = MyExcel(filepath)
-    for i in my.save():
-        print(i)
+    my.sheetReader()
