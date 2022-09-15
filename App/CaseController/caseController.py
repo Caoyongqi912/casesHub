@@ -120,7 +120,7 @@ class UpdateExcel2CaseController(Resource):
         projectID: int = parse.parse_args().get("projectID")
         filePath: str = file.filePath
         from celery_task.tasks import caseExcelWrite2Sql
-        caseExcelWrite2Sql.apply_async(args=[projectID, g.user.id, filePath])
+        caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)
         # from Utils.myExcel import MyExcel
         # MyExcel(filePath).sheetReader(projectID,g.user.id)
         return MyResponse.success()

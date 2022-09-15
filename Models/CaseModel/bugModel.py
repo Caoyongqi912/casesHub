@@ -1,6 +1,6 @@
 # @Time : 2022/7/10 21:55 
 # @Author : cyq
-# @File : bugs.py 
+# @File : bugModel.py
 # @Software: PyCharm
 # @Desc: bug实体
 from typing import AnyStr

@@ -9,7 +9,7 @@ from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Enums import BugLevel, BugStatus
-from Models.CaseModel.bugs import Bug
+from Models.CaseModel.bugModel import Bug
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
 
