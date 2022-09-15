@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:bugView
 from flask_restful import Resource
-from flask_restful import Api
+from MyException import Api
 from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse

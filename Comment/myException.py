@@ -18,7 +18,7 @@ class MyException(HTTPException):
     自定义 Exception 基类
     """
 
-    def __init__(self, response: Dict = None):
+    def __init__(self, response: Dict | str = None):
         """
         :param response: MyResponse
         """
@@ -34,6 +34,9 @@ class MyException(HTTPException):
         :return: Response
         """
         log.error(self._response)
+        if isinstance(self._response, str):
+            return Response(json.dumps(MyResponse.limiter_err(self._response)), mimetype="application/json", status=500)
+
         return Response(json.dumps(self._response), mimetype="application/json", status=500)
 
 

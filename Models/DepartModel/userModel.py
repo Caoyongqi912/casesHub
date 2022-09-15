@@ -11,7 +11,7 @@ from App import db
 from typing import AnyStr
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from Comment.myException import ParamException
+from Comment.myException import ParamException, AuthException
 from Enums.myEnum import Gender, UserTag, IntEnum
 from Utils import MyLog, delAvatar
 import time
@@ -88,19 +88,18 @@ class User(Base):
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
     @classmethod
-    def verify_token(cls, token: AnyStr) -> None | UserType:
+    def verify_token(cls, token: AnyStr) -> UserType:
         """
         token 解密
         :param token:
-        :return: Union[None | user]
+        :return: UserType
         """
         try:
             data: Dict[str, str | int] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
-            print(data)
+            return cls.query.get(data['id'])
         except Exception as e:
-            log.error(f"校验token 失效： {repr(e)}")
-            return None
-        return cls.query.get(data['id'])
+            log.error(e)
+            raise AuthException()
 
     def verify_password(self, password: AnyStr) -> bool:
         """
@@ -118,12 +117,12 @@ class User(Base):
         return self.isAdmin
 
     @classmethod
-    def login(cls, username: AnyStr, password: AnyStr) -> AnyStr:
+    def login(cls, username: AnyStr, password: AnyStr) -> Dict[str, str]:
         user = cls.query.filter(User.username == username).first()
         if user:
             if user.verify_password(password):
                 token = user.generate_token().decode("utf-8")
-                return token
+                return {'token': token}
             raise ParamException("password err!")
         else:
             raise ParamException("username err!")

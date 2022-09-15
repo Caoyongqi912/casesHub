@@ -3,6 +3,7 @@
 # @File : myApi.py 
 # @Software: PyCharm
 # @Desc:
+from flask_limiter import RateLimitExceeded
 from flask_restful import Api as _Api
 from werkzeug.exceptions import HTTPException
 from Comment.myException import MyException, AuthException, ParamException
@@ -22,4 +23,6 @@ class Api(_Api):
         log.error(e)
         if isinstance(e, AuthException | ParamException):
             return e
+        if isinstance(e, RateLimitExceeded):
+            return MyException("too manny request! be wait ..")
         return MyException()

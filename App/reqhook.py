@@ -1,7 +1,6 @@
 from typing import Union, NoReturn
 from flask import request, Response
 
-from Comment.myException import MyException
 from Comment.myResponse import MyResponse
 from Utils import MyLog
 

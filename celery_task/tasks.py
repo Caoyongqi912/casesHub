@@ -3,14 +3,17 @@
 # @File : tasks.py 
 # @Software: PyCharm
 # @Desc:
-from Utils import MyLog
-from App import create_app, celery
+from App import create_app
+from App.myCelery import create_celery_app
 
-log = MyLog.get_log(__file__)
+celery = create_celery_app(create_app())
+
+
+# celery_cmd = "celery -A celery_task.tasks:celery worker -l info -P eventlet -E"
 
 
 
-@celery.task()
+@celery.task
 def caseExcelWrite2Sql(projectID: int, creator: int, filePath: str):
     from Utils.myExcel import MyExcel
     my = MyExcel(file_path=filePath)

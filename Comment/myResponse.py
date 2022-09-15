@@ -30,12 +30,9 @@ class MyResponse:
     def not_find() -> make_response:
         return make_response(ResponseCode.NOT_FOUND, None, ResponseMsg.NOT_FOUND)
 
-    @classmethod
-    def swagger(cls):
-        return {"code": 200, "description": "success", "model": {
-            "code": ResponseCode.NOT_FOUND,
-            "data": None,
-            "msg": ResponseMsg.NOT_FOUND}}
+    @staticmethod
+    def limiter_err(msg: str):
+        return {"code": ResponseCode.LIMITER_ERROR, "data": None, "msg": msg}
 
 
 class ParamError:

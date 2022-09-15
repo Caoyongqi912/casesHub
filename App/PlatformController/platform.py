@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from flask_restful import Resource
-from flask_restful import Api
+from MyException import Api
 from App import auth
 from Comment.myException import MyResponse
 from App.PlatformController import platformBP

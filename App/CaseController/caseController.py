@@ -7,8 +7,8 @@
 from flask import g
 from flask_restful import Resource
 from Models.CaseModel.caseExcel import CaseExcel
-from flask_restful import Api
-from App import auth, siwa
+from MyException import Api
+from App import auth, siwa, limiter
 from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
 from Enums import CaseTag, CaseLevel, CaseType
@@ -17,7 +17,7 @@ from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
-# from Swagger import CaseSwagger, BaseResponseSwagger
+from Swagger import CaseSwagger, BaseResponseSwagger
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)
@@ -26,7 +26,7 @@ log = MyLog.get_log(__file__)
 class CaseController(Resource):
 
     @auth.login_required
-    # @siwa.doc(body=CaseSwagger, tags=['caseController'], resp=BaseResponseSwagger)
+    @siwa.doc(body=CaseSwagger, tags=['caseController'], resp=BaseResponseSwagger)
     def post(self) -> MyResponse:
         """
         新增用例
@@ -103,9 +103,10 @@ class QueryBugs(Resource):
         return MyResponse.success(case.bugs)
 
 
-class ExcelPut(Resource):
+class UpdateExcel2CaseController(Resource):
 
     @auth.login_required
+    @limiter.limit("1/minute")
     def post(self) -> MyResponse:
         """
         excel文件录入sql
@@ -118,15 +119,14 @@ class ExcelPut(Resource):
         file = CaseExcel.get_by_uid(fileID)
         projectID: int = parse.parse_args().get("projectID")
         filePath: str = file.filePath
-        # from celery_task.tasks import caseExcelWrite2Sql
-
-        # caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)
-        from Utils.myExcel import MyExcel
-        MyExcel(filePath).sheetReader(projectID,g.user.id)
+        from celery_task.tasks import caseExcelWrite2Sql
+        caseExcelWrite2Sql.apply_async(args=[projectID, g.user.id, filePath])
+        # from Utils.myExcel import MyExcel
+        # MyExcel(filePath).sheetReader(projectID,g.user.id)
         return MyResponse.success()
 
 
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
 api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
-api_script.add_resource(ExcelPut, "/upload/excel")
+api_script.add_resource(UpdateExcel2CaseController, "/upload/excel")

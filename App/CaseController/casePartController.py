@@ -10,7 +10,7 @@ from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Models.CaseModel.cases import CasePart
 from Models.ProjectModel.project import Project
-from flask_restful import Api
+from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
 

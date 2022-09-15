@@ -12,6 +12,7 @@ class ResponseCode:
     PARAMS_ERROR = 2000
     AUTH_ERROR = 3000
     NOT_FOUND = 4000
+    LIMITER_ERROR = 5000
 
 
 class ResponseMsg:
@@ -21,6 +22,7 @@ class ResponseMsg:
     AUTH_ERROR = "auth error No permission !"
     ERROR_EXCEL = "check ur excel param !"
     NOT_FOUND = "not found !"
+    LIMITER_ERROR = "to many request! wait.."
 
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:

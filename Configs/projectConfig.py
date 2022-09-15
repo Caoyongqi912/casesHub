@@ -35,8 +35,10 @@ class ProjectConfig:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     HOST = "127.0.0.1"
-    redisPort = '6379'
-
+    REDIS_PORT = '6379'
+    MYSQL_PORT = '3306'
+    MYSQL_DATABASE = 'caseHub'
+    FLASK_ADMIN_SWATCH = 'cerulean'
     # FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     # FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     # FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
@@ -51,7 +53,7 @@ class DevelopmentConfig(ProjectConfig):
 
     CACHE_TYPE = 'simple'
     ERROR_404_HELP = False
-    CACHE_DEFAULT_TIMEOUT = 300
+    CACHE_DEFAULT_TIMEOUT = 3000
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 123
     MAIL_USE_TLS = True
@@ -60,13 +62,12 @@ class DevelopmentConfig(ProjectConfig):
     REPORT_MAIL = "xxxx@mail.com"
     JSON_AS_ASCII = False  # 这个配置可以确保http请求返回的json数据中正常显示中文
 
-    #    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root@localhost:3306/caseHub"
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:root@{ProjectConfig.HOST}:{ProjectConfig.MYSQL_PORT}/{ProjectConfig.MYSQL_DATABASE}"
+    # SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-    result_backend = 'redis://{}:{}'.format(ProjectConfig.HOST, ProjectConfig.redisPort)
-    CELERY_BROKER_URL = 'redis://{}:{}'.format(ProjectConfig.HOST, ProjectConfig.redisPort)
+    RESULT_BACKEND = 'redis://{}:{}/1'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
+    CELERY_BROKER_URL = 'redis://{}:{}/2'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
     timezone = 'Asia/Shanghai'
     accept_content = ['json', 'pickle']
     result_serializer = "json"
@@ -98,5 +99,3 @@ config = {
     "pro": ProjectConfig,
     "default": DevelopmentConfig
 }
-if __name__ == '__main__':
-    print(basedir)

@@ -9,18 +9,19 @@ from flask import Flask
 from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
 from flask_cors import CORS
+from flask_limiter.util import get_remote_address
 from flask_sqlalchemy import SQLAlchemy
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
-from celery import Celery
 from flask_siwadoc import SiwaDoc
+from flask_limiter import Limiter
 
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 auth: HTTPBasicAuth = HTTPBasicAuth()
 siwa = SiwaDoc(title="CaseHubAPI", ui="redoc")
-celery = Celery(__name__, broker='redis://127.0.0.1:6379/0', backend='redis://127.0.0.1:6379/0')
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(configName: AnyStr = "default") -> Flask:
@@ -40,9 +41,9 @@ def create_app(configName: AnyStr = "default") -> Flask:
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
     app.json_encoder = JSONEncoder  # json
+    siwa.init_app(app)  # swagger
+    limiter.init_app(app)  # 接口频率限制
     CORS(app, supports_credentials=True)
-    celery.conf.update(app.config)
-    siwa.init_app(app)
 
     from .DepartController import userBP
     app.register_blueprint(userBP)

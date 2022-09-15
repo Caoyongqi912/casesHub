@@ -77,8 +77,3 @@ class MyExcel:
 
         return _steps
 
-
-if __name__ == '__main__':
-    filepath = "../resource/case.xlsx"
-    my = MyExcel(filepath)
-    my.sheetReader(1, 2)

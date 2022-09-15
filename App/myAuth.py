@@ -19,12 +19,14 @@ def verify_password_or_token(username_or_token: AnyStr, password: AnyStr) -> boo
     :param username_or_token: 密钥 或者用户名
     :return: bool
     """
-
-    user = User.verify_token(token=username_or_token)
-    if not user:
+    # 使用了用户名密码尝试登陆
+    if username_or_token and password:
         user = User.query.filter(User.username == username_or_token).first()
         if not user or not user.verify_password(password):
             raise AuthException()
+    else:
+        # 使用token
+        user = User.verify_token(token=username_or_token)
     g.user = user
     return True
 

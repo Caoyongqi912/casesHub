@@ -5,7 +5,7 @@
 # @Desc: 部门controller
 
 from flask_restful import Resource
-from flask_restful import Api
+from MyException import Api
 from App import auth
 from App.DepartController import userBP
 from App.myAuth import is_admin
