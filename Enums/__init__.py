@@ -5,5 +5,6 @@
 # @Desc:
 
 from .responseCodeAndMsg import ResponseCode, ResponseMsg
-from .myEnum import Base, CaseTag, CaseType, CaseStatus, CaseLevel, Gender, UserTag, BugType, BugStatus, BugLevel, \
-    IntEnum
+from .myEnum import CaseTag, CaseType, CaseStatus, CaseLevel, Gender, UserTag, BugType, BugStatus, BugLevel
+from .intEnum import IntEnum
+from .apiEnum import APIMethodEnum

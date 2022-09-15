@@ -66,6 +66,7 @@ class DevelopmentConfig(ProjectConfig):
     # SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+    RATELIMIT_STORAGE_URI = 'redis://{}:{}/1'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
     RESULT_BACKEND = 'redis://{}:{}/1'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
     CELERY_BROKER_URL = 'redis://{}:{}/2'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
     timezone = 'Asia/Shanghai'

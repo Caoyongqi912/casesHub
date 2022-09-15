@@ -23,6 +23,7 @@ class ResponseMsg:
     ERROR_EXCEL = "check ur excel param !"
     NOT_FOUND = "not found !"
     LIMITER_ERROR = "to many request! wait.."
+    PARAM_ERROR = "params error ! place check"
 
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:

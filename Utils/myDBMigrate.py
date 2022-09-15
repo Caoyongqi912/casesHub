@@ -4,7 +4,8 @@
 # @Software: PyCharm
 # @Desc:
 from App import create_app, db
-from Models.CaseModel import caseExcel
+from Models.CaseModel.envValueModel import EnvValueModel
+
 if __name__ == '__main__':
     create_app().app_context().push()
     db.create_all()

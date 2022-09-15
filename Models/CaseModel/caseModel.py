@@ -1,6 +1,6 @@
 # @Time : 2022/7/10 21:17 
 # @Author : cyq
-# @File : cases.py 
+# @File : caseModel.py
 # @Software: PyCharm
 # @Desc: 用例实体
 import json
@@ -25,6 +25,7 @@ class CasePart(Base):
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属产品")
     # 模块与用例是一对多关系
     cases = db.relationship("Cases", backref='case_part', lazy='dynamic')
+    apis = db.relationship("ApiModel", backref="case_part", lazy="dynamic")
 
     def __init__(self, partName: AnyStr, projectID: int):
         self.partName = partName

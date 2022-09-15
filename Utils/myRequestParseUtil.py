@@ -9,7 +9,8 @@ from flask import request
 from Comment.myException import ParamException
 from Models.base import Base
 from Utils.myLog import MyLog
-from Enums import ResponseMsg, Base as EnumBase
+from Enums import ResponseMsg
+from Enums.baseEnum import Base as EnumBase
 
 log = MyLog.get_log(__file__)
 

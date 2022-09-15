@@ -12,7 +12,7 @@ from App import auth, siwa, limiter
 from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
 from Enums import CaseTag, CaseLevel, CaseType
-from Models.CaseModel.cases import CasePart, Cases
+from Models.CaseModel.caseModel import CasePart, Cases
 from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
@@ -106,7 +106,7 @@ class QueryBugs(Resource):
 class UpdateExcel2CaseController(Resource):
 
     @auth.login_required
-    @limiter.limit("1/minute")
+    @limiter.limit("1/minute")  # 一分钟一次
     def post(self) -> MyResponse:
         """
         excel文件录入sql

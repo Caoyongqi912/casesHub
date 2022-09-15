@@ -12,7 +12,7 @@ from typing import AnyStr
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
-from Enums.myEnum import Gender, UserTag, IntEnum
+from Enums import Gender, UserTag, IntEnum
 from Utils import MyLog, delAvatar
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping

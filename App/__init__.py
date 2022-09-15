@@ -15,13 +15,13 @@ from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
 from flask_siwadoc import SiwaDoc
-from flask_limiter import Limiter
+from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
 
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 auth: HTTPBasicAuth = HTTPBasicAuth()
 siwa = SiwaDoc(title="CaseHubAPI", ui="redoc")
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
 
 
 def create_app(configName: AnyStr = "default") -> Flask:

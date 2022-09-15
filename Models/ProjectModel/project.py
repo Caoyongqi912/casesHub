@@ -1,6 +1,6 @@
 # @Time : 2022/7/10 21:01 
 # @Author : cyq
-# @File : project.py
+# @File : projectController.py
 # @Software: PyCharm
 # @Desc: 产品实体
 
@@ -38,6 +38,9 @@ class Project(Base):
     # 用例 与 产品为一对多关系
     cases = db.relationship("Cases", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
+    hosts = db.relationship("HostModel", backref="project", lazy="dynamic")
+    envs = db.relationship("EnvValueModel", backref="project", lazy="dynamic")
+    apis = db.relationship("ApiModel", backref="project", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int):
         self.name = name
@@ -76,13 +79,6 @@ class Project(Base):
             raise AuthException()
         return super(Project, Project).update(**kwargs)
 
-    @property
-    def query_version(self) -> List:
-        """
-        :return: versions
-        """
-        return self.versions.all()
-
     def page_case(self, **kwargs) -> Pagination:
         """
         查询用例分页
@@ -109,6 +105,30 @@ class Project(Base):
         分页查询用户分页
         """
         return self.users.my_paginate(**kwargs)
+
+    @property
+    def query_host(self) -> List:
+        """
+        query host
+        :return: hosts
+        """
+        return self.hosts.all()
+
+    @property
+    def query_version(self) -> List:
+        """
+        query versions
+        :return: versions
+        """
+        return self.versions.all()
+
+    @property
+    def query_env(self) -> List:
+        """
+        query envs
+        :return: envs
+        """
+        return self.envs.all()
 
     def __verify_auth(self) -> NoReturn:
         """

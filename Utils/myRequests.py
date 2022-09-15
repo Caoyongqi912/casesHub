@@ -9,7 +9,7 @@ import requests
 import urllib3
 from requests import Response, exceptions
 
-from Enums.myEnum import RequestMethod
+from Enums import APIMethodEnum
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)
@@ -27,7 +27,11 @@ class MyRequest:
         self.host = HOST
         self.worker = requests.session()
 
-    def todo(self, url: str, method: RequestMethod, body: Dict[str, Any] | List = None, params: Dict[str, Any] = None,
+    def runAPI(self):
+
+
+
+    def todo(self, url: str, method: APIMethodEnum, body: Dict[str, Any] | List = None, params: Dict[str, Any] = None,
              file: Dict[str, Any] = None, headers: Dict[str, Any] = None, data: Dict[str, Any] = None,
              allow_redirects: bool = True
              ) -> Dict | List:

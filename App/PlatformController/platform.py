@@ -8,7 +8,7 @@ from MyException import Api
 from App import auth
 from Comment.myException import MyResponse
 from App.PlatformController import platformBP
-from Models.CaseModel.cases import Cases
+from Models.CaseModel.caseModel import Cases
 from Models.CaseModel.platforms import Platform
 from Utils.myRequestParseUtil import MyRequestParseUtil
 

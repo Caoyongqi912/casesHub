@@ -8,7 +8,7 @@ from flask_restful import Resource
 from App import auth
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
-from Models.CaseModel.cases import CasePart
+from Models.CaseModel.caseModel import CasePart
 from Models.ProjectModel.project import Project
 from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil

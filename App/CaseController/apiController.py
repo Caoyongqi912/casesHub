@@ -9,3 +9,10 @@ from flask_restful import Resource
 
 class ApiController(Resource):
     pass
+
+
+
+if __name__ == '__main__':
+    d = {"name":"cuq","age":1,"other":"Adad"}
+    d["name"] = d.get("fdds")
+    print(d)

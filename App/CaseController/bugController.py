@@ -21,7 +21,7 @@ class BugController(Resource):
         添加bug
         :return: MyResponse
         """
-        from Models.CaseModel.cases import Cases
+        from Models.CaseModel.caseModel import Cases
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="caseID", type=int, required=True, isExist=Cases)
         parse.add(name="title", type=str, required=True, unique=Bug)

@@ -8,7 +8,7 @@ from typing import AnyStr
 from flask import g
 
 from Enums import BugLevel, BugType, BugStatus
-from Enums.myEnum import IntEnum
+from Enums import IntEnum
 from Models.base import Base
 from App import db
 from Utils import MyLog

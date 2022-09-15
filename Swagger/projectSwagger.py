@@ -8,9 +8,9 @@ class AddProjectSwagger(BaseModel):
 
 
 class PageSwagger(BaseModel):
-    pageSize: str = Field(description="数")
-    current: str = Field(description="页")
-    sort: str = Field(description="排序字段")
+    pageSize: str = None
+    current: str = None
+    sort: str = None
 
 
 class UpdateProjectSwagger(BaseModel):

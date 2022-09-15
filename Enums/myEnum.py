@@ -1,32 +1,4 @@
-from enum import Enum
-from typing import TypeVar, Generic, Union
-
-import sqlalchemy as sql
-
-
-class Base(Enum):
-
-    @classmethod
-    def e(cls, value: int) -> Enum:
-        for k, v in cls.__members__.items():
-            if v.value == value:
-                return v
-
-    @classmethod
-    def values(cls):
-        return [v.value for v in cls]
-
-    @classmethod
-    def getName(cls, value: int) -> str:
-        for k, v in cls.__members__.items():
-            if v.value == value:
-                return v.name
-
-    @classmethod
-    def getValue(cls, name: str) -> int:
-        for k, v in cls.__members__.items():
-            if v.name == name:
-                return v.value
+from Enums.baseEnum import Base
 
 
 class CaseLevel(Base):
@@ -86,42 +58,3 @@ class UserTag(Base):
     PR = 2
     DEV = 3
     ADMIN = 0
-
-
-class RequestMethod(Base):
-    GET = 1
-    POST = 2
-    PUT = 3
-    DELETE = 4
-
-
-enumType = TypeVar("enumType", bound=Base)
-
-
-class IntEnum(sql.types.TypeDecorator):
-    impl = sql.Integer
-    cache_ok = True
-
-    def __init__(self, enumType: Generic[enumType], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__enumType = enumType
-
-    def process_bind_param(self, value, dialect) -> Union[Enum, int]:
-        """
-        :param value:
-        :param dialect:
-        :return:
-        """
-        if isinstance(value, self.__enumType):
-            return value.value
-        else:
-            return value
-
-    def process_result_value(self, value, dialect):
-        """
-        :param value: Enum value
-        :param dialect:
-        :return: Enum name
-        """
-        e = self.__enumType(value)
-        return e.name

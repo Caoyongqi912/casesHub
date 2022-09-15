@@ -26,6 +26,7 @@ class Version(Base):
     # prd = db.Column(db.String(200), nullable=False, comment="需求链接")
     cases = db.relationship("Cases", backref='version', lazy='dynamic')
     bugs = db.relationship("Bug", backref='version', lazy="dynamic")
+    apis = db.relationship("ApiModel", backref="version", lazy="dynamic")
 
     def __init__(self, name: AnyStr, projectID: int, desc: AnyStr = None):
         self.name = name
