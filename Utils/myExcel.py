@@ -4,13 +4,16 @@
 # @Software: PyCharm
 # @Desc: 处理excel
 import re
-import time
-from typing import AnyStr, List, Dict
+from typing import AnyStr, List, Dict, Any
 
 from openpyxl import load_workbook
-from openpyxl.worksheet.worksheet import Worksheet
 from App import create_app
-from Models.CaseModel.cases import Cases
+from Models.CaseModel.cases import Cases, CasePart
+from Models.CaseModel.platforms import Platform
+from Utils import MyLog
+from Enums.myEnum import CaseLevel
+
+log = MyLog.get_log(__file__)
 
 
 class MyExcel:
@@ -20,7 +23,7 @@ class MyExcel:
         self.wb = load_workbook(self.file_path)
         self.worker = self.wb.worksheets[0]
 
-    async def sheetReader(self, projectID: int, creator: int):
+    def sheetReader(self, projectID: int, creator: int):
         """
         [{title:xx,desc:xx,prd:xx,case_level:xx,status:xx,steps:"steps": [{step:1,do:xx,exp:xx}..]
         :param projectID:
@@ -34,18 +37,26 @@ class MyExcel:
         with create_app().app_context():
             for j in range(MIN_ROW + 1, MAX_ROW + 1):  # 第二行开始
                 d = {'part': None, 'title': None, 'desc': None, 'setup': None,
-                     'steps': [], "exp": None, "platform": None, 'case_level': None}
-                body = [self.worker.cell(j, i).value for i in range(MIN_COL, MAX_COL + 1)]
-                case = dict(zip(d, body))
-                case['steps'] = self._steps(case.get("steps"), case.get("exp"))
+                     'info': [], "exp": None, "platform": None, 'case_level': None}
+                body: List[str] = [self.worker.cell(j, i).value for i in range(MIN_COL, MAX_COL + 1)]
+                case: Dict[str, Any] = dict(zip(d, body))
+                case['info'] = self._steps(case.get("info"), case.get("exp"))
                 case.pop("exp")
-
-                case['productID'] = projectID
+                case['projectID'] = projectID
                 case['creator'] = creator
-                # Cases(**case).save()
-                print(case)
-                time.sleep(10)
-                return
+
+                partName: str = case.pop("part")
+                casePart: List[Dict[str, Any]] | Dict[str, Any] = CasePart.getOrCreate(partName, projectID)
+                if isinstance(casePart, list):  # 存在
+                    case["partID"] = casePart[0].get("id")
+                else:
+                    case["partID"] = casePart.get("id")
+                case['case_level'] = CaseLevel.getValue(case['case_level'])
+                platform: str = case.pop("platform")
+                platform = Platform.get_by_name(platform)
+                case['platformID'] = platform.id
+                log.info(f"save{case}")
+                Cases(**case).save()
 
     @staticmethod
     def _steps(steps: AnyStr, exp: AnyStr) -> List[Dict]:
@@ -70,4 +81,4 @@ class MyExcel:
 if __name__ == '__main__':
     filepath = "../resource/case.xlsx"
     my = MyExcel(filepath)
-    my.sheetReader()
+    my.sheetReader(1, 2)

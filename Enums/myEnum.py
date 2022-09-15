@@ -16,6 +16,18 @@ class Base(Enum):
     def values(cls):
         return [v.value for v in cls]
 
+    @classmethod
+    def getName(cls, value: int) -> str:
+        for k, v in cls.__members__.items():
+            if v.value == value:
+                return v.name
+
+    @classmethod
+    def getValue(cls, name: str) -> int:
+        for k, v in cls.__members__.items():
+            if v.name == name:
+                return v.value
+
 
 class CaseLevel(Base):
     P1 = 1

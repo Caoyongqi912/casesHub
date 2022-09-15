@@ -23,6 +23,10 @@ class Platform(Base):
     def __init__(self, name: AnyStr):
         self.name = name
 
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter_by(name=name).first()
+
     @simpleCase
     def page_case(self, **kwargs) -> Pagination:
         """

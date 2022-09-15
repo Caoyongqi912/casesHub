@@ -4,7 +4,7 @@ from flask_restful import Resource
 from flask import request, Response
 from App import auth
 from Comment.myResponse import MyResponse
-from MyException import Api
+from flask_restful import Api
 from App.UploadController import fileBP
 from faker import Faker
 from werkzeug.utils import secure_filename

@@ -30,6 +30,23 @@ class CasePart(Base):
         self.partName = partName
         self.projectID = projectID
 
+    @classmethod
+    def getOrCreate(cls, partName: str, projectID: str | int) -> List[Dict[str, Any]] | Dict[str, Any]:
+        """
+        获取用例模块ID 或者创建一个在获取其ID
+        :param partName:
+        :param projectID
+        :return: casePart
+        """
+        sql = "select * from case_part where partName = '{}' and projectID = '{}'".format(partName, projectID)
+        val = CasePart.execute_sql(sql=sql)
+        # 如果查询不到 创建一个新的
+        if not val:
+            c = cls(partName, projectID)
+            c.save()
+            return c
+        return val
+
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"
 
@@ -68,10 +85,11 @@ class Cases(Base):
                  partID: Optional[int] = None,
                  projectID: Optional[int] = None,
                  platformID: Optional[int] = None,
+                 creator: int = None,
                  versionID: Optional[int] = None):
         self.title = title
         self.desc = desc
-        self.creator = g.user.id
+        self.creator = creator if creator else g.user.id
         self.status = status
         self.projectID = projectID
         self.platformID = platformID

@@ -65,11 +65,11 @@ class DevelopmentConfig(ProjectConfig):
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-    CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(ProjectConfig.HOST, ProjectConfig.redisPort)
+    result_backend = 'redis://{}:{}'.format(ProjectConfig.HOST, ProjectConfig.redisPort)
     CELERY_BROKER_URL = 'redis://{}:{}'.format(ProjectConfig.HOST, ProjectConfig.redisPort)
-    CELERY_TIMEZONE = 'Asia/Shanghai'
-    CELERY_ACCEPT_CONTENT = ['json', 'pickle']
-    CELERY_RESULT_SERIALIZER = "json"
+    timezone = 'Asia/Shanghai'
+    accept_content = ['json', 'pickle']
+    result_serializer = "json"
 
     # CELERYBEAT_SCHEDULE = {
     #     'import_data': {

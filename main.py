@@ -3,7 +3,6 @@
 # @File : main.py 
 # @Software: PyCharm
 # @Desc: 入口
-from gevent import monkey
 from App import create_app
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler

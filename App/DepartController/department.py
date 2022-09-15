@@ -5,7 +5,7 @@
 # @Desc: 部门controller
 
 from flask_restful import Resource
-from MyException import Api
+from flask_restful import Api
 from App import auth
 from App.DepartController import userBP
 from App.myAuth import is_admin
@@ -24,7 +24,7 @@ class DepartmentController(Resource):
         :return: MyResponse
         """
         from Models.DepartModel.userModel import User
-        parse:  MyRequestParseUtil = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Department, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, isExist=User, required=False)

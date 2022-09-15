@@ -5,8 +5,7 @@
 # @Desc: 注册controller
 from typing import AnyStr
 from flask import g, request, Response
-from flask_restful import Resource
-from MyException import Api
+from flask_restful import Resource,Api
 from App import auth
 from App.DepartController import userBP
 from Comment.myException import MyResponse
