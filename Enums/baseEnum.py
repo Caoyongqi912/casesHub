@@ -19,6 +19,10 @@ class Base(Enum):
         return [v.value for v in cls]
 
     @classmethod
+    def names(cls):
+        return [v.name for v in cls]
+
+    @classmethod
     def getName(cls, value: int) -> str:
         for k, v in cls.__members__.items():
             if v.value == value:

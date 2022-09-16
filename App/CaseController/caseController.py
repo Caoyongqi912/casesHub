@@ -26,7 +26,6 @@ log = MyLog.get_log(__file__)
 class CaseController(Resource):
 
     @auth.login_required
-    @siwa.doc(body=CaseSwagger, tags=['caseController'], resp=BaseResponseSwagger)
     def post(self) -> MyResponse:
         """
         新增用例
@@ -37,9 +36,9 @@ class CaseController(Resource):
         parse.add(name="desc", type=str, required=True)
         parse.add(name="setup", type=str, required=False)
 
-        parse.add(name="tag", type=int, enum=CaseTag, required=True)
-        parse.add(name="case_level", type=int, enum=CaseLevel, required=True)
-        parse.add(name="case_type", type=int, enum=CaseType, required=False)
+        parse.add(name="tag", enum=CaseTag, required=True)
+        parse.add(name="case_level", enum=CaseLevel, required=True)
+        parse.add(name="case_type", enum=CaseType, required=False)
 
         parse.add(name="platformID", type=int, isExist=Platform, required=False)
         parse.add(name="projectID", type=int, isExist=Project, required=False)

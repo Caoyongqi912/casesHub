@@ -99,7 +99,9 @@ class MyRequestParseUtil:
                         self.body[kw['name']] = kw.get('default')
                     else:
                         continue
-            self._verify_type(self.body.get(kw["name"]), kw['type'])
+
+
+            self._verify_type(self.body.get(kw["name"]), kw['type'], kw['name'])
 
             if kw.get("choices"):
                 self._verify_choices(self.body.get(kw["name"]), kw['choices'], kw['name'])
@@ -114,21 +116,23 @@ class MyRequestParseUtil:
 
             # 枚举校验
             if kw.get("enum"):
-                self.body[kw['name']] = self._verify_enum(kw['enum'], self.body.get(kw["name"]))
+                self.body[kw['name']] = self._verify_enum(kw['enum'], self.body.get(kw["name"]), kw["name"])
+
         return self.body
 
     @staticmethod
-    def _verify_enum(ENUM: Generic[enumType], value: int) -> enum.Enum:
+    def _verify_enum(ENUM: Generic[enumType], name: str, param: str) -> enum.Enum:
         """
         校验枚举值
         :param ENUM: 枚举类
-        :param value: 整形值
+        :param name: name
+        :param param
         :return: enum
         """
-        vs: List[int] = ENUM.values()
-        if value not in vs:
-            raise ParamException(ResponseMsg.error_val(value, vs))
-        return ENUM.e(value)
+        vs: List[int] = ENUM.names()
+        if name not in vs:
+            raise ParamException(ResponseMsg.error_val(param, vs))
+        return ENUM.getValue(name)
 
     @staticmethod
     def _verify_empty(target: AnyStr, filed: AnyStr) -> NoReturn:
@@ -142,15 +146,16 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.empty(filed))
 
     @staticmethod
-    def _verify_type(target: Any, t: type) -> NoReturn:
+    def _verify_type(target: Any, t: type, param: str) -> NoReturn:
         """
         校验类型
         :param target: 目标值
         :param t: 期望类型
+        :param param:字段名
         :raise: ParamException
         """
         if not isinstance(target, t):
-            raise ParamException(ResponseMsg.error_type(target, t))
+            raise ParamException(ResponseMsg.error_type(param, t))
 
     @staticmethod
     def _verify_choices(target: Any, choices: List, filedName: AnyStr) -> NoReturn:
