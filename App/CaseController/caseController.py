@@ -12,7 +12,8 @@ from App import auth, siwa, limiter
 from App.CaseController import caseBP
 from Comment.myException import MyResponse, ParamError
 from Enums import CaseTag, CaseLevel, CaseType
-from Models.CaseModel.caseModel import CasePart, Cases
+from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.partModel import CasePart
 from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
@@ -121,7 +122,7 @@ class UpdateExcel2CaseController(Resource):
         # from celery_task.tasks import caseExcelWrite2Sql
         # caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)
         from Utils.myExcel import MyExcel
-        MyExcel(filePath).sheetReader(projectID,g.user.id)
+        MyExcel(filePath).sheetReader(projectID, g.user.id)
         return MyResponse.success()
 
 

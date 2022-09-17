@@ -13,7 +13,8 @@ from App.ProjectController import proBP
 from App import auth, siwa
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
-from Models.CaseModel.caseModel import CasePart, Cases
+from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.partModel import CasePart
 from Models.DepartModel.userModel import User
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version

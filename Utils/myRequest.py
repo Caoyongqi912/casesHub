@@ -19,7 +19,8 @@ class MyRequest:
     def __init__(self):
         pass
 
-    def go(self, method="GET", url="", params=None, headers=None, body=None, files=None, auth=("ADMIN", "ADMIN")):
+    def go(self, method="GET", url="", params=None, headers=None, body=None, files=None, auth=(
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZXhwaXJlc190aW1lIjoxNjYzNDkzMjY3LjAwMDAwMjl9.-vmJLaVYnIDXFI2xpbv9YsaWBrj91b8","")):
 
         if method == "GET":
             return requests.get(url=self.Host + url, params=params, json=body, auth=auth)
@@ -76,6 +77,10 @@ class MyRequest:
         res = self.go(method="POST", url="api/upload/", files=files)
         print(res.text)
 
+    def getuser(self):
+        res = self.go(method="GET", url="/api/user/page?current=1&pageSize=10&sort=update_time&tag=1&gender=1")
+        print(res.text)
+
 
 if __name__ == '__main__':
-    MyRequest().addExcel()
+    MyRequest().getuser()

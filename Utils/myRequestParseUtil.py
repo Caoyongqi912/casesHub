@@ -19,6 +19,9 @@ enumType = TypeVar("enumType", bound=EnumBase)
 
 
 class MyRequestParseUtil:
+    """
+    待改造、 去除多余参数
+    """
 
     def __init__(self, location: str = "json"):
         """
@@ -38,7 +41,7 @@ class MyRequestParseUtil:
         添加请求数据与数据类型
         :param kwargs: name
         :param kwargs: type
-        :param kwargs: required bool
+        :param kwargs: required bool default false
         :param kwargs: default
         :param kwargs: choices
         :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
@@ -99,7 +102,6 @@ class MyRequestParseUtil:
                         self.body[kw['name']] = kw.get('default')
                     else:
                         continue
-
 
             self._verify_type(self.body.get(kw["name"]), kw['type'], kw['name'])
 

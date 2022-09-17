@@ -40,6 +40,8 @@ class Project(Base):
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
     hosts = db.relationship("HostModel", backref="project", lazy="dynamic")
     envs = db.relationship("EnvValueModel", backref="project", lazy="dynamic")
+    interfaces = db.relationship("InterfaceModel", backref="project", lazy="dynamic")
+
     # apis = db.relationship("ApiModel", backref="project", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int):

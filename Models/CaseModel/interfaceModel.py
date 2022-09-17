@@ -5,10 +5,9 @@
 # @File : casesHub
 # @Software: PyCharm
 # @Desc: 流程接口实体类
+
 from typing import List
-
 from flask import g
-
 from App import db
 from Models.base import Base
 

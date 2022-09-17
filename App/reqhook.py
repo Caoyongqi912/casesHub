@@ -14,7 +14,7 @@ def logWrite() -> NoReturn:
     """
     log.info(
         f"[\n| request ip = {request.remote_addr} \n| request url = {request.url} \n| request Host = {request.host} \n| request Method = {request.method} ")
-
+    log.info(f"[ request Headers = {request.headers}]")
 
 def resp(response: Response) -> Union[MyResponse, Response]:
     """
