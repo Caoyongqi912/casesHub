@@ -114,6 +114,8 @@ class MyRequest:
             log.error(e)
         except exceptions.HTTPError as e:
             log.error(e)
+        except exceptions.ConnectionError as e:
+            log.error(e)
         except Exception as e:
             log.error(e)
             log.error(self.response.text)
