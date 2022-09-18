@@ -153,14 +153,14 @@ class QueryHostController(Resource):
         return MyResponse.success(Project.get(projectID, "projectID").query_host)
 
 
-class QueryEnvController(Resource):
+class QueryVariableIDController(Resource):
     @auth.login_required
     def get(self, projectID: AnyStr) -> MyResponse:
         """
         查询env by projectID
         :return: MyResponse
         """
-        return MyResponse.success(Project.get(projectID, "projectID").query_env)
+        return MyResponse.success(Project.get(projectID, "projectID").query_variables)
 
 
 class AddUser2ProjectController(Resource):
@@ -188,5 +188,5 @@ api_script.add_resource(PageVersionController, "/<string:projectID>/page_version
 api_script.add_resource(PageCasePartController, '/<string:projectID>/page_casePart')
 api_script.add_resource(PageUserController, '/<string:projectID>/page_user')
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
-api_script.add_resource(QueryEnvController, '/<string:projectID>/query_env')
+api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")

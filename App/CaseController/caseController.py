@@ -8,9 +8,9 @@ from flask import g
 from flask_restful import Resource
 from Models.CaseModel.caseExcel import CaseExcel
 from MyException import Api
-from App import auth, siwa, limiter
+from App import auth, limiter
 from App.CaseController import caseBP
-from Comment.myException import MyResponse, ParamError
+from Comment.myException import MyResponse
 from Enums import CaseTag, CaseLevel, CaseType
 from Models.CaseModel.caseModel import Cases
 from Models.CaseModel.partModel import CasePart
@@ -18,7 +18,6 @@ from Models.CaseModel.platforms import Platform
 from Models.ProjectModel.project import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Swagger import CaseSwagger, BaseResponseSwagger
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)

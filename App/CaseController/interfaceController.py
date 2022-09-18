@@ -3,7 +3,9 @@
 1、crud
 2、运行结果校验与结果持久化
 """
+from typing import Dict, Any
 
+from flask import g
 from flask_restful import Resource
 from App import auth
 from App.CaseController import caseBP
@@ -45,6 +47,35 @@ class InterfaceController(Resource):
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
         pare.add(name="interfaceID")
         return MyResponse.success(InterfaceModel.get_by_uid(pare.parse_args().get("interfaceID")))
+
+    @auth.login_required
+    def put(self) -> MyResponse:
+        """
+        更新
+        :return:
+        """
+        pare: MyRequestParseUtil = MyRequestParseUtil()
+        pare.add(name="id", type=int, required=True)
+        pare.add(name="title", type=str)
+        pare.add(name="desc", type=str)
+        pare.add(name="steps", type=list)
+        pare.add(name="mark", type=str)
+        pare.add(name="connectTimeout", type=int)
+        pare.add(name="responseTimeout", type=int)
+        info: Dict[str, Any] = pare.parse_args()
+        info['updater'] = g.user.id
+        InterfaceModel.update(**info)
+        return MyResponse.success()
+
+    @auth.login_required
+    def delete(self) -> MyResponse:
+        """
+        :return:
+        """
+        pare: MyRequestParseUtil = MyRequestParseUtil()
+        pare.add(name="id", type=int, required=True)
+        InterfaceModel.delete_by_id(**pare.parse_args())
+        return MyResponse.success()
 
 
 class RunController(Resource):

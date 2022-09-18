@@ -47,10 +47,15 @@ class MyTools:
             val = re.findall(r"\{\{(.*?)\}\}", target)[0]
             _ = target.replace("{{", "").replace("}}", "")
             for ext in extracts:
-                v = ext.get(val, "")
-                return _.replace(val, v)
+                v = ext.get(val)
+                if v:
+                    return _.replace(val, v)
+                else:
+                    continue
         else:
             return target
+
+
 
     @staticmethod
     def auth(extracts: List[Dict[str, Any]] | None = None, authBody: Dict[str, str] | None = None) -> Dict | None:

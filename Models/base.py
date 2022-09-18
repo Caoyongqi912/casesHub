@@ -82,7 +82,7 @@ class Base(db.Model):
             db.session.add(self)
             db.session.commit()
         except Exception as e:
-            log.error(f"save error:  [ {repr(e)} ]")
+            log.error(f"db save error:  [ {repr(e)} ]")
             db.session.rollback()
             raise MyException()
 
@@ -109,6 +109,7 @@ class Base(db.Model):
     @classmethod
     def update(cls, **kwargs) -> NoReturn:
         """
+        id
         通过kwargs.get('id') 获得实例 修改
         """
         target = cls.get(kwargs.pop('id'))

@@ -35,14 +35,18 @@ class MyRequest:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
-    def __init__(self, HOST: str):
+    def __init__(self, HOST: str, variable: Dict[str, Any] = None):
         """
         :param HOST:HOST
         """
         self.host = HOST
+        self.extract = []
+
         log.info(f"host   ====== {self.host}")
         self.worker = requests.session()
-        self.extract = []
+        if variable:
+
+            self.extract.append(variable)
 
     def runAPI(self, interface: InterfaceModel):
         """
@@ -139,8 +143,12 @@ if __name__ == '__main__':
 
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
+    from Models.ProjectModel.project import Project
 
-    inter = InterfaceModel.get(8)
+    p = Project.get(1)
+    var = p.query_variables2dict()
+    inter = InterfaceModel.get(1)
     hostName = HostModel.get(6).host
-    worker = MyRequest(hostName).runAPI(inter)
+    worker = MyRequest(hostName, var).runAPI(inter)
+    # print(var)
     # print(inter)

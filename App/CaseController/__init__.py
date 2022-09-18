@@ -8,4 +8,5 @@ from flask import Blueprint
 
 caseBP = Blueprint("caseBP", __name__, url_prefix="/api/case")
 
-from . import bugController, caseController, casePartController, apiHostController, apiEnvValueController,interfaceController
+from . import bugController, caseController, casePartController, apiHostController, variableController, \
+    interfaceController

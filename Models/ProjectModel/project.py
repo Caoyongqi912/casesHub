@@ -13,7 +13,7 @@ from Enums import ResponseMsg
 from Models.DepartModel.userModel import User
 from Models.base import Base
 from App import db
-from Utils import MyLog, simpleCase, simpleUser
+from Utils import MyLog, variable2dict
 
 log = MyLog.get_log(__file__)
 
@@ -39,7 +39,7 @@ class Project(Base):
     cases = db.relationship("Cases", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
     hosts = db.relationship("HostModel", backref="project", lazy="dynamic")
-    envs = db.relationship("EnvValueModel", backref="project", lazy="dynamic")
+    variables = db.relationship("VariableModel", backref="project", lazy="dynamic")
     interfaces = db.relationship("InterfaceModel", backref="project", lazy="dynamic")
 
     # apis = db.relationship("ApiModel", backref="project", lazy="dynamic")
@@ -125,12 +125,20 @@ class Project(Base):
         return self.versions.all()
 
     @property
-    def query_env(self) -> List:
+    def query_variables(self) -> List:
         """
         query envs
         :return: envs
         """
-        return self.envs.all()
+        return self.variables.all()
+
+    @variable2dict
+    def query_variables2dict(self):
+        """
+        variables obj -> dict
+        :return:
+        """
+        return self.variables.all()
 
     def __verify_auth(self) -> NoReturn:
         """

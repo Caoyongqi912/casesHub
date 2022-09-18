@@ -5,6 +5,8 @@
 # @Desc:
 from functools import wraps
 
+from Utils.myTools import MyTools
+
 
 def pageSerialize(func):
     """
@@ -82,11 +84,11 @@ def simpleCase(func):
     return decorator
 
 
-def simpleUser(func):
+def variable2dict(func):
     @wraps(func)
-    def user(cls, *args, **kwargs):
-        info = func(cls, *args, **kwargs)
-        results = [{"id": _[0], "uid": _[1], "username": _[2]} for _ in info]
-        return results
+    def decorator(self):
+        info = func(self)
+        result = [{"key": var.key, "val": var.val} for var in info]
+        return MyTools.list2Dict(params=result)
 
-    return user
+    return decorator

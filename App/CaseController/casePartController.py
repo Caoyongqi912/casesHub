@@ -46,7 +46,7 @@ class CasePartController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name='id', type=int, required=True)
-        parse.add(name="partName", type=str, required=False)
+        parse.add(name="partName", type=str)
         CasePart.update(**parse.parse_args())
         return MyResponse.success()
 
