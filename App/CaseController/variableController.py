@@ -7,6 +7,10 @@ from App import auth
 from Models.CaseModel.variableModel import VariableModel
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
+"""
+:type constant , List,random
+"""
+
 
 class VariableController(Resource):
 

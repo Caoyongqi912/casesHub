@@ -1,7 +1,13 @@
 """
 接口用例
-1、crud
-2、运行结果校验与结果持久化
+1、crud done
+1.1 、 结果入库、 调试历史
+1.2 、 添加status、requestNum responseTIME、
+2、运行结果校验 done
+3、与结果持久化
+4、快速创建接口、title part、、method 、url  、creator、desc
+5、补全
+
 """
 from typing import Dict, Any
 
