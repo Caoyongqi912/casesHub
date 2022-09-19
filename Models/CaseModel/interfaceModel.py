@@ -6,7 +6,7 @@
 # @Software: PyCharm
 # @Desc: 流程接口实体类
 
-from typing import List
+from typing import List, Any
 from flask import g
 from App import db
 from Models.base import Base
@@ -26,8 +26,9 @@ class InterfaceModel(Base):
     partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="所属模块")
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
     versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True, comment="所属版本")
-
     steps = db.Column(db.JSON, comment="接口步骤")
+
+    results = db.relationship("InterfaceResultModel", backref="interface", lazy="dynamic")
 
     def __init__(self, title: str, steps: List, desc: str = None, creator: int = None, updater: int = None,
                  mark: str = None,
@@ -46,3 +47,20 @@ class InterfaceModel(Base):
         self.projectID = projectID
         self.partID = partID
         self.versionID = versionID
+
+    @property
+    def query_results(self):
+        return self.results.order_by("create_time").all()
+
+    def __repr__(self):
+        return f"<{InterfaceModel.__name__} {self.title}>"
+
+
+class InterfaceResultModel(Base):
+    __tablename__ = 'interface_result'
+    interfaceID = db.Column(db.INTEGER, db.ForeignKey('interface.id', ondelete='CASCADE'), comment="所属用例")
+    resultInfo = db.Column(db.JSON, nullable=True, comment="响应结果")
+    status = db.Column(db.Enum('SUCCESS', 'FAIL'), nullable=False, comment="运行状态")
+
+    def __repr__(self):
+        return f"<{InterfaceResultModel.__name__} {self.interfaceID}>"

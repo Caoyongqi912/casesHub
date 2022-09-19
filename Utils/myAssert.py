@@ -15,12 +15,14 @@ class MyAssert:
     def __init__(self, response: Response):
         self.response = response
 
-    def jpAssert(self, jps: List[Dict[str, str]]) -> bool:
+    def jpAssert(self, jps: List[Dict[str, Any]]):
         """
         jsonpath 校验
         :param jps: jsonpath [{jp: str, expect: Any, option: str}]
         :return:
         """
+        flag = True
+        assert_result = []
         for _ in jps:
 
             jp_str = _['jp']
@@ -35,7 +37,11 @@ class MyAssert:
             try:
                 if option == "==":
                     assert expect == actual
-                    return True
+                    _["result"] = True
+                    assert_result.append(_)
             except AssertionError as e:
                 log.error(e)
-                return False
+                _["result"] = False
+                flag = False
+                assert_result.append(_)
+        return assert_result, flag
