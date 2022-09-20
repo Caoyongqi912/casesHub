@@ -9,6 +9,15 @@ from copy import deepcopy
 
 
 class MyTools:
+
+    # def __init__(self, extracts: List = None, headers: List = None, params: List = None, body: List = None,
+    #              auth: Dict = None):
+    #     self.extracts = extracts
+    #     self.headers = headers
+    #     self.params = params
+    #     self.body = body
+    #     self.auth = auth
+
     @staticmethod
     def list2Dict(extracts: List | None = None, params: List[Dict[str, str]] | None = None, ) -> Dict[str, str] | None:
         """
@@ -55,8 +64,6 @@ class MyTools:
         else:
             return target
 
-
-
     @staticmethod
     def auth(extracts: List[Dict[str, Any]] | None = None, authBody: Dict[str, str] | None = None) -> Dict | None:
         """
@@ -70,4 +77,3 @@ class MyTools:
             password = MyTools.getValue(extracts, authBody.get("password", ""))
             return {"username": username, "password": password}
         return
-

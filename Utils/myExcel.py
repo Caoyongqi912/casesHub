@@ -8,7 +8,8 @@ from typing import AnyStr, List, Dict, Any
 
 from openpyxl import load_workbook
 from App import create_app
-from Models.CaseModel.caseModel import Cases, CasePart
+from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.partModel import CasePart
 from Models.CaseModel.platforms import Platform
 from Utils import MyLog
 from Enums.myEnum import CaseLevel

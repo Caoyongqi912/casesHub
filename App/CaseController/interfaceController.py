@@ -97,6 +97,20 @@ class RunController(Resource):
         return MyResponse.success()
 
 
+class InterfaceHistoryController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        by id
+        :return:
+        """
+        pare: MyRequestParseUtil = MyRequestParseUtil("values")
+        pare.add(name="interfaceID")
+        return MyResponse.success(InterfaceModel.get_by_uid(pare.parse_args().get("interfaceID")).query_results)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
+api_script.add_resource(InterfaceHistoryController, "/interface/history")
 api_script.add_resource(RunController, "/interface/run")

@@ -10,25 +10,12 @@ import urllib3
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
 
-from Models.CaseModel.interfaceModel import InterfaceModel
+from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Utils import MyLog, MyTools
 from Utils.myAssert import MyAssert
 from Utils.myJsonpath import MyJsonPath
 
 log = MyLog.get_log(__file__)
-
-
-def _get_assert(response: Response, jsonpath: List[Dict[str, Any]] | None = None) -> bool:
-    """
-    jp 校验
-    :param response: Response
-    :param jsonpath:  List[Dict[str, Any]]
-    :return:
-    """
-    if not jsonpath:
-        return True
-    else:
-        return MyAssert(response).jpAssert(jsonpath)
 
 
 class MyRequest:
@@ -41,11 +28,10 @@ class MyRequest:
         """
         self.host = HOST
         self.extract = []
-
+        self.responseInfo = []
         log.info(f"host   ====== {self.host}")
         self.worker = requests.session()
         if variable:
-
             self.extract.append(variable)
 
     def runAPI(self, interface: InterfaceModel):
@@ -54,7 +40,11 @@ class MyRequest:
         :param interface:
         :return:
         """
+        STATUS = 'SUCCESS'
+        interfaceResult = InterfaceResultModel()
+        interfaceResult.interfaceID = interface.id
         for step in interface.steps:
+
             log.info(f"========================= request {step['step']} start ================================")
             response = self.todo(url=step['url'],
                                  method=step['method'],
@@ -65,13 +55,25 @@ class MyRequest:
 
             log.info(f"response  ====== {response.json()}")
             # 如果存在校验
-            if not _get_assert(response, step.get("jsonpath")):
+            verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
+            if flag is True:
+                # 如果需要提取参数
+                self._get_extract(response, step.get("extract"))
+                self._writeResponse(step.get("step"), response, verifyInfo)
+            else:
+                STATUS = 'FAIL'
                 break
-            # 如果需要提取参数
-            self._get_extract(response, step.get("extract"))
+        interfaceResult.resultInfo = self.responseInfo
+        interfaceResult.status = STATUS
+        interfaceResult.save()
 
-    def todo(self, url: str, method: str, body: Dict[str, Any] | List = None, params: Dict[str, Any] = None,
-             file: Dict[str, Any] = None, headers: Dict[str, Any] = None, data: Dict[str, Any] = None,
+    def todo(self, url: str,
+             method: str,
+             body: Dict[str, Any] | List = None,
+             params: Dict[str, Any] = None,
+             file: Dict[str, Any] = None,
+             headers: Dict[str, Any] = None,
+             data: Dict[str, Any] = None,
              auth=None,
              allow_redirects: bool = False
              ) -> Response:
@@ -136,6 +138,20 @@ class MyRequest:
                 value = MyJsonPath(response.json(), ext.get("val")).value
                 _ = {ext["key"]: value}
                 self.extract.append(_)
+
+    def _writeResponse(self, stepID: int, response: Response = None,
+                       verifyInfo: Any = None):
+
+        info = {
+            "step": stepID,
+            "response": {
+                "status_code": response.status_code,
+                "response": response.text,
+                "elapsed": response.elapsed.total_seconds()
+            },
+            "verify": verifyInfo
+        }
+        self.responseInfo.append(info)
 
 
 if __name__ == '__main__':

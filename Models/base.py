@@ -72,8 +72,8 @@ class Base(db.Model):
     __abstract__ = True
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uid: str = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time: str = db.Column(db.Date, default=datetime.now, comment="创建时间")
-    update_time: str = db.Column(db.Date, default=datetime.now, onupdate=datetime.now, comment="修改时间")
+    create_time: str = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
+    update_time: str = db.Column(db.DATETIME, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
     def save(self) -> NoReturn:
         """save"""

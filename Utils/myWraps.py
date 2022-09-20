@@ -92,3 +92,7 @@ def variable2dict(func):
         return MyTools.list2Dict(params=result)
 
     return decorator
+
+if __name__ == '__main__':
+    from datetime import datetime
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
