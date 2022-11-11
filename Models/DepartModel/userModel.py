@@ -13,7 +13,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
 from Enums import Gender, UserTag, IntEnum
-from Utils import MyLog, delAvatar
+from Utils import MyLog, delAvatar, simpleUser
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
 
@@ -58,6 +58,19 @@ class User(Base):
         self.isAdmin: bool = True
         self.tag: UserTag = UserTag.ADMIN
         self.save()
+
+    @classmethod
+    @simpleUser
+    def search_like(cls, target: str, value: str):
+        """
+        模糊查询
+        :param target: username  cls.column
+        :param value:  search value
+        :return: execute_sql
+        """
+        sql = "select * from user where {} like '{}%'".format(target, value)
+        res = Base.execute_sql(sql)
+        return res
 
     def addUser(self) -> NoReturn:
         """

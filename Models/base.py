@@ -135,7 +135,8 @@ class Base(db.Model):
         :return: execute_sql
         """
         sql = "select * from {} where {} like '{}%'".format(cls.__tablename__, target, value)
-        return Base.execute_sql(sql)
+        res = Base.execute_sql(sql)
+        return res
 
     @classmethod
     def get(cls, ident: int | str, name: AnyStr = None):
