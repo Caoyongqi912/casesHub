@@ -89,19 +89,6 @@ def simpleUser(func):
        指定user字段返回
    """
 
-    @wraps(func)
-    def decorator(*args, **kwargs):
-        info = func(*args, **kwargs)
-        results = [{
-            "id": i.id,
-            "username": i.username,
-            "create_time": i.create_time,
-            "update_time": i.update_time
-        } for i in info],
-
-        return results
-
-    return decorator
 
 
 def variable2dict(func):

@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc: 用户模型类
 
-from typing import Dict, NoReturn, TypeVar
+from typing import Dict, NoReturn, TypeVar, List
 from werkzeug.datastructures import FileStorage
 from Models.base import Base
 from App import db
@@ -60,16 +60,15 @@ class User(Base):
         self.save()
 
     @classmethod
-    @simpleUser
-    def search_like(cls, target: str, value: str):
+    def search_like(cls, target: str, value: str) -> simpleUser:
         """
         模糊查询
         :param target: username  cls.column
         :param value:  search value
         :return: execute_sql
         """
-        sql = "select * from user where {} like '{}%'".format(target, value)
-        res = Base.execute_sql(sql)
+        sql = """Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value)
+        res = cls.execute_sql(sql)
         return res
 
     def addUser(self) -> NoReturn:
