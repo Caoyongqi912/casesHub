@@ -45,6 +45,20 @@ class MyTools:
         return D
 
     @staticmethod
+    def kw2str(**kwargs):
+        """
+        {name:cyq,age:13}
+        ->
+        name = cyq or age = 13
+        :param kwargs:
+        :return:
+        """
+        _ = ""
+        for k, v in kwargs.items():
+            _ += f"`{k}`" + " = " + f"'{str(v)}'" + ' or '
+        return _.strip(" or ")
+
+    @staticmethod
     def getValue(extracts: List[Dict[str, Any]], target: str) -> Any:
         """
         {{value}} -> value

@@ -62,7 +62,7 @@ from sqlalchemy import asc, Column
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
-from Utils import MyLog, UUID, pageSerialize
+from Utils import MyLog, UUID, pageSerialize, MyTools
 from Comment.myException import MyException, ParamException
 
 log = MyLog.get_log(__file__)
@@ -241,21 +241,7 @@ class Base(db.Model):
         """
 
         log.info(cls.__tablename__)
-        param: str = kw2str(**kwargs)
+        param: str = MyTools.kw2str(**kwargs)
         sql = f"select * from {cls.__tablename__} where {param}"
         res = Base.execute_sql(sql)
         return res
-
-
-def kw2str(**kwargs):
-    """
-    {name:cyq,age:13}
-    ->
-    name = cyq or age = 13
-    :param kwargs:
-    :return:
-    """
-    _ = ""
-    for k, v in kwargs.items():
-        _ += f"`{k}`" + " = " + f"'{str(v)}'" + ' or '
-    return _.strip(" or ")
