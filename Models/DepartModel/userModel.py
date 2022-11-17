@@ -62,7 +62,7 @@ class User(Base):
     @classmethod
     def search_like(cls, target: str, value: str) -> simpleUser:
         """
-        模糊查询
+        sql执行模糊查询
         :param target: username  cls.column
         :param value:  search value
         :return: execute_sql

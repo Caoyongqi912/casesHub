@@ -21,6 +21,9 @@ from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Swagger import AddProjectSwagger, BaseResponseSwagger, PageSwagger, UpdateProjectSwagger, \
     DeleteProjectSwagger
+from Utils import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class ProjectController(Resource):
@@ -180,6 +183,20 @@ class AddUser2ProjectController(Resource):
         return MyResponse.success()
 
 
+class SearchProjectController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        搜索项目
+        :return:
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        log.info(parse.parse_args())
+        Project
+        return MyResponse.success()
+
+
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
 api_script.add_resource(PageCaseController, "/<string:projectID>/page_cases")
@@ -190,3 +207,4 @@ api_script.add_resource(PageUserController, '/<string:projectID>/page_user')
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
 api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")
+api_script.add_resource(SearchProjectController, "/search")

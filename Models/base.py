@@ -184,7 +184,8 @@ class Base(db.Model):
         :return:    Pagination
         """
         _fk = filter_key if filter_key else {}
-        items = db.session.query(cls).filter_by(**_fk).order_by(sort).limit(pageSize).offset(
+        items = db.session.query(cls).filter_by(**_fk).order_by(sort).order_by(cls.create_time.desc()).limit(
+            pageSize).offset(
             (current - 1) * pageSize).all()
         total = db.session.query(cls).filter_by(**_fk).order_by(sort).count()
         return Pagination(cls, current, pageSize, total, items)
@@ -230,3 +231,12 @@ class Base(db.Model):
             return
         result_dict = [dict(zip([field[0].lower() for field in cursor.description], v)) for v in cursor.fetchall()]
         return result_dict
+
+    @classmethod
+    def search_data(cls, **kwargs):
+        """
+        字段搜索
+        :param kwargs:
+        :return:
+        """
+        return
