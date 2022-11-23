@@ -192,9 +192,7 @@ class SearchProjectController(Resource):
         :return:
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        log.info(parse.parse_args())
-
-        return MyResponse.success(Project.search_data(**parse.parse_args()))
+        return MyResponse.success(Project.search_by_chemy(**parse.parse_args()))
 
 
 api_script = Api(proBP)

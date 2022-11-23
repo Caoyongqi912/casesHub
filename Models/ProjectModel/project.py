@@ -27,6 +27,7 @@ projectUser = db.Table(
 
 class Project(Base):
     __tablename__ = "project"
+
     name = db.Column(db.String(20), unique=True, comment="项目名称")
     desc = db.Column(db.String(100), nullable=True, comment="项目描述")
     adminID = db.Column(db.INTEGER, comment="项目负责人")

@@ -58,7 +58,7 @@ with_entities
 """
 from typing import List, AnyStr, Dict, NoReturn
 from flask_sqlalchemy import Pagination
-from sqlalchemy import asc, Column
+from sqlalchemy import asc, Column, or_
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
@@ -233,15 +233,29 @@ class Base(db.Model):
         return result_dict
 
     @classmethod
-    def search_data(cls, **kwargs):
+    def search_data(cls, **kwargs) -> List:
         """
-        字段搜索
+        使用原生SQL搜索
+
         :param kwargs:
         :return:
         """
 
-        log.info(cls.__tablename__)
         param: str = MyTools.kw2str(**kwargs)
-        sql = f"select * from {cls.__tablename__} where {param}"
+        sql = f"select * from {cls.__tablename__} where {param} order by create_time desc"
+        log.info(sql)
         res = Base.execute_sql(sql)
+        return res
+
+    @classmethod
+    def search_by_chemy(cls, **kwargs) -> List:
+        """
+        使用SQLAlchemy 搜索 create_time 倒叙
+        :param kwargs:
+        :return:
+        """
+        searchData = []
+        for k, v in kwargs.items():
+            searchData.append(getattr(cls, k) == v)
+        res = cls.query.filter(or_(*searchData)).order_by(cls.create_time.desc()).all()
         return res
