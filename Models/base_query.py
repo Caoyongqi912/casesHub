@@ -39,7 +39,7 @@ class MyBaseQuery(BaseQuery):
         return rv
 
     @pageSerialize
-    def my_paginate(self, pageSize: int, current: int, sort: str = None) -> Pagination:
+    def my_paginate(self, pageSize: int, current: int, sort: str = None, **kwargs) -> Pagination:
         """
         paginate
         :param pageSize:    pageSize

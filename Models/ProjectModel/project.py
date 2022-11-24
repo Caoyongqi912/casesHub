@@ -13,7 +13,7 @@ from Enums import ResponseMsg
 from Models.DepartModel.userModel import User
 from Models.base import Base
 from App import db
-from Utils import MyLog, variable2dict
+from Utils import MyLog, variable2dict, MyTools
 
 log = MyLog.get_log(__file__)
 
@@ -63,7 +63,7 @@ class Project(Base):
         uIds: List[int] = [u.id for u in self.users.all()]
         for uid in users:
             u: User = User.get(uid, f"uid {uid}")
-            if self.search(uIds, u.id):
+            if MyTools.search(uIds, u.id):
                 raise ParamException(ResponseMsg.already_exist(str(id)))
             else:
                 self.users.append(u)
@@ -89,6 +89,7 @@ class Project(Base):
         :param kwargs:  page
         :return: Pagination
         """
+
         return self.cases.my_paginate(**kwargs)
 
     def page_version(self, **kwargs) -> Pagination:

@@ -91,3 +91,23 @@ class MyTools:
             password = MyTools.getValue(extracts, authBody.get("password", ""))
             return {"username": username, "password": password}
         return
+
+    @staticmethod
+    def search(nums: List[int], target: int) -> bool:
+        """
+        二分查找 存在返回True 不存在返回False
+        :param nums:
+        :param target:
+        :return:bool
+        """
+        left, right = 0, len(nums) - 1
+        while left <= right:
+            mid = (right - left) // 2 + left
+            num = nums[mid]
+            if num == target:
+                return True
+            elif num > target:
+                right = mid - 1
+            else:
+                left = mid + 1
+        return False

@@ -4,6 +4,7 @@
 # @Software: PyCharm
 # @Desc:  自定义参数校验
 import enum
+import json
 from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn
 from flask import request
 from Comment.myException import ParamException
@@ -74,13 +75,15 @@ class MyRequestParseUtil:
         body = dict(self.body)
         pageSize = body.pop("pageSize") if body.get("pageSize") else 10
         current = body.pop("current") if body.get("current") else 1
-        sort = body.pop("sort") if body.get("sort") else None
+        sort = json.loads(body.pop("sort")) if body.get("sort") else None
+        filter = json.loads(body.pop("filter")) if body.get("filter") else None
         self._verify_filterKey(body, cls)
 
         pageInfo = {
             "pageSize": self._verify_pageSize(pageSize),
             "current": self._verify_current(current),
-            "sort": self._verify_sort(sort, cls)
+            "sort": self._verify_sort(sort, cls),
+            "filter_key": filter
         }
         return pageInfo
 
@@ -199,7 +202,7 @@ class MyRequestParseUtil:
         return pageSize
 
     @staticmethod
-    def _verify_sort(sort: str | None, cls: Generic[clsType]) -> Union[None, str]:
+    def _verify_sort(sort: Dict | None, cls: Generic[clsType]) -> Union[None, str]:
         """
 
         verify sort value in  cls.__table__.columns if not return None
@@ -207,10 +210,12 @@ class MyRequestParseUtil:
         :param cls: Generic[clsType
         :return:  Union[None, str]
         """
-        if not sort:
+        if sort is None:
             return sort
-        if sort not in cls.columns():
-            return None
+        for k, v in sort.items():
+            if k not in cls.columns() or v not in ['descend', "ascend"]:
+                return None
+
         return sort
 
     @staticmethod

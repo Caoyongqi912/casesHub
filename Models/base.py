@@ -30,6 +30,8 @@ default	为这列定义默认值
 """
 from sqlalchemy.engine import CursorResult
 
+from Models.base_query import MyBaseQuery
+
 """
 关系表参数
 
@@ -174,41 +176,32 @@ class Base(db.Model):
 
     @classmethod
     @pageSerialize
-    def page(cls, pageSize: int, current: int, sort: str = None, filter_key: Dict = None) -> Pagination:
+    def page(cls, pageSize: int, current: int, sort: Dict = None, filter_key: Dict = None) -> Pagination:
         """
         paginate
+        如果指定sort排序 则走sort  否则 默认 create_time.desc()
         :param filter_key:  filter_by(**filter_key)
         :param pageSize:    pageSize
-        :param current:    current
-        :param sort:    order_by(sort)
-        :return:    Pagination
+        :param current:     current
+        :param sort:        order_by(sort)  'descend' or "ascend'
+        :return:            Pagination
         """
-        _fk = filter_key if filter_key else {}
-        items = db.session.query(cls).filter_by(**_fk).order_by(sort).order_by(cls.create_time.desc()).limit(
-            pageSize).offset(
-            (current - 1) * pageSize).all()
-        total = db.session.query(cls).filter_by(**_fk).order_by(sort).count()
+        searchData: List = getSearchData(cls, filter_key)
+        sortList: List = getSortData(cls, sort)
+        if sortList:
+            items = db.session.query(cls).filter(or_(*searchData)) \
+                .order_by(*sortList) \
+                .limit(pageSize) \
+                .offset((current - 1) * pageSize) \
+                .all()
+        else:
+            items = db.session.query(cls).filter(or_(*searchData)) \
+                .order_by(cls.create_time.desc()) \
+                .limit(pageSize) \
+                .offset((current - 1) * pageSize) \
+                .all()
+        total = db.session.query(cls).filter(or_(*searchData)).count()
         return Pagination(cls, current, pageSize, total, items)
-
-    @staticmethod
-    def search(nums: List[int], target: int) -> bool:
-        """
-        二分查找 存在返回True 不存在返回False
-        :param nums:
-        :param target:
-        :return:bool
-        """
-        left, right = 0, len(nums) - 1
-        while left <= right:
-            mid = (right - left) // 2 + left
-            num = nums[mid]
-            if num == target:
-                return True
-            elif num > target:
-                right = mid - 1
-            else:
-                left = mid + 1
-        return False
 
     @classmethod
     def columns(cls) -> List[str]:
@@ -254,8 +247,27 @@ class Base(db.Model):
         :param kwargs:
         :return:
         """
-        searchData = []
-        for k, v in kwargs.items():
-            searchData.append(getattr(cls, k) == v)
+        searchData: List = getSearchData(cls, **kwargs)
         res = cls.query.filter(or_(*searchData)).order_by(cls.create_time.desc()).all()
         return res
+
+
+def getSearchData(cls, kw: Dict = None) -> List:
+    searchData = []
+    if not kw:
+        return searchData
+    for k, v in kw.items():
+        searchData.append(getattr(cls, k) == v)
+    return searchData
+
+
+def getSortData(cls, kw: Dict = None) -> List:
+    sortList = []
+    if not kw:
+        return sortList
+    for k, v in kw.items():
+        if v == "descend":
+            sortList.append(getattr(cls, k).desc())
+        else:
+            sortList.append(getattr(cls, k).asc())
+    return sortList
