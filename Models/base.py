@@ -160,7 +160,7 @@ class Base(db.Model):
         """
         rv = cls.query.filter_by(uid=uid).first()
         if not rv:
-            raise ParamException(ResponseMsg.ERROR)
+            raise ParamException(ResponseMsg.NOT_FOUND)
         return rv
 
     @classmethod

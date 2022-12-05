@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import time
 # @Time    : 2022/9/15 下午2:46
 # @Author  : cyq
 # @File    : myRequest.py
@@ -7,6 +7,7 @@
 from typing import Dict, Any, List, Optional
 import requests
 import urllib3
+from flask import g
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
 
@@ -43,17 +44,23 @@ class MyRequest:
         STATUS = 'SUCCESS'
         interfaceResult = InterfaceResultModel()
         interfaceResult.interfaceID = interface.id
+        useTime = 0
         for step in interface.steps:
 
             log.info(f"========================= request {step['step']} start ================================")
+            start = time.time()
             response = self.todo(url=step['url'],
                                  method=step['method'],
                                  headers=MyTools.list2Dict(self.extract, step.get("headers")),
                                  params=MyTools.list2Dict(self.extract, step.get("params")),
                                  body=MyTools.list2Dict(self.extract, step.get("body")),
                                  auth=MyTools.auth(self.extract, step.get("auth")))
+            end = time.time()
 
-            log.info(f"response  ====== {response.json()}")
+            stepTime = end - start
+            useTime += stepTime
+            log.info(f"{step}:response  ====== {response.json()}")
+            log.info(f"{step}:useTime   ====== {useTime}s")
             # 如果存在校验
             verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
             if flag is True:
@@ -65,6 +72,9 @@ class MyRequest:
                 break
         interfaceResult.resultInfo = self.responseInfo
         interfaceResult.status = STATUS
+        interfaceResult.starterID = 1
+        interfaceResult.starterName = "ADMIN"
+        interfaceResult.useTime = f"{round(useTime,3)}s"  # 待优化60+
         interfaceResult.save()
 
     def todo(self, url: str,
@@ -156,6 +166,7 @@ class MyRequest:
 
 if __name__ == '__main__':
     from App import create_app
+    from flask import g
 
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
@@ -164,7 +175,7 @@ if __name__ == '__main__':
     p = Project.get(1)
     var = p.query_variables2dict()
     inter = InterfaceModel.get(1)
-    hostName = HostModel.get(6).host
+    hostName = HostModel.get(1).host
     worker = MyRequest(hostName, var).runAPI(inter)
     # print(var)
     # print(inter)

@@ -3,6 +3,7 @@
 # @File : myHttpx.py 
 # @Software: PyCharm
 # @Desc:
+import time
 from typing import Dict, Any, List, Coroutine
 from httpx import AsyncClient, Response
 import asyncio
@@ -15,8 +16,9 @@ log = MyLog.get_log(__file__)
 
 class MyHttpx:
 
-    def __init__(self, HOST: str):
+    def __init__(self, HOST: str, jobList):
         self.HOST = HOST
+        self.jobList = jobList
         self.taskList = []
 
     async def todo(self, url: str,
@@ -50,38 +52,42 @@ class MyHttpx:
         log.info(f"params ====== {params}")
 
         if method == "GET":
-            response = client.get(self.HOST + url, params=params, headers=headers,
-                                  follow_redirects=follow_redirects, auth=auth)
+            response = await client.get(self.HOST + url, params=params, headers=headers,
+                                        follow_redirects=follow_redirects, auth=auth)
+            log.info(response.status_code)
 
         elif method == "POST":
-            response = client.post(self.HOST + url, json=body, params=params, headers=headers,
-                                   files=file,
-                                   data=data, follow_redirects=follow_redirects, auth=auth)
+            response = await client.post(self.HOST + url, json=body, params=params, headers=headers,
+                                         files=file,
+                                         data=data, follow_redirects=follow_redirects, auth=auth)
         elif method == "PUT":
-            response = client.put(self.HOST + url, json=body, params=params, headers=headers,
-                                  files=file,
-                                  data=data, follow_redirects=follow_redirects, auth=auth)
+            response = await client.put(self.HOST + url, json=body, params=params, headers=headers,
+                                        files=file,
+                                        data=data, follow_redirects=follow_redirects, auth=auth)
         else:
-            response = client.delete(self.HOST + url, params=params, headers=headers,
-                                     follow_redirects=follow_redirects,
-                                     auth=auth)
+            response = await client.delete(self.HOST + url, params=params, headers=headers,
+                                           follow_redirects=follow_redirects,
+                                           auth=auth)
         return response
 
     async def main(self):
         async with AsyncClient() as client:
-            res = self.todo(client, i)
-            task = asyncio.create_task(res)  # 创建任务
-            self.taskList.append(task)
+            for tar in self.jobList:
+                tar["client"] = client
+                res = self.todo(**tar)
+                task = asyncio.create_task(res)  # 创建任务
+                self.taskList.append(task)
             await asyncio.gather(*self.taskList)  # 收集任务
 
 
-def bifen():
-    import random
-    n1 = random.randint(0, 4)
-    n2 = random.randint(0, 4)
-    print(f"加纳 {n1}:{n2} 乌拉圭")
-
-
 if __name__ == '__main__':
-    # asyncio.run(main())
-    bifen()
+    host = "https://www.baidu.com"
+    l = [{"method": "GET", "url": ""} for i in range(100)]
+    h = MyHttpx(host, l)
+
+
+    start = time.time()
+    asyncio.run(h.main())
+
+    end = time.time()
+    print(f'异步发送300次请求，耗时：{end - start}')

@@ -39,9 +39,10 @@ class MyAssert:
                     assert expect == actual
                     _["result"] = True
                     assert_result.append(_)
+                    log.info(f"result   -> [success]")
             except AssertionError as e:
-                log.error(e)
                 _["result"] = False
                 flag = False
                 assert_result.append(_)
+                log.error(f"result   -> [fail]")
         return assert_result, flag

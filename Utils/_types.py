@@ -21,7 +21,7 @@ def demo(arg: Union[int, None] = 1):
 
 
 AuthTypes = Union[
-    Tuple[Union[str, bytes], Union[str, bytes]],
+    Mapping[str,str],
     Callable[["Request"], "Request"],
     "Auth",
 ]

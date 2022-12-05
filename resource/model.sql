@@ -250,3 +250,57 @@ CREATE TABLE bug
     FOREIGN KEY (`caseID`) REFERENCES cases (id) ON DELETE SET NULL
 );
 
+
+
+CREATE TABLE interface
+(
+    id                INTEGER NOT NULL AUTO_INCREMENT,
+    uid               VARCHAR(50) COMMENT '唯一标识',
+    create_time       DATETIME COMMENT '创建时间',
+    update_time       DATETIME COMMENT '修改时间',
+    title             VARCHAR(40) COMMENT '标题',
+    `desc`            VARCHAR(200) COMMENT '描述',
+    mark              VARCHAR(200) COMMENT '备注',
+    creator           INTEGER COMMENT '创建人',
+    updater           INTEGER COMMENT '修改人',
+    `connectTimeout`  INTEGER COMMENT '连接超时',
+    `responseTimeout` INTEGER COMMENT '请求超时',
+    `caseID`          INTEGER COMMENT '关联的用例',
+    `partID`          INTEGER COMMENT '所属模块',
+    `projectID`       INTEGER COMMENT '所属产品',
+    `versionID`       INTEGER COMMENT '所属版本',
+    steps             JSON COMMENT '接口步骤',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`partID`) REFERENCES case_part (id) ON DELETE SET NULL,
+    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE SET NULL,
+    FOREIGN KEY (`versionID`) REFERENCES version (id) ON DELETE SET NUll
+);
+
+
+CREATE TABLE api_host
+(
+    id          INTEGER NOT NULL AUTO_INCREMENT,
+    uid         VARCHAR(50) COMMENT '唯一标识',
+    create_time DATETIME COMMENT '创建时间',
+    update_time DATETIME COMMENT '修改时间',
+    name        VARCHAR(20) COMMENT 'host 名称',
+    host        VARCHAR(50) COMMENT 'host 值',
+    `projectID` INTEGER COMMENT '所属版本',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`projectID`) REFERENCES project (id) ON DELETE SET NUll
+);
+CREATE TABLE interface_result
+(
+    id            INTEGER                 NOT NULL AUTO_INCREMENT,
+    uid           VARCHAR(50) COMMENT '唯一标识',
+    create_time   DATETIME COMMENT '创建时间',
+    update_time   DATETIME COMMENT '修改时间',
+    `interfaceID` INTEGER COMMENT '所属用例',
+    `resultInfo`  JSON COMMENT '响应结果',
+    `starterID`   INTEGER COMMENT '运行人ID',
+    `starterName` VARCHAR(20) COMMENT '运行人姓名',
+    `useTime`     VARCHAR(20) COMMENT '用时',
+    status        ENUM ('SUCCESS','FAIL') NOT NULL COMMENT '运行状态',
+    PRIMARY KEY (id),
+    FOREIGN KEY (`interfaceID`) REFERENCES interface (id) ON DELETE CASCADE
+)

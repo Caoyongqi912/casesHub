@@ -23,9 +23,12 @@ class InterfaceModel(Base):
     responseTimeout = db.Column(db.INTEGER, nullable=True, default=6000, comment="请求超时")
     caseID = db.Column(db.INTEGER, nullable=True, comment="关联的用例")
 
-    partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="所属模块")
-    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
-    versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True, comment="所属版本")
+    partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True,
+                       comment="所属模块")
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True,
+                          comment="所属产品")
+    versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True,
+                          comment="所属版本")
     steps = db.Column(db.JSON, comment="接口步骤")
 
     results = db.relationship("InterfaceResultModel", backref="interface", lazy="dynamic")
@@ -60,6 +63,10 @@ class InterfaceResultModel(Base):
     __tablename__ = 'interface_result'
     interfaceID = db.Column(db.INTEGER, db.ForeignKey('interface.id', ondelete='CASCADE'), comment="所属用例")
     resultInfo = db.Column(db.JSON, nullable=True, comment="响应结果")
+    starterID = db.Column(db.INTEGER, comment="运行人ID")
+    starterName = db.Column(db.String(20), comment="运行人姓名")
+    useTime = db.Column(db.String(20), comment="用时")
+
     status = db.Column(db.Enum('SUCCESS', 'FAIL'), nullable=False, comment="运行状态")
 
     def __repr__(self):
