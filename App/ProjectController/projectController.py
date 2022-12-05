@@ -40,8 +40,11 @@ class ProjectController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Project, required=True)
         parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, isExist=User, required=True)
-        Project(**parse.parse_args()).save()
+        parse.add(name="adminID", type=int, required=True)
+        par = parse.parse_args()
+        user = User.get(par.get("adminID"))
+        par['adminName'] = user.username
+        Project(**par).save()
         return MyResponse.success()
 
     @auth.login_required

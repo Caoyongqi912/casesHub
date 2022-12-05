@@ -27,7 +27,8 @@ CREATE TABLE project
     update_time DATE COMMENT '修改时间',
     name        VARCHAR(20) COMMENT '项目名称',
     `desc`      VARCHAR(100) COMMENT '项目描述',
-    `adminID`   INTEGER COMMENT '项目负责人',
+    `adminID`   INTEGER COMMENT '项目负责人ID',
+    `adminNAme` VARCHAR(50) COMMENT '项目负责人姓名',
     PRIMARY KEY (id),
     UNIQUE (name)
 );

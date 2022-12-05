@@ -4,14 +4,14 @@
 # @Author  : cyq
 # @File    : myRequest.py
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import requests
 import urllib3
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
 
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
-from Utils import MyLog, MyTools
+from Utils import MyLog, MyTools, AuthTypes
 from Utils.myAssert import MyAssert
 from Utils.myJsonpath import MyJsonPath
 
@@ -74,7 +74,7 @@ class MyRequest:
              file: Dict[str, Any] = None,
              headers: Dict[str, Any] = None,
              data: Dict[str, Any] = None,
-             auth=None,
+             auth: Optional[AuthTypes] = None,
              allow_redirects: bool = False
              ) -> Response:
         """
