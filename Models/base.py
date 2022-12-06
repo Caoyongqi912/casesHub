@@ -164,6 +164,15 @@ class Base(db.Model):
         return rv
 
     @classmethod
+    def get_by_field(cls, **kwargs):
+        """
+        通过字段查询
+        :param filed:
+        :return:
+        """
+        return cls.query.filter_by(**kwargs).first()
+
+    @classmethod
     def verify_unique(cls, **kwargs) -> NoReturn:
         """verify_unique by field name"""
         rv = cls.query.filter_by(**kwargs).first()

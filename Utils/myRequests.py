@@ -7,11 +7,12 @@ import time
 from typing import Dict, Any, List, Optional
 import requests
 import urllib3
-from flask import g
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
 
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
+from Models.CaseModel.variableModel import VariableModel
+from Models.DepartModel.userModel import User
 from Utils import MyLog, MyTools, AuthTypes
 from Utils.myAssert import MyAssert
 from Utils.myJsonpath import MyJsonPath
@@ -23,13 +24,16 @@ class MyRequest:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
-    def __init__(self, HOST: str, variable: Dict[str, Any] = None):
+    def __init__(self, HOST: str, variable: Dict[str, Any] = None, starter: User = None):
         """
-        :param HOST:HOST
+        :param HOST:      host
+        :param variable:  使用得环境变量
+        :param starter:   运行人
         """
         self.host = HOST
         self.extract = []
         self.responseInfo = []
+        self.starter = starter
         log.info(f"host   ====== {self.host}")
         self.worker = requests.session()
         if variable:
@@ -48,19 +52,16 @@ class MyRequest:
         for step in interface.steps:
 
             log.info(f"========================= request {step['step']} start ================================")
-            start = time.time()
             response = self.todo(url=step['url'],
                                  method=step['method'],
                                  headers=MyTools.list2Dict(self.extract, step.get("headers")),
                                  params=MyTools.list2Dict(self.extract, step.get("params")),
                                  body=MyTools.list2Dict(self.extract, step.get("body")),
                                  auth=MyTools.auth(self.extract, step.get("auth")))
-            end = time.time()
-
-            stepTime = end - start
-            useTime += stepTime
-            log.info(f"{step}:response  ====== {response.json()}")
-            log.info(f"{step}:useTime   ====== {useTime}s")
+            useTime += response.elapsed.total_seconds()
+            log.info(f"{step['step']}:status_code  ====== {response.status_code}")
+            log.info(f"{step['step']}:response     ====== {response.text}")
+            log.info(f"{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
             # 如果存在校验
             verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
             if flag is True:
@@ -72,9 +73,9 @@ class MyRequest:
                 break
         interfaceResult.resultInfo = self.responseInfo
         interfaceResult.status = STATUS
-        interfaceResult.starterID = 1
-        interfaceResult.starterName = "ADMIN"
-        interfaceResult.useTime = f"{round(useTime,3)}s"  # 待优化60+
+        interfaceResult.starterID = self.starter.id
+        interfaceResult.starterName = self.starter.username
+        interfaceResult.useTime = f"{round(useTime, 3)}s"  # 待优化60+
         interfaceResult.save()
 
     def todo(self, url: str,
@@ -104,6 +105,7 @@ class MyRequest:
         log.info(f"header ====== {headers}")
         log.info(f"body   ====== {body}")
         log.info(f"params ====== {params}")
+        log.info(f'auth   ====== {auth}')
         if auth:
             auth = HTTPBasicAuth(**auth)
         try:
@@ -139,7 +141,8 @@ class MyRequest:
 
     def _get_extract(self, response: Response, extract: List[Dict[str, str]] | None = None):
         """
-        提取
+        1、提取上个接口变量变成参数
+        2、提取全局变量变成参数
         :param response:
         :param extract:[{"key":"token","val":"$.data.token"}] -> self.extract = [{"token":"xxxx"}]
         """
@@ -166,16 +169,15 @@ class MyRequest:
 
 if __name__ == '__main__':
     from App import create_app
-    from flask import g
 
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
     from Models.ProjectModel.project import Project
 
-    p = Project.get(1)
-    var = p.query_variables2dict()
-    inter = InterfaceModel.get(1)
+    v: VariableModel = VariableModel.get(3)
+    u = User.get(1)
+    inter = InterfaceModel.get(6)
     hostName = HostModel.get(1).host
-    worker = MyRequest(hostName, var).runAPI(inter)
+    MyRequest(hostName, v.to_Dict, u).runAPI(inter)
     # print(var)
     # print(inter)

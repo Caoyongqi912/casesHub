@@ -63,7 +63,7 @@ class DevelopmentConfig(ProjectConfig):
     JSON_AS_ASCII = False  # 这个配置可以确保http请求返回的json数据中正常显示中文
 
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:root@{ProjectConfig.HOST}:{ProjectConfig.MYSQL_PORT}/{ProjectConfig.MYSQL_DATABASE}"
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     RATELIMIT_STORAGE_URI = 'redis://{}:{}/1'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)

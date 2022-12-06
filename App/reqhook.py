@@ -18,6 +18,8 @@ def logWrite() -> NoReturn:
         f"request Host = {request.host} \n"
         f"request Method = {request.method} ")
 
+    log.info(request.headers)
+
 def resp(response: Response) -> Union[MyResponse, Response]:
     """
     response 钩子

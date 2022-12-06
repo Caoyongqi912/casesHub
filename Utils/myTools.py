@@ -21,13 +21,13 @@ class MyTools:
     @staticmethod
     def list2Dict(extracts: List | None = None, params: List[Dict[str, str]] | None = None, ) -> Dict[str, str] | None:
         """
-        1、参数转换 ↓
+        1、参数转换 extracts ↓
         [{"key":"Content-Type","val":"application/json"},{"key":"token","val":"{{token}}"}]
         ==>
         {"Content-Type":"application/json",token:  {{token}}}
-        2、提取转换 ↓
+        2、提取转换  params  ↓
         [{token:xxx}]
-        ===>
+        ===> 返回
         {"Content-Type":"application/json",token:xxx}
         :param extracts: [{token:xxx}]
         :param params:   [{"key":"Content-Type","val":"application/json"},{"key":"token","val":"{{token}}"}]
@@ -66,7 +66,7 @@ class MyTools:
         :param extracts
         :return:
         """
-        if "{{" in target and "}}" in target:
+        if isinstance(target, str) and "{{" in target and "}}" in target:
             val = re.findall(r"\{\{(.*?)\}\}", target)[0]
             _ = target.replace("{{", "").replace("}}", "")
             for ext in extracts:
@@ -111,4 +111,3 @@ class MyTools:
             else:
                 left = mid + 1
         return False
-

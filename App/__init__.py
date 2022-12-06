@@ -24,18 +24,20 @@ siwa = SiwaDoc(title="CaseHubAPI", ui="redoc")
 limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
 
 
-def create_app(configName: AnyStr = "default") -> Flask:
+def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     """
     初始化app
     定义环境配置
     定义中文
     支持跨域
     注册蓝本
+    :param printSql: 控制台是否输出sql
     :param configName: projectConfig
     :return: app
     """
 
     app = Flask(__name__)
+    config[configName].SQLALCHEMY_ECHO = printSql
     app.config.from_object(config[configName])
     app.config["BABEL_DEFAULT_LOCALE"] = "zh"
     catch.init_app(app)  # 支持缓存
