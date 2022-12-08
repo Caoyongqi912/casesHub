@@ -86,12 +86,6 @@ class ProjectController(Resource):
         return MyResponse.success()
 
 
-
-
-
-
-
-
 class QueryHostController(Resource):
     @auth.login_required
     def get(self, projectID: AnyStr) -> MyResponse:

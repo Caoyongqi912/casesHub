@@ -23,14 +23,15 @@ class BugController(Resource):
         """
         from Models.CaseModel.caseModel import Cases
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="caseID", type=int, required=True, isExist=Cases)
-        parse.add(name="title", type=str, required=True, unique=Bug)
-        parse.add(name="desc", type=str, required=True)
-        parse.add(name="tester", type=str, required=True)
-        parse.add(name="developer", type=str, required=True)
-        parse.add(name="pr", type=str, required=True)
-        parse.add(name="level", type=str, required=True, enum=BugLevel)
-        parse.add(name="status", type=str, required=True, enum=BugStatus)
+        parse.add(name="title", required=True, unique=Bug)
+        parse.add(name="desc", required=True)
+        parse.add(name="tag")
+        parse.add(name="agentID", required=True, type=int)
+
+        parse.add(name="level", required=True, enum=BugLevel)
+        parse.add(name="status", enum=BugStatus)
+        parse.add(name="caseID", type=int, isExist=Cases)
+
         Bug(**parse.parse_args()).save()
         return MyResponse.success()
 
