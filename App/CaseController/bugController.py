@@ -4,13 +4,18 @@
 # @Software: PyCharm
 # @Desc:bugView
 from flask_restful import Resource
+
+from Models.CaseModel.platformsModel import Platform
+from Models.ProjectModel.versions import Version
 from MyException import Api
-from App import auth
+from App import auth, UID
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
-from Enums import BugLevel, BugStatus
+from Enums import BugLevel, BugType
 from Models.CaseModel.bugModel import Bug
 from Utils.myRequestParseUtil import MyRequestParseUtil
+
+from Models.CaseModel.caseModel import Cases
 
 
 class BugController(Resource):
@@ -21,33 +26,66 @@ class BugController(Resource):
         添加bug
         :return: MyResponse
         """
-        from Models.CaseModel.caseModel import Cases
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="title", required=True, unique=Bug)
         parse.add(name="desc", required=True)
-        parse.add(name="tag")
         parse.add(name="agentID", required=True, type=int)
+        parse.add(name="agentName", required=True)
+        parse.add(name="bug_type", required=True, enum=BugType)
+        parse.add(name="bug_level", required=True, enum=BugLevel)
 
-        parse.add(name="level", required=True, enum=BugLevel)
-        parse.add(name="status", enum=BugStatus)
+        parse.add(name="bug_tag")
         parse.add(name="caseID", type=int, isExist=Cases)
+        parse.add(name="platformID", type=int, isExist=Platform)
+        parse.add(name="versionID", type=int, isExist=Version)
 
         Bug(**parse.parse_args()).save()
         return MyResponse.success()
 
-
-class FindBug(Resource):
     @auth.login_required
-    def get(self, UID) -> MyResponse:
+    def get(self) -> MyResponse:
         """
-        获取case下的所有bug
+        uid获取
         :return: MyResponse
         """
-        bug = Bug.get_by_uid(UID)
-        return MyResponse.success(bug)
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name=UID, required=True)
+        return MyResponse.success(Bug.get_by_uid(**parse.parse_args()))
+
+    @auth.login_required
+    def put(self) -> MyResponse:
+        """
+        维护
+        :return: MyResponse
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name=UID, required=True)
+        parse.add(name="title")
+        parse.add(name="desc")
+        parse.add(name="agentID", type=int)
+        parse.add(name="agentName")
+        parse.add(name="bug_type", enum=BugType)
+        parse.add(name="bug_level", enum=BugLevel)
+        parse.add(name="bug_tag")
+        parse.add(name="mark")
+        parse.add(name="caseID", type=int, isExist=Cases)
+        parse.add(name="platformID", type=int, isExist=Platform)
+        parse.add(name="versionID", type=int, isExist=Version)
+        Bug.update(**parse.parse_args())
+        return MyResponse.success()
+
+    @auth.login_required
+    def delete(self) -> MyResponse:
+        """
+        删除
+        :return: MyResponse
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name=UID, required=True)
+        Bug.delete_by_id(**parse.parse_args())
+        return MyResponse.success()
 
 
 #
 api_script = Api(caseBP)
-api_script.add_resource(BugController, "/bug")
-api_script.add_resource(FindBug, "/bug/<string:bugID>")
+api_script.add_resource(BugController, "/bug/opt")

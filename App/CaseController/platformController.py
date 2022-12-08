@@ -61,7 +61,5 @@ class PlatformController(Resource):
         return MyResponse.success()
 
 
-cl
-
 api_script = Api(caseBP)
 api_script.add_resource(PlatformController, "/platform/opt")

@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from App import create_app, db
-from Models.CaseModel.variableModel import VariableModel
+from Models.CaseModel.fileModel import FileModel
 
 if __name__ == '__main__':
     create_app(printSql=True).app_context().push()
