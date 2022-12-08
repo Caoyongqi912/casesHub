@@ -3,62 +3,9 @@
 # @File : base.py
 # @Software: PyCharm
 # @Desc: 模型基类
-"""
-Integer int 常规整形，通常为32位
-SmallInteger    int 短整形，通常为16位
-BigInteger  int或long    精度不受限整形
-Float   float   浮点数
-Numeric decimal.Decimal 定点数
-String  str 可变长度字符串
-Text    str 可变长度字符串，适合大量文本
-Unicode unicode 可变长度Unicode字符串
-Boolean bool    布尔型
-Date    datetime.date   日期类型
-Time    datetime.time   时间类型
-Interval    datetime.timedelta  时间间隔
-Enum    str 字符列表
-PickleType  任意Python对象  自动Pickle序列化
-LargeBinary str 二进制
-primary_key 如果设置为True，则为该列表的主键
-unique  如果设置为True，该列不允许相同值
-index   如果设置为True，为该列创建索引，查询效率会更高
-default 定义该列的默认值
-unique	如果设为 True ,这列不允许出现重复的值
-index	如果设为 True ,为这列创建索引,提升查询效率
-nullable	如果设为 True ,这列允许使用空值;如果设为 False ,这列不允许使用空值
-default	为这列定义默认值
-"""
+
 from sqlalchemy.engine import CursorResult
-
-from Models.base_query import MyBaseQuery
-
-"""
-关系表参数
-
-ondelete: 级联删除
-CASCADE 级联删除、 SET NULL 只有父表被删除，子表修改为NULL 、 RESTRICT 阻止删除数据
-比如
-productID = db.Column(db.INTEGER, db.ForeignKey("product.id",ondelete="CASCADE"), comment="所属产品")
-
-lazy: ->relationship
-懒加载 、 获取对象而非列表
-比如
-versions = db.relationship("Version", backref="product", lazy="dynamic")
-
-cascade: ->relationship
-save-update：在添加一条数据的时候，会把其他和它相关联的数据都添加到数据库中
-delete:表示当删除某一个模型中的数据的时候，是否也删除掉使用relationship和它关联的数据。
-delete-orphan:表示当对一个ORM对象解除了父表中的关联对象的时候，自己便会被删除掉。
-当然如果表中的数据被删除，自己也会被删除。这个选项只能用在一对多上，不能用在多对多以及多对一上。
-并且还需要在子模型中的relationship中，增加一个single_parent=True的参数。
-merge:默认选项。当在使用session.merge，合并一个对象的时候，会将使用了relationship相关联的对象也进行merge操作
-expunge:移除操作的时候，会将相关联的对象也进行移除。这个操作只是从session中移除，并不会真正的从数据库中删除。
-all:是对save-update，merge，refresh-expire，expunge，delete几种的填写
-比如
-articles = relationship("Article",cascade="save-update,delete")
-with_entities
-"""
-from typing import List, AnyStr, Dict, NoReturn
+from typing import List, AnyStr, Dict, NoReturn, Any
 from flask_sqlalchemy import Pagination
 from sqlalchemy import asc, Column, or_
 from App import db
@@ -72,15 +19,20 @@ log = MyLog.get_log(__file__)
 
 class Base(db.Model):
     __abstract__ = True
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid: str = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time: str = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
-    update_time: str = db.Column(db.DATETIME, default=datetime.now, onupdate=datetime.now, comment="修改时间")
+    id: Column = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid: Column = db.Column(db.String(50), index=True, comment="唯一标识")
+    create_time: Column = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
+    update_time: Column = db.Column(db.DATETIME, default=datetime.now, onupdate=datetime.now, comment="修改时间")
 
-    def save(self) -> NoReturn:
-        """save"""
+    def save(self, new: bool = True) -> NoReturn:
+        """
+        save
+        :param new 首次录入
+
+        """
         try:
-            self.uid: str = UUID().getUId
+            if new:
+                self.uid: str = UUID().getUId
             db.session.add(self)
             db.session.commit()
         except Exception as e:
@@ -99,27 +51,29 @@ class Base(db.Model):
             raise MyException()
 
     @classmethod
-    def delete_by_id(cls, id: int) -> NoReturn:
+    def delete_by_id(cls, uid: str) -> NoReturn:
         """
         通过id 删除
-        :param id: cls。id
+        :param    uid: cls。uid
         :raise:   ParamException
         """
-        target = cls.get(id, f"{cls.__name__} id")
+        target = cls.get_by_uid(uid)
         target.delete()
 
     @classmethod
     def update(cls, **kwargs) -> NoReturn:
         """
         id
-        通过kwargs.get('id') 获得实例 修改
+        通过kwargs.get_by_uid('id') 获得实例 修改
         """
-        target = cls.get(kwargs.pop('id'))
+        from flask import g
+        kwargs.setdefault("updater", g.user.id)  # 修改人
+        target = cls.get_by_uid(kwargs.pop('uid'))
         c = cls.columns()
         for k, v in kwargs.items():
             if k in c:
                 setattr(target, k, v)
-        target.save()
+        target.save(False)
 
     @classmethod
     def all(cls) -> List:
@@ -167,7 +121,7 @@ class Base(db.Model):
     def get_by_field(cls, **kwargs):
         """
         通过字段查询
-        :param filed:
+        :param kwargs: cls field
         :return:
         """
         return cls.query.filter_by(**kwargs).first()
@@ -261,7 +215,13 @@ class Base(db.Model):
         return res
 
 
-def getSearchData(cls, kw: Dict = None) -> List:
+def getSearchData(cls, kw: Dict[str, Any] = None) -> List:
+    """
+    从对应实体类里获取 数据成列
+    :param cls: 目标实体
+    :param kw:  {name:xxx}
+    :return: [] | [cls]
+    """
     searchData = []
     if not kw:
         return searchData
@@ -270,7 +230,13 @@ def getSearchData(cls, kw: Dict = None) -> List:
     return searchData
 
 
-def getSortData(cls, kw: Dict = None) -> List:
+def getSortData(cls, kw: Dict[str, Any] = None) -> List:
+    """
+    根据关键字段升序或者降序
+    :param cls: 目标实体
+    :param kw: {id：ascend} | {time：descend}
+    :return: [] | [cls]
+    """
     sortList = []
     if not kw:
         return sortList

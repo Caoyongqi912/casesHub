@@ -1,13 +1,13 @@
 # @Time : 2022/7/6 22:24 
 # @Author : cyq
-# @File : user.py
+# @File : userController.py
 # @Software: PyCharm
 # @Desc: 注册controller
 from typing import AnyStr
 from flask import g, request, Response
 from flask_restful import Resource, Api
-from App import auth
-from App.DepartController import userBP
+from App import auth, UID, tokenAuth
+from App.UserController import userBP
 from Comment.myException import MyResponse
 from Models.DepartModel.departModel import Department
 from Models.DepartModel.userModel import User
@@ -34,16 +34,16 @@ class AddAdminController(Resource):
 
 class UserOptController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     @is_admin
     def get(self) -> MyResponse:
         """
-        通userID 获取info
+        通UID 获取info
         :return:
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="userID", required=True)
-        info = User.get(parse.parse_args().get("userID"), "userID")
+        parse.add(name=UID, required=True)
+        info = User.get_by_uid(**parse.parse_args())
         return MyResponse.success(info)
 
     @auth.login_required
@@ -56,10 +56,10 @@ class UserOptController(Resource):
 
         from Enums.myEnum import Gender, UserTag
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="username", type=str, unique=User, required=True)
-        parse.add(name="phone", type=str, unique=User, required=True)
-        parse.add(name="gender", type=int, enum=Gender, required=True)
-        parse.add(name="tag", type=int, enum=UserTag, required=True)
+        parse.add(name="username", unique=User, required=True)
+        parse.add(name="phone", unique=User, required=True)
+        parse.add(name="gender", enum=Gender, required=True)
+        parse.add(name="tag", enum=UserTag, required=True)
         parse.add(name="departmentID", type=int, isExist=Department, required=True)
         User(**parse.parse_args()).addUser()
         return MyResponse.success()
@@ -68,14 +68,14 @@ class UserOptController(Resource):
     @is_admin
     def delete(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=str, required=True)
+        parse.add(name=UID, required=True)
         User.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 
 class GetTokenController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     def post(self) -> MyResponse:
         """
         get token
@@ -84,9 +84,8 @@ class GetTokenController(Resource):
         return MyResponse.success(t)
 
 
-class PageUserController(Resource):
-
-    @auth.login_required
+class QueryUserController(Resource):
+    @tokenAuth.login_required
     @is_admin
     def get(self) -> MyResponse:
         """
@@ -94,7 +93,7 @@ class PageUserController(Resource):
         :return:MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        return MyResponse.success(User.page(**parse.page(User)))
+        return MyResponse.success(User.page(**parse.page(cls=User)))
 
 
 class LoginController(Resource):
@@ -115,42 +114,31 @@ class UserController(Resource):
     @auth.login_required
     def post(self) -> MyResponse:
         """
-        通过userID 查询单个用户Info、
-        :return: MyResponse
-        """
-        parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="userID", type=int, required=True)
-        return MyResponse.success(User.get(parse.parse_args().get("userID")))
-
-    @auth.login_required
-    def put(self) -> MyResponse:
-        """
         修改密码
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="password", type=str, required=True)
-        u = User.get(g.user.id, "")
-        u.hash_password(parse.parse_args().get("password"))
+        g.user.hash_password(parse.parse_args().get("password"))
         return MyResponse.success()
 
 
 class AvatarController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     async def post(self) -> MyResponse:
         """
         上传头像
-        :return:
+        :return:MyResponse
         """
         from werkzeug.datastructures import FileStorage
-        file: FileStorage = request.files.get("file")
+        file: FileStorage = request.files.get("avatar")
         await User.save_or_update_avatar(file)
         return MyResponse.success()
 
 
 class GetAvatarController(Resource):
-    @auth.login_required
+    @tokenAuth.login_required
     def get(self, filename: AnyStr) -> Response:
         """
         返回头像
@@ -165,7 +153,7 @@ class GetAvatarController(Resource):
 
 class SetPasswordController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     def post(self) -> MyResponse:
         """
         用户修改密码
@@ -173,13 +161,14 @@ class SetPasswordController(Resource):
         """
         user: User = g.user
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="password", type=str, required=True)
-        user.hash_password(**parse.parse_args()).save()
+        parse.add(name="old_password", type=str, required=True)
+        parse.add(name="new_password", type=str, required=True)
+        user.set_password(**parse.parse_args())
         return MyResponse.success()
 
 
 class CurrentUserController(Resource):
-    @auth.login_required
+    @tokenAuth.login_required
     def get(self) -> MyResponse:
         """
         CurrentUserInfo
@@ -210,7 +199,7 @@ api_script.add_resource(AddAdminController, "/admin")
 api_script.add_resource(UserOptController, "/opt")
 api_script.add_resource(SetPasswordController, "/setpassword")
 api_script.add_resource(CurrentUserController, '/current')
-api_script.add_resource(PageUserController, "/page")
+api_script.add_resource(QueryUserController, "/query")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
 api_script.add_resource(AvatarController, "/avatar")

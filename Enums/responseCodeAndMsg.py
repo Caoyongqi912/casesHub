@@ -42,7 +42,7 @@ class ResponseMsg:
         return f"{target} must in {choices} !"
 
     @staticmethod
-    def error_param(target: Any, msg: AnyStr):
+    def error_param(target: Any, msg: AnyStr = ""):
         return f"{target} err ! {msg}"
 
     @staticmethod

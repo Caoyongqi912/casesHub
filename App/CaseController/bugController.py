@@ -37,12 +37,12 @@ class BugController(Resource):
 
 class FindBug(Resource):
     @auth.login_required
-    def get(self, bugID) -> MyResponse:
+    def get(self, UID) -> MyResponse:
         """
         获取case下的所有bug
         :return: MyResponse
         """
-        bug = Bug.get(bugID, "bugID")
+        bug = Bug.get_by_uid(UID)
         return MyResponse.success(bug)
 
 

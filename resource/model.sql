@@ -304,3 +304,18 @@ CREATE TABLE interface_result
     PRIMARY KEY (id),
     FOREIGN KEY (`interfaceID`) REFERENCES interface (id) ON DELETE CASCADE
 )
+
+CREATE TABLE variable (
+	id INTEGER NOT NULL AUTO_INCREMENT,
+	uid VARCHAR(50) COMMENT '唯一标识',
+	create_time DATETIME COMMENT '创建时间',
+	update_time DATETIME COMMENT '修改时间',
+	`key` VARCHAR(20) COMMENT '变量名称',
+	val VARCHAR(500) COMMENT '变量值',
+	`desc` VARCHAR(500) COMMENT '描述',
+	creator VARCHAR(20) COMMENT '创建人',
+	updater VARCHAR(20) COMMENT '修改人',
+	`projectID` INTEGER COMMENT '所属项目',
+	PRIMARY KEY (id),
+	FOREIGN KEY(`projectID`) REFERENCES project (id) ON DELETE SET NUll
+)

@@ -3,10 +3,10 @@
 # @File : apiEnum.py 
 # @Software: PyCharm
 # @Desc:
-from Enums.baseEnum import Base
+from Enums.baseEnum import BaseEnum
 
 
-class APIMethodEnum(Base):
+class APIMethodEnum(BaseEnum):
     GET = 1
     POST = 2
     PUT = 3

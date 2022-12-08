@@ -6,9 +6,9 @@
 from typing import TypeVar, Generic, Union
 import sqlalchemy as sql
 from enum import Enum
-from Enums.baseEnum import Base
+from Enums.baseEnum import BaseEnum
 
-enumType = TypeVar("enumType", bound=Base)
+enumType = TypeVar("enumType", bound=BaseEnum)
 
 
 class IntEnum(sql.types.TypeDecorator):

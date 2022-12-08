@@ -5,18 +5,20 @@
 # @Desc:  自定义参数校验
 import enum
 import json
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn
+from json import JSONDecodeError
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn, Optional
 from flask import request
 from Comment.myException import ParamException
+from Models.CaseModel.caseModel import Cases
 from Models.base import Base
 from Utils.myLog import MyLog
 from Enums import ResponseMsg
-from Enums.baseEnum import Base as EnumBase
+from Enums.baseEnum import BaseEnum
 
 log = MyLog.get_log(__file__)
 
 clsType = TypeVar("clsType", bound=Base)
-enumType = TypeVar("enumType", bound=EnumBase)
+enumType = TypeVar("enumType", bound=BaseEnum)
 
 
 class MyRequestParseUtil:
@@ -65,7 +67,7 @@ class MyRequestParseUtil:
         """
         分页参数校验
         pageSize ： if request get pageSize  else 10
-        current ： if request get current  else 10
+        current ： if request get current  else 1
         sort : if request get sort  else None
         like select * from cls order by (sort)
         filter_key : __verify_filterKey
@@ -75,15 +77,14 @@ class MyRequestParseUtil:
         body = dict(self.body)
         pageSize = body.pop("pageSize") if body.get("pageSize") else 10
         current = body.pop("current") if body.get("current") else 1
-        sort = json.loads(body.pop("sort")) if body.get("sort") else None
-        filter = json.loads(body.pop("filter")) if body.get("filter") else None
-        self._verify_filterKey(body, cls)
+        sort = body.pop("sort") if body.get("sort") else None
+        filter_key = body.pop("filter") if body.get("filter") else None
 
         pageInfo = {
             "pageSize": self._verify_pageSize(pageSize),
             "current": self._verify_current(current),
-            "sort": self._verify_sort(sort, cls),
-            "filter_key": filter
+            "sort": self._verify_sort(cls, sort),
+            "filter_key": self._verify_filterKey(cls, filter_key)
         }
         return pageInfo
 
@@ -202,41 +203,57 @@ class MyRequestParseUtil:
         return pageSize
 
     @staticmethod
-    def _verify_sort(sort: Dict | None, cls: Generic[clsType]) -> Union[None, str]:
+    def _verify_sort(cls: Generic[clsType], sort: str = None) -> Optional[Dict[str, Any]]:
         """
 
         verify sort value in  cls.__table__.columns if not return None
         :param sort: str | None  Generic[clsType]
-        :param cls: Generic[clsType
-        :return:  Union[None, str]
+        :param cls: Generic[clsType]
+        :return:  Optional[Dict[str,Any]]
         """
-        if sort is None:
+        if isinstance(sort, str):
+            try:
+                sort = json.loads(sort)
+            except JSONDecodeError as e:
+                log.error(repr(e))
+                raise ParamException(ResponseMsg.error_param("sort"))
+            for k, v in sort.items():
+                if k not in cls.columns() or v not in ['descend', "ascend"]:
+                    return None
             return sort
-        for k, v in sort.items():
-            if k not in cls.columns() or v not in ['descend', "ascend"]:
-                return None
-
-        return sort
+        else:
+            return sort
 
     @staticmethod
-    def _verify_filterKey(key: Dict[str, str] | None, cls: Generic[clsType]) -> Union[Dict[str, str], None]:
+    def _verify_filterKey(cls: Generic[clsType], keys: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         request get tag=1&gender=0 => {tag:1,gender:0}
         verify: pop key
         1.key not  in cls.__table__.columns
         2.value == "" or None
-        :param key:  Mapping[str, str]
-        :param cls: Generic[clsType]
-        :return: Union[Mapping[str, str], None]
+        :param keys:  Optional[str] = None  {"name":"p1","name":"p2"}
+        :param cls:  Generic[clsType]
+        :return: Optional[Dict[str,Any]]
         """
-        if not key:
-            return key
+        if isinstance(keys, str):
+            try:
+                keys = json.loads(keys)
+            except JSONDecodeError as e:
+                log.error(repr(e))
+                raise ParamException(ResponseMsg.error_param("filter"))
 
-        columns = cls.columns()
-        from copy import deepcopy
-        deepKEY = deepcopy(key)
-        for k, v in deepKEY.items():
-            if k not in columns or v == "":
-                key.pop(k)
-        return key
+                pass
 
+            columns = cls.columns()
+            from copy import deepcopy
+            deepKEY = deepcopy(keys)
+            for k, v in deepKEY.items():
+                if k not in columns or v == "":
+                    keys.pop(k)
+
+            # 枚举转化
+            if cls is Cases:
+                return Cases.column2Enum(keys)
+            return keys
+        else:
+            return None

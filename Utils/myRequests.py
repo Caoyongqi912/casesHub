@@ -4,7 +4,7 @@ import time
 # @Author  : cyq
 # @File    : myRequest.py
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, NoReturn, Union
 import requests
 import urllib3
 from requests import Response, exceptions
@@ -34,10 +34,11 @@ class MyRequest:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
-        log.info(f"host   ====== {self.host}")
         self.worker = requests.session()
         if variable:
             self.extract.append(variable)
+        log.info(f"host    ====== {self.host}")
+        log.info(f"starter ====== {self.starter.username}")
 
     def runAPI(self, interface: InterfaceModel):
         """
@@ -46,12 +47,10 @@ class MyRequest:
         :return:
         """
         STATUS = 'SUCCESS'
-        interfaceResult = InterfaceResultModel()
-        interfaceResult.interfaceID = interface.id
         useTime = 0
         for step in interface.steps:
 
-            log.info(f"========================= request {step['step']} start ================================")
+            log.info(f"========================= request step-{step['step']} start ================================")
             response = self.todo(url=step['url'],
                                  method=step['method'],
                                  headers=MyTools.list2Dict(self.extract, step.get("headers")),
@@ -59,9 +58,9 @@ class MyRequest:
                                  body=MyTools.list2Dict(self.extract, step.get("body")),
                                  auth=MyTools.auth(self.extract, step.get("auth")))
             useTime += response.elapsed.total_seconds()
-            log.info(f"{step['step']}:status_code  ====== {response.status_code}")
-            log.info(f"{step['step']}:response     ====== {response.text}")
-            log.info(f"{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
+            log.info(f"step-{step['step']}:status_code  ====== {response.status_code}")
+            log.info(f"step-{step['step']}:response     ====== {response.text}")
+            log.info(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
             # 如果存在校验
             verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
             if flag is True:
@@ -71,12 +70,8 @@ class MyRequest:
             else:
                 STATUS = 'FAIL'
                 break
-        interfaceResult.resultInfo = self.responseInfo
-        interfaceResult.status = STATUS
-        interfaceResult.starterID = self.starter.id
-        interfaceResult.starterName = self.starter.username
-        interfaceResult.useTime = f"{round(useTime, 3)}s"  # 待优化60+
-        interfaceResult.save()
+
+        self._writeResult(interface.id, self.responseInfo, STATUS, useTime)
 
     def todo(self, url: str,
              method: str,
@@ -166,17 +161,36 @@ class MyRequest:
         }
         self.responseInfo.append(info)
 
+    def _writeResult(self, interfaceID: int, responseInfo: List[Dict[str, Any]], status: str,
+                     useTime: Union[str, float, int]) -> NoReturn:
+        """
+        测试结果入库
+        :param interfaceID: 接口id
+        :param responseInfo: 测试结果信息
+        :param status: 测试结果
+        :param useTime:用时
+        :return:NoReturn
+        """
+        interfaceResult = InterfaceResultModel()
+        interfaceResult.interfaceID = interfaceID
+        interfaceResult.resultInfo = responseInfo
+        interfaceResult.status = status
+        interfaceResult.useTime = useTime
+        interfaceResult.starterID = self.starter.id
+        interfaceResult.starterName = self.starter.username
+        interfaceResult.save()
+
 
 if __name__ == '__main__':
     from App import create_app
 
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
-    from Models.ProjectModel.project import Project
+    from Models.ProjectModel.projectModel import Project
 
     v: VariableModel = VariableModel.get(3)
     u = User.get(1)
-    inter = InterfaceModel.get(6)
+    inter = InterfaceModel.get(1)
     hostName = HostModel.get(1).host
     MyRequest(hostName, v.to_Dict, u).runAPI(inter)
     # print(var)

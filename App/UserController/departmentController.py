@@ -1,13 +1,13 @@
 # @Time : 2022/7/11 22:08 
 # @Author : cyq
-# @File : department.py 
+# @File : departmentController.py
 # @Software: PyCharm
 # @Desc: 部门controller
 
 from flask_restful import Resource
 from MyException import Api
-from App import auth
-from App.DepartController import userBP
+from App import auth, tokenAuth, UID
+from App.UserController import userBP
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -16,7 +16,7 @@ from Models.DepartModel.departModel import Department
 
 class DepartmentController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     @is_admin
     def post(self) -> MyResponse:
         """
@@ -31,7 +31,7 @@ class DepartmentController(Resource):
         Department(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @auth.login_required
+    @tokenAuth.login_required
     def put(self) -> MyResponse:
         """
         更新部门
@@ -46,16 +46,17 @@ class DepartmentController(Resource):
         Department.update(**parse.parse_args())
         return MyResponse.success()
 
-    @auth.login_required
+    @tokenAuth.login_required
     def get(self) -> MyResponse:
         """
         分页查询部门
         :return:MyResponse
         """
         parse = MyRequestParseUtil("values")
-        return MyResponse.success(Department.page)((parse.page(Department)))
+        parse.add(name=UID, required=True)
+        return MyResponse.success(Department.get_by_uid(**parse.parse_args()))
 
-    @auth.login_required
+    @tokenAuth.login_required
     @is_admin
     def delete(self) -> MyResponse:
         """
@@ -63,10 +64,19 @@ class DepartmentController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
-        Department.delete_by_id(parse.parse_args().get("id"))
+        parse.add(name=UID, required=True)
+        Department.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 
+class QueryDepartmentController(Resource):
+
+    @tokenAuth.login_required
+    def get(self) -> MyResponse:
+        parse = MyRequestParseUtil("values")
+        return MyResponse.success(Department.page(**parse.page(Department)))
+
+
 api_script = Api(userBP)
-api_script.add_resource(DepartmentController, "/department")
+api_script.add_resource(DepartmentController, "/department/opt")
+api_script.add_resource(QueryDepartmentController, "/department/query")

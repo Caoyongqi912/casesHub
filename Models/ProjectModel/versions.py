@@ -10,7 +10,7 @@ from flask_sqlalchemy import Pagination
 
 from Comment.myException import ParamException
 from Enums import ResponseMsg
-from Models.ProjectModel.project import Project
+from Models.ProjectModel.projectModel import Project
 from Models.base import Base
 from App import db
 from Utils import MyLog

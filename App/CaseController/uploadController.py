@@ -5,7 +5,7 @@ from flask import request, Response
 from App import auth
 from Comment.myResponse import MyResponse
 from MyException import Api
-from App.UploadController import fileBP
+from App.CaseController import caseBP
 from faker import Faker
 from werkzeug.utils import secure_filename
 from Models.CaseModel.caseExcel import CaseExcel
@@ -42,5 +42,5 @@ class UploadController(Resource):
         return Response(file, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
-api_script = Api(fileBP)
-api_script.add_resource(UploadController, "/")
+api_script = Api(caseBP)
+api_script.add_resource(UploadController, "/file")

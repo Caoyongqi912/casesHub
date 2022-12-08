@@ -1,13 +1,13 @@
 # @Time : 2022/7/19 19:47 
 # @Author : cyq
-# @File : report.py 
+# @File : reportController.py
 # @Software: PyCharm
 # @Desc:
 
 from flask_restful import Resource
 from MyException import Api
 from App import auth
-from App.ProjectController import proBP
+from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.ProjectModel.reports import Report
@@ -88,5 +88,5 @@ class SendReport(Resource):
         return MyResponse.success()
 
 
-api_script = Api(proBP)
+api_script = Api(caseBP)
 api_script.add_resource(ReportController, "/report")

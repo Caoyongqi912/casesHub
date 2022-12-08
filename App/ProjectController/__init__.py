@@ -8,4 +8,4 @@ from flask import Blueprint
 
 proBP = Blueprint("project", __name__, url_prefix="/api/project")
 
-from . import projectController, version
+from . import projectController

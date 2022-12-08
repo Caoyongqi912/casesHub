@@ -6,9 +6,18 @@
 from functools import wraps
 from typing import AnyStr
 from flask import g
-from App import auth
+from App import auth, tokenAuth
+from Comment import MyRedis
 from Comment.myException import AuthException
 from Models.DepartModel.userModel import User
+
+
+@tokenAuth.verify_token
+def verify_token(token: str = None) -> bool:
+    if token:
+        g.user = User.verify_token(token)
+        return True
+    return False
 
 
 @auth.verify_password
@@ -57,7 +66,6 @@ def is_DepartAdmin(func):
         uid = g.user.id
         if g.user.isAdmin:
             pass
-
         return func(*args, **kwargs)
 
     return wrap_func

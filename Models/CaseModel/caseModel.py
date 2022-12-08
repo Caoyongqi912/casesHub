@@ -6,7 +6,7 @@
 import json
 from typing import AnyStr, Dict, List, Any, Optional
 from Comment.myException import ParamException
-from Enums import CaseLevel, CaseTag, CaseType, CaseStatus, IntEnum
+from Enums import CaseLevel, CaseTag, CaseType, CaseStatus, IntEnum, EnumDict
 from Enums import ResponseMsg
 from Models.base import Base
 from App import db
@@ -15,8 +15,6 @@ from Utils import MyLog, simpleBug
 from flask import g
 
 log = MyLog.get_log(__file__)
-
-
 
 
 class Cases(Base):
@@ -36,11 +34,14 @@ class Cases(Base):
     # case 与 模块 属于多对一 关系
     partID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True, comment="模块")
     # case 与 product 是多对一关系 、产品删除、用例productID 置为null
-    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True, comment="所属产品")
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=True,
+                          comment="所属产品")
     # case与platform 是多对一关系、平台删除、字段置为空、可无平台
-    platformID = db.Column(db.INTEGER, db.ForeignKey('platform.id', ondelete="SET NUll"), nullable=True, comment="所属平台")
+    platformID = db.Column(db.INTEGER, db.ForeignKey('platform.id', ondelete="SET NUll"), nullable=True,
+                           comment="所属平台")
     # version yu case 是1vn
-    versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True, comment="所属版本")
+    versionID = db.Column(db.INTEGER, db.ForeignKey('version.id', ondelete='SET NUll'), nullable=True,
+                          comment="所属版本")
 
     # bug 与 用例是一对多关系
     bugs = db.relationship("Bug", backref="case", lazy="dynamic")
@@ -79,17 +80,6 @@ class Cases(Base):
         """
         return self.bug.all()
 
-    @classmethod
-    def update(cls, **kwargs):
-        """
-        case 更新 重写父类 不需要校验用户。
-        :param kwargs:0
-        :return:
-        """
-        from flask import g
-        kwargs.setdefault("updater", g.user.id)  # 修改人
-        return super(Cases, Cases).update(**kwargs)
-
     @staticmethod
     def __verify_info(info: List[Dict]) -> json:
         """
@@ -121,6 +111,19 @@ class Cases(Base):
                 raise ParamException(ResponseMsg.miss("exp"))
         info.sort(key=lambda s: s['step'])
         return info
+
+    @staticmethod
+    def column2Enum(col: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        枚举类型转化
+        :param col:{"case_type":"COMMENT","case_level":"P1"...}
+        :return: {"case_type":1","case_level":1...}
+        """
+        from copy import deepcopy
+        dk = deepcopy(col)
+        for k, v in dk.items():
+            col[k] = EnumDict[k].getValue(v)
+        return col
 
     def __repr__(self):
         return f"<{Cases.__name__} {self.name}>"

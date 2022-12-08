@@ -35,8 +35,8 @@ class ProjectConfig:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     HOST = "127.0.0.1"
-    REDIS_PORT = '6379'
-    MYSQL_PORT = '3306'
+    REDIS_PORT = 6379
+    MYSQL_PORT = 3306
     MYSQL_DATABASE = 'caseHub'
     FLASK_ADMIN_SWATCH = 'cerulean'
     # FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'

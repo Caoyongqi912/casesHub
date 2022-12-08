@@ -1,6 +1,6 @@
 # @Time : 2022/7/10 21:15 
 # @Author : cyq
-# @File : platforms.py 
+# @File : platformsModel.py
 # @Software: PyCharm
 # @Desc: 平台实体
 
@@ -26,16 +26,6 @@ class Platform(Base):
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).first()
-
-    @simpleCase
-    def page_case(self, **kwargs) -> Pagination:
-        """
-        查询用例分页
-        :param limit: limit
-        :param page: page
-        :return:Pagination
-        """
-        return self.cases.my_paginate(**kwargs)
 
     def __repr__(self):
         return f"{Platform.__name__} {self.name}"

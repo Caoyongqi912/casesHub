@@ -13,7 +13,7 @@ from typing import Dict, Any
 
 from flask import g
 from flask_restful import Resource
-from App import auth
+from App import auth, UID
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from MyException import Api
@@ -51,8 +51,8 @@ class InterfaceController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
-        pare.add(name="interfaceID")
-        return MyResponse.success(InterfaceModel.get_by_uid(pare.parse_args().get("interfaceID")))
+        pare.add(name=UID)
+        return MyResponse.success(InterfaceModel.get_by_uid(**pare.parse_args()))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -61,7 +61,7 @@ class InterfaceController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
-        pare.add(name="id", type=int, required=True)
+        pare.add(name=UID, type=int, required=True)
         pare.add(name="title", type=str)
         pare.add(name="desc", type=str)
         pare.add(name="steps", type=list)
@@ -106,8 +106,8 @@ class InterfaceHistoryController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
-        pare.add(name="interfaceID")
-        return MyResponse.success(InterfaceModel.get_by_uid(pare.parse_args().get("interfaceID")).query_results)
+        pare.add(name=UID)
+        return MyResponse.success(InterfaceModel.get_by_uid(**pare.parse_args()).query_results)
 
 
 api_script = Api(caseBP)

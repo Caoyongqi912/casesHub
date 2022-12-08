@@ -4,3 +4,4 @@
 # @Software: PyCharm
 # @Desc:
 
+from .myRedis import MyRedis

@@ -1,9 +1,9 @@
 from flask_restful import Resource
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
-from Models.ProjectModel.project import Project
+from Models.ProjectModel.projectModel import Project
 from MyException import Api
-from App import auth
+from App import auth, UID
 from Models.CaseModel.variableModel import VariableModel
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
@@ -24,6 +24,7 @@ class VariableController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="key", type=str, required=True)
         parse.add(name="val", type=str, required=True)
+        parse.add(name="desc", type=str, required=False)
         parse.add(name="projectID", type=int, required=True, isExist=Project)
         key = {"key": parse.parse_args().get("key")}
         variable: VariableModel = VariableModel.get_by_field(**key)
@@ -38,14 +39,14 @@ class VariableController(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name="variableID", required=True, isExist=Project)
-        return MyResponse.success(VariableModel.get(parse.parse_args().get("envID")))
+        parse.add(name=UID, required=True, isExist=Project)
+        return MyResponse.success(VariableModel.get_by_uid(**parse.parse_args()))
 
     @auth.login_required
     def delete(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="variableID", type=int, required=True)
-        VariableModel.delete_by_id(parse.parse_args().get("variableID"))
+        parse.add(name=UID, type=int, required=True)
+        VariableModel.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 

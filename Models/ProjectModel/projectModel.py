@@ -62,7 +62,7 @@ class Project(Base):
         """
         self.__verify_auth()
 
-        uIds: List[int] = [u.id for u in self.users.all()]
+        uIds = [u.id for u in self.users.all()]
         for uid in users:
             u: User = User.get(uid, f"uid {uid}")
             if MyTools.search(uIds, u.id):
@@ -84,33 +84,9 @@ class Project(Base):
             raise AuthException()
         return super(Project, Project).update(**kwargs)
 
-    def page_case(self, **kwargs) -> Pagination:
-        """
-        查询用例分页
-        :param kwargs: limit
-        :param kwargs:  page
-        :return: Pagination
-        """
-
-        return self.cases.my_paginate(**kwargs)
-
-    def page_version(self, **kwargs) -> Pagination:
-        """
-        查询版本分页
-        """
-        return self.versions.my_paginate(**kwargs)
-
-    def page_casePart(self, **kwargs) -> Pagination:
-        """
-        查询用例分组分页
-        """
-        return self.parts.my_paginate(**kwargs)
-
-    def page_user(self, **kwargs) -> Pagination:
-        """
-        分页查询用户分页
-        """
-        return self.users.my_paginate(**kwargs)
+    @property
+    def query_casePart(self):
+        return self.parts.all()
 
     @property
     def query_host(self) -> List:

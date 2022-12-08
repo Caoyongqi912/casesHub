@@ -11,3 +11,5 @@ from .myPath import *
 from .myJsonSerialize import JSONEncoder
 from .myTools import MyTools
 from ._types import *
+
+UID = "uid"

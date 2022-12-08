@@ -1,16 +1,16 @@
 # @Time : 2022/7/16 18:09 
 # @Author : cyq
-# @File : version.py 
+# @File : versionController.py
 # @Software: PyCharm
 # @Desc: version view
 from flask_restful import Resource
 from MyException import Api
 from App import auth
-from App.ProjectController import proBP
+from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Models.CaseModel.bugModel import Bug
 from Models.CaseModel.caseModel import Cases
-from Models.ProjectModel.project import Project
+from Models.ProjectModel.projectModel import Project
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.ProjectModel.versions import Version
 from App.myAuth import is_admin
@@ -93,7 +93,7 @@ class PageBugs(Resource):
         return MyResponse.success(Version.get(versionID, "versionID").page_bugs(**parse.page(Bug)))
 
 
-api_script = Api(proBP)
+api_script = Api(caseBP)
 api_script.add_resource(VersionController, "/version/opt")
 api_script.add_resource(PageCases, "/version/<string:versionID>/page_case")
 api_script.add_resource(PageBugs, "/version/<string:versionID>/page_bugs")

@@ -8,14 +8,14 @@ from flask import g
 from flask_restful import Resource
 from Models.CaseModel.caseExcel import CaseExcel
 from MyException import Api
-from App import auth, limiter
+from App import auth, limiter, UID, tokenAuth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Enums import CaseTag, CaseLevel, CaseType
 from Models.CaseModel.caseModel import Cases
-from Models.CaseModel.partModel import CasePart
-from Models.CaseModel.platforms import Platform
-from Models.ProjectModel.project import Project
+from Models.CaseModel.casePartModel import CasePart
+from Models.CaseModel.platformsModel import Platform
+from Models.ProjectModel.projectModel import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Utils import MyLog
@@ -25,7 +25,7 @@ log = MyLog.get_log(__file__)
 
 class CaseController(Resource):
 
-    @auth.login_required
+    @tokenAuth.login_required
     def post(self) -> MyResponse:
         """
         新增用例
@@ -48,7 +48,7 @@ class CaseController(Resource):
         Cases(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @auth.login_required
+    @tokenAuth.login_required
     def put(self) -> MyResponse:
         """
         用例修改
@@ -56,7 +56,7 @@ class CaseController(Resource):
         """
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True, isExist=Cases)
+        parse.add(name=UID, type=int, required=True, isExist=Cases)
         parse.add(name="part", type=str, required=False)
         parse.add(name="title", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
@@ -69,37 +69,26 @@ class CaseController(Resource):
         Cases.update(**parse.parse_args())
         return MyResponse.success()
 
-    @auth.login_required
+    @tokenAuth.login_required
     def delete(self) -> MyResponse:
         """
         通过id删除
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True, isExist=Cases)
+        parse.add(name=UID, required=True)
         Cases.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
-    @auth.login_required
+    @tokenAuth.login_required
     def get(self) -> MyResponse:
         """
         通过caseID查
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="caseID", required=True, isExist=Cases)
-        return MyResponse.success(Cases.get(parse.parse_args().get("caseID"), "caseID"))
-
-
-class QueryBugs(Resource):
-    @auth.login_required
-    def get(self, caseID) -> MyResponse:
-        """
-        获取单个case下的所有bug
-        :return: MyResponse
-        """
-        case = Cases.get(caseID, "caseID")
-        return MyResponse.success(case.bugs)
+        parse.add(name=UID, required=True)
+        return MyResponse.success(Cases.get_by_uid(**parse.parse_args()))
 
 
 class UpdateExcel2CaseController(Resource):
@@ -125,7 +114,19 @@ class UpdateExcel2CaseController(Resource):
         return MyResponse.success()
 
 
+class QueryCaseController(Resource):
+
+    @tokenAuth.login_required
+    def get(self) -> MyResponse:
+        """
+        用例分页
+        :return:
+        """
+        parse = MyRequestParseUtil("values")
+        return MyResponse.success(Cases.page(**parse.page(Cases)))
+
+
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
-api_script.add_resource(QueryBugs, "/<string:caseID>/bugs")
+api_script.add_resource(QueryCaseController, "/query")
 api_script.add_resource(UpdateExcel2CaseController, "/upload/excel")

@@ -1,17 +1,20 @@
 # @Time : 2022/9/17 10:04 
 # @Author : cyq
-# @File : partModel.py 
+# @File : casePartModel.py
 # @Software: PyCharm
 # @Desc:
-from typing import List, Dict, Any
+from typing import List, Dict, Any, NoReturn
 
 from App import db
+from Comment.myException import ParamException
+from Enums import ResponseMsg
+from Models.ProjectModel.projectModel import Project
 from Models.base import Base
 
 
 class CasePart(Base):
     __tablename__ = 'case_part'
-    partName = db.Column(db.String(20), unique=True, comment="用例模块")
+    partName = db.Column(db.String(20), comment="用例模块")
 
     # 用例模块与产品是多对一关系
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属产品")
@@ -41,6 +44,15 @@ class CasePart(Base):
             c.save()
             return c
         return val
+
+    def save_(self) -> NoReturn:
+        """
+        项目下、name唯一校验
+        """
+        p: Project = Project.get(self.projectID)
+        if self.partName in [h.partName for h in p.query_casePart]:
+            raise ParamException(ResponseMsg.already_exist(self.partName))
+        return super(CasePart, self).save()
 
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"

@@ -14,9 +14,9 @@ from App import auth, siwa
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Models.CaseModel.caseModel import Cases
-from Models.CaseModel.partModel import CasePart
+from Models.CaseModel.casePartModel import CasePart
 from Models.DepartModel.userModel import User
-from Models.ProjectModel.project import Project
+from Models.ProjectModel.projectModel import Project
 from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Swagger import AddProjectSwagger, BaseResponseSwagger, PageSwagger, UpdateProjectSwagger, \
@@ -48,7 +48,7 @@ class ProjectController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    @siwa.doc(query=PageSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
+    # @siwa.doc(query=PageSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def get(self) -> MyResponse:
         """
         分页查询
@@ -86,67 +86,10 @@ class ProjectController(Resource):
         return MyResponse.success()
 
 
-class PageCaseController(Resource):
-
-    @auth.login_required
-    @siwa.doc(query=PageSwagger, tags=['PageCaseController'], resp=BaseResponseSwagger)
-    def get(self, projectID: AnyStr) -> MyResponse:
-        """
-        通过MyResponse 分页查询
-        :param projectID: 产品ID
-        :return: MyResponse
-        """
-        parse = MyRequestParseUtil("values")
-        return MyResponse.success(Project.get(projectID, "projectID").page_case(**parse.page(Cases)))
 
 
-class QueryVersionController(Resource):
-
-    @auth.login_required
-    def get(self, projectID: AnyStr) -> MyResponse:
-        """
-        通过MyResponse 分页查询
-        :param projectID: 产品ID
-        :return: MyResponse
-        """
-        return MyResponse.success(Project.get(projectID, "projectID").query_version)
 
 
-class PageVersionController(Resource):
-
-    @auth.login_required
-    def get(self, projectID: AnyStr) -> MyResponse:
-        """
-        通过projectID 分页查询
-        :param projectID: 产品ID
-        :return: MyResponse
-        """
-        parse = MyRequestParseUtil("values")
-        return MyResponse.success(Project.get(projectID, "projectID").page_version(**parse.page(Version)))
-
-
-class PageCasePartController(Resource):
-
-    @auth.login_required
-    def get(self, projectID: AnyStr) -> MyResponse:
-        """
-        通过casePart 分页查询
-        :return: MyResponse
-        """
-        parse = MyRequestParseUtil("values")
-        return MyResponse.success(Project.get(projectID, "projectID").page_casePart(**parse.page(CasePart)))
-
-
-class PageUserController(Resource):
-    @auth.login_required
-    @is_admin
-    def get(self, projectID: AnyStr) -> MyResponse:
-        """
-        查询user by projectID
-        :return: MyResponse
-        """
-        parse = MyRequestParseUtil("values")
-        return MyResponse.success(Project.get(projectID, "projectID").page_user(**parse.page(User)))
 
 
 class QueryHostController(Resource):
@@ -200,11 +143,6 @@ class SearchProjectController(Resource):
 
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
-api_script.add_resource(PageCaseController, "/<string:projectID>/page_cases")
-api_script.add_resource(QueryVersionController, "/<string:projectID>/query_versions")
-api_script.add_resource(PageVersionController, "/<string:projectID>/page_versions")
-api_script.add_resource(PageCasePartController, '/<string:projectID>/page_casePart')
-api_script.add_resource(PageUserController, '/<string:projectID>/page_user')
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
 api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")

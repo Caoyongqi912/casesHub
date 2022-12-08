@@ -12,8 +12,9 @@ from typing import AnyStr
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
-from Enums import Gender, UserTag, IntEnum
+from Enums import Gender, UserTag, IntEnum, ResponseMsg
 from Utils import MyLog, delAvatar, simpleUser
+from Comment import MyRedis
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
 
@@ -83,6 +84,19 @@ class User(Base):
         self.email: str = self.username + self._mail
         self.save()
 
+    def set_password(self, old_password: str, new_password: str) -> NoReturn:
+        """
+        修改密码
+        :param old_password:
+        :param new_password:
+        :return:
+        """
+        if self.verify_password(old_password):
+            self.hash_password(new_password)
+            self.save(new=False)
+        else:
+            raise ParamException(ResponseMsg.error_param("old password"))
+
     def hash_password(self, password: AnyStr) -> NoReturn:
         """
         密码加密
@@ -96,7 +110,7 @@ class User(Base):
         :param expires_time: 过期时间 默认 一天
         :return: token
         """
-        token: dict[str, int | str] = {"id": self.id, "expires_time": time.time() + expires_time}
+        token = {"id": self.id, "expires_time": time.time() + expires_time}
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
     @classmethod
@@ -134,6 +148,7 @@ class User(Base):
         if user:
             if user.verify_password(password):
                 token = user.generate_token().decode("utf-8")
+                MyRedis().handle_redis_token(user.uid,token)
                 return {'token': token}
             raise ParamException("password err!")
         else:
@@ -171,7 +186,7 @@ class User(Base):
         file.save(filePath)  # 存储头像
 
         avatar: str = "/api/user/avatar/" + fileName
-        User.update(**{"avatar": avatar, "id": g.user.id})
+        User.update(**{"avatar": avatar, "uid": g.user.uid})
 
     def __repr__(self):
         return f"<{User.__name__} {self.username}>"
