@@ -4,10 +4,8 @@
 # @Software: PyCharm
 # @Desc: 头像路径
 import os
+import time
 from typing import AnyStr, NoReturn
-from .myLog import MyLog
-
-log = MyLog.get_log(__file__)
 
 
 def get_cwd(target: AnyStr) -> AnyStr:
@@ -58,6 +56,18 @@ def getExcelPath(file: AnyStr) -> AnyStr:
     return os.path.join(os.path.join(filePath, excel_path), file)
 
 
+def getBugFilePath(file: AnyStr) -> AnyStr:
+    filePathRoot = get_cwd("Files")
+    bugFile = os.path.join(filePathRoot, "BugFile")
+    if not os.path.exists(bugFile):
+        os.makedirs(bugFile)
+    local_date = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+    fileFinalPath = os.path.join(bugFile, local_date)
+    if not os.path.exists(fileFinalPath):
+        os.makedirs(fileFinalPath)
+    return os.path.join(fileFinalPath, file)
+
+
 def getCaseXlsx():
     """
     获取用例模板
@@ -68,4 +78,4 @@ def getCaseXlsx():
 
 
 if __name__ == '__main__':
-    delAvatar("/api/user/avatar/WZrDttjEPwafFwLvjFiS_casesHub.png")
+    print(getBugFilePath("haha.text"))

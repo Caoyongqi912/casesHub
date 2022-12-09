@@ -47,7 +47,7 @@ class Bug(Base):
     # bug v case  ==  n v 1
     caseID = db.Column(db.INTEGER, db.ForeignKey("cases.id", ondelete="SET NULL"), nullable=True, comment="所属用例")
     # 附件
-    file = db.relationship("FileModel", backref="bug_file", lazy="dynamic")
+    file = db.relationship("FileModel", backref="bug_file", lazy="dynamic", cascade="all, delete")
 
     def __init__(self, title: AnyStr, desc: AnyStr, bug_type: BugType, bug_level: BugLevel,
                  agentID: int, agentName: str,
@@ -77,7 +77,7 @@ class Bug(Base):
         return super(Bug, cls).update(**kwargs)
 
     @classmethod
-    def get_by_uid(cls, uid) -> Dict[str, Any]:
+    def get_bug_by_uid(cls, uid) -> Dict[str, Any]:
         """
         获取详情、要把附件给出去
         :param uid:

@@ -5,7 +5,7 @@
 # @Desc:
 from flask_restful import Resource
 
-from App import auth, UID, tokenAuth
+from App import auth, UID, auth
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Models.CaseModel.casePartModel import CasePart
@@ -15,7 +15,7 @@ from Utils.myRequestParseUtil import MyRequestParseUtil
 
 
 class CasePartController(Resource):
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         添加用例模块
@@ -27,7 +27,7 @@ class CasePartController(Resource):
         CasePart(**parse.parse_args()).save_()
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         通过casePartID 获取用例集
@@ -37,7 +37,7 @@ class CasePartController(Resource):
         parse.add(name=UID, required=True)
         return MyResponse.success(CasePart.get_by_uid(**parse.parse_args()))
 
-    @tokenAuth.login_required
+    @auth.login_required
     def put(self) -> MyResponse:
         """
         更新
@@ -49,7 +49,7 @@ class CasePartController(Resource):
         CasePart.update(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def delete(self) -> MyResponse:
         """
         删除
@@ -63,7 +63,7 @@ class CasePartController(Resource):
 
 class QueryCasePartController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
         return MyResponse.success(CasePart.page(**parse.page(CasePart)))

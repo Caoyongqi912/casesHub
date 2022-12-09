@@ -20,7 +20,7 @@ from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 auth: HTTPBasicAuth = HTTPBasicAuth()
-tokenAuth: HTTPTokenAuth = HTTPTokenAuth()
+# auth: HTTPTokenAuth = HTTPTokenAuth()
 siwa = SiwaDoc(title="CaseHubAPI", ui="redoc")
 limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
 

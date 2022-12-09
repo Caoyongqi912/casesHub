@@ -8,7 +8,7 @@ from flask import g
 from flask_restful import Resource
 from Models.CaseModel.caseExcel import CaseExcel
 from MyException import Api
-from App import auth, limiter, UID, tokenAuth
+from App import auth, limiter, UID, auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Enums import CaseTag, CaseLevel, CaseType
@@ -25,7 +25,7 @@ log = MyLog.get_log(__file__)
 
 class CaseController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         新增用例
@@ -48,7 +48,7 @@ class CaseController(Resource):
         Cases(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def put(self) -> MyResponse:
         """
         用例修改
@@ -69,7 +69,7 @@ class CaseController(Resource):
         Cases.update(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def delete(self) -> MyResponse:
         """
         通过id删除
@@ -80,7 +80,7 @@ class CaseController(Resource):
         Cases.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         通过caseID查
@@ -116,7 +116,7 @@ class UpdateExcel2CaseController(Resource):
 
 class QueryCaseController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         用例分页

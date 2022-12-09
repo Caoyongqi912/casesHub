@@ -37,9 +37,9 @@ class BugLevel(BaseEnum):
 
 
 class BugType(BaseEnum):
-    ONLINE = 1
-    OPTIMIZE = 2
-    FAIL = 3
+    ONLINE = 1  # 线上BUG
+    OPTIMIZE = 2  # 优化BUG
+    FAIL = 3  # 常规缺陷
 
 
 class BugStatus(BaseEnum):

@@ -70,10 +70,14 @@ class Base(db.Model):
         kwargs.setdefault("updater", g.user.id)  # 修改人
         target = cls.get_by_uid(kwargs.pop('uid'))
         c = cls.columns()
-        for k, v in kwargs.items():
-            if k in c:
-                setattr(target, k, v)
-        target.save(False)
+        try:
+            for k, v in kwargs.items():
+                if k in c:
+                    setattr(target, k, v)
+            target.save(False)
+        except Exception as e:
+            log.error(e)
+            raise ParamException(ResponseMsg.ERROR)
 
     @classmethod
     def all(cls) -> List:
@@ -124,7 +128,11 @@ class Base(db.Model):
         :param kwargs: cls field
         :return:
         """
-        return cls.query.filter_by(**kwargs).first()
+
+        rv = cls.query.filter_by(**kwargs).first()
+        if not rv:
+            raise ParamException(ResponseMsg.NOT_FOUND)
+        return rv
 
     @classmethod
     def verify_unique(cls, **kwargs) -> NoReturn:

@@ -6,7 +6,7 @@
 
 from flask_restful import Resource
 from MyException import Api
-from App import auth, tokenAuth, UID
+from App import auth, UID
 from App.UserController import userBP
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
@@ -16,7 +16,7 @@ from Models.DepartModel.departModel import Department
 
 class DepartmentController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     @is_admin
     def post(self) -> MyResponse:
         """
@@ -31,7 +31,7 @@ class DepartmentController(Resource):
         Department(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def put(self) -> MyResponse:
         """
         更新部门
@@ -46,7 +46,7 @@ class DepartmentController(Resource):
         Department.update(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         分页查询部门
@@ -56,7 +56,7 @@ class DepartmentController(Resource):
         parse.add(name=UID, required=True)
         return MyResponse.success(Department.get_by_uid(**parse.parse_args()))
 
-    @tokenAuth.login_required
+    @auth.login_required
     @is_admin
     def delete(self) -> MyResponse:
         """
@@ -71,7 +71,7 @@ class DepartmentController(Resource):
 
 class QueryDepartmentController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
         return MyResponse.success(Department.page(**parse.page(Department)))

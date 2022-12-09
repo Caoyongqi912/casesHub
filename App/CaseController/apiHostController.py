@@ -4,14 +4,14 @@ from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Models.ProjectModel.projectModel import Project
 from MyException import Api
-from App import auth, UID, tokenAuth
+from App import auth, UID, auth
 from Models.CaseModel.hostModel import HostModel
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
 
 class HostController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         添加host
@@ -25,7 +25,7 @@ class HostController(Resource):
 
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         get by Host ID
@@ -35,7 +35,7 @@ class HostController(Resource):
         parse.add(name=UID, required=True)
         return MyResponse.success(HostModel.get_by_uid(**parse.parse_args()))
 
-    @tokenAuth.login_required
+    @auth.login_required
     def put(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
@@ -44,7 +44,7 @@ class HostController(Resource):
         HostModel.update(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def delete(self) -> MyResponse:
         """
         id 删除
@@ -58,7 +58,7 @@ class HostController(Resource):
 
 class QueryHostController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name="projectID", required=False)

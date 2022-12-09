@@ -7,7 +7,7 @@ from flask_restful import Resource
 
 from Models.ProjectModel.projectModel import Project
 from MyException import Api
-from App import auth, UID, tokenAuth
+from App import auth, UID, auth
 from Comment.myException import MyResponse
 from App.CaseController import caseBP
 from Models.CaseModel.caseModel import Cases
@@ -17,7 +17,7 @@ from Utils.myRequestParseUtil import MyRequestParseUtil
 
 class PlatformController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         添加平台
@@ -29,7 +29,7 @@ class PlatformController(Resource):
         Platform(**parse.parse_args()).save()
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         get
@@ -39,7 +39,7 @@ class PlatformController(Resource):
         parse.add(name=UID, required=True)
         return MyResponse.success(Platform.get_by_uid(**parse.parse_args()))
 
-    @tokenAuth.login_required
+    @auth.login_required
     def delete(self) -> MyResponse:
         """
         :return: MyResponse
@@ -49,7 +49,7 @@ class PlatformController(Resource):
         Platform.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
-    @tokenAuth.login_required
+    @auth.login_required
     def put(self) -> MyResponse:
         """
         :return: MyResponse

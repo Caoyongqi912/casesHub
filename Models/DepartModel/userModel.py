@@ -148,7 +148,7 @@ class User(Base):
         if user:
             if user.verify_password(password):
                 token = user.generate_token().decode("utf-8")
-                MyRedis().handle_redis_token(user.uid,token)
+                # MyRedis().handle_redis_token(user.uid,token)
                 return {'token': token}
             raise ParamException("password err!")
         else:

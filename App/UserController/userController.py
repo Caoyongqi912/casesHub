@@ -6,7 +6,7 @@
 from typing import AnyStr
 from flask import g, request, Response
 from flask_restful import Resource, Api
-from App import auth, UID, tokenAuth
+from App import auth, UID
 from App.UserController import userBP
 from Comment.myException import MyResponse
 from Models.DepartModel.departModel import Department
@@ -34,7 +34,7 @@ class AddAdminController(Resource):
 
 class UserOptController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     @is_admin
     def get(self) -> MyResponse:
         """
@@ -67,6 +67,10 @@ class UserOptController(Resource):
     @auth.login_required
     @is_admin
     def delete(self) -> MyResponse:
+        """
+        删除
+        :return:
+        """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
         User.delete_by_id(**parse.parse_args())
@@ -75,7 +79,7 @@ class UserOptController(Resource):
 
 class GetTokenController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         get token
@@ -85,7 +89,7 @@ class GetTokenController(Resource):
 
 
 class QueryUserController(Resource):
-    @tokenAuth.login_required
+    @auth.login_required
     @is_admin
     def get(self) -> MyResponse:
         """
@@ -125,7 +129,7 @@ class UserController(Resource):
 
 class AvatarController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     async def post(self) -> MyResponse:
         """
         上传头像
@@ -138,7 +142,7 @@ class AvatarController(Resource):
 
 
 class GetAvatarController(Resource):
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self, filename: AnyStr) -> Response:
         """
         返回头像
@@ -153,7 +157,7 @@ class GetAvatarController(Resource):
 
 class SetPasswordController(Resource):
 
-    @tokenAuth.login_required
+    @auth.login_required
     def post(self) -> MyResponse:
         """
         用户修改密码
@@ -168,7 +172,7 @@ class SetPasswordController(Resource):
 
 
 class CurrentUserController(Resource):
-    @tokenAuth.login_required
+    @auth.login_required
     def get(self) -> MyResponse:
         """
         CurrentUserInfo

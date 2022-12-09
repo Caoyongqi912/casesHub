@@ -8,7 +8,7 @@ from flask_restful import Resource
 from Models.CaseModel.platformsModel import Platform
 from Models.ProjectModel.versions import Version
 from MyException import Api
-from App import auth, UID
+from App import auth, UID, auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Enums import BugLevel, BugType
@@ -50,7 +50,7 @@ class BugController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        return MyResponse.success(Bug.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(Bug.get_bug_by_uid(**parse.parse_args()))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -77,7 +77,8 @@ class BugController(Resource):
     @auth.login_required
     def delete(self) -> MyResponse:
         """
-        删除
+        Bug 校验是否是创建人以及管理 、
+        级联附件删除
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
@@ -86,6 +87,14 @@ class BugController(Resource):
         return MyResponse.success()
 
 
-#
+class QueryBugController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        return MyResponse.success(Bug.page(**parse.page(Bug)))
+
+
 api_script = Api(caseBP)
 api_script.add_resource(BugController, "/bug/opt")
+api_script.add_resource(QueryBugController, "/bug/query")
