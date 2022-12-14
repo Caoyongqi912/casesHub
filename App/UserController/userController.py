@@ -11,7 +11,6 @@ from App.UserController import userBP
 from Comment.myException import MyResponse
 from Models.DepartModel.departModel import Department
 from Models.DepartModel.userModel import User
-from Utils import getAvatarPath
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
 
@@ -127,34 +126,6 @@ class UserController(Resource):
         return MyResponse.success()
 
 
-class AvatarController(Resource):
-
-    @auth.login_required
-    async def post(self) -> MyResponse:
-        """
-        上传头像
-        :return:MyResponse
-        """
-        from werkzeug.datastructures import FileStorage
-        file: FileStorage = request.files.get("avatar")
-        await User.save_or_update_avatar(file)
-        return MyResponse.success()
-
-
-class GetAvatarController(Resource):
-    @auth.login_required
-    def get(self, filename: AnyStr) -> Response:
-        """
-        返回头像
-        :param filename: 头像名
-        :return: Response
-        """
-        path: AnyStr = getAvatarPath(filename)
-        with open(path, "rb") as f:
-            avatar: AnyStr = f.read()
-        return Response(avatar, mimetype="image/jpeg")
-
-
 class SetPasswordController(Resource):
 
     @auth.login_required
@@ -179,7 +150,7 @@ class CurrentUserController(Resource):
         :return: MyResponse
         """
         from flask import g
-        return MyResponse.success(User.get(g.user.id))
+        return MyResponse.success(User.get_by_uid(g.user.uid))
 
 
 class MoHuSearch(Resource):
@@ -206,5 +177,3 @@ api_script.add_resource(CurrentUserController, '/current')
 api_script.add_resource(QueryUserController, "/query")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")
-api_script.add_resource(AvatarController, "/avatar")
-api_script.add_resource(GetAvatarController, "/avatar/<string:filename>")

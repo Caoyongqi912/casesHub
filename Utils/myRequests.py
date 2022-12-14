@@ -63,10 +63,10 @@ class MyRequest:
             log.info(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
             # 如果存在校验
             verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
+            self._writeResponse(step.get("step"), response, verifyInfo)
             if flag is True:
                 # 如果需要提取参数
                 self._get_extract(response, step.get("extract"))
-                self._writeResponse(step.get("step"), response, verifyInfo)
             else:
                 STATUS = 'FAIL'
                 break
@@ -161,7 +161,7 @@ class MyRequest:
         }
         self.responseInfo.append(info)
 
-    def _writeResult(self, interfaceID: int, responseInfo: List[Dict[str, Any]], status: str,
+    def _writeResult(self, interfaceID: int | str, responseInfo: List[Dict[str, Any]], status: str,
                      useTime: Union[str, float, int]) -> NoReturn:
         """
         测试结果入库
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     from Models.CaseModel.hostModel import HostModel
     from Models.ProjectModel.projectModel import Project
 
-    v: VariableModel = VariableModel.get(3)
+    v: VariableModel = VariableModel.get(1)
     u = User.get(1)
     inter = InterfaceModel.get(1)
     hostName = HostModel.get(1).host

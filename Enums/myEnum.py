@@ -60,6 +60,12 @@ class UserTag(BaseEnum):
     ADMIN = 0
 
 
+class FileEnum(BaseEnum):
+    AVATAR = "avatar"
+    BUG = "bug"
+    Excel = "excel"
+
+
 EnumDict = {
     "case_level": CaseLevel,
     "case_tag": CaseTag,

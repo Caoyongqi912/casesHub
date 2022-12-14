@@ -6,7 +6,6 @@
 
 from flask import g
 from flask_restful import Resource
-from Models.CaseModel.caseExcel import CaseExcel
 from MyException import Api
 from App import auth, limiter, UID, auth
 from App.CaseController import caseBP
@@ -91,27 +90,27 @@ class CaseController(Resource):
         return MyResponse.success(Cases.get_by_uid(**parse.parse_args()))
 
 
-class UpdateExcel2CaseController(Resource):
-
-    @auth.login_required
-    @limiter.limit("1/minute")  # 一分钟一次
-    def post(self) -> MyResponse:
-        """
-        excel文件录入sql
-        :return:
-        """
-        parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="projectID", type=int, required=True, isExist=Project)
-        parse.add(name="fileID", type=str, required=True)
-        fileID: str = parse.parse_args().get("fileID")
-        file = CaseExcel.get_by_uid(fileID)
-        projectID: int = parse.parse_args().get("projectID")
-        filePath: str = file.filePath
-        # from celery_task.tasks import caseExcelWrite2Sql
-        # caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)
-        from Utils.myExcel import MyExcel
-        MyExcel(filePath).sheetReader(projectID, g.user.id)
-        return MyResponse.success()
+# class UpdateExcel2CaseController(Resource):
+#
+#     @auth.login_required
+#     @limiter.limit("1/minute")  # 一分钟一次
+#     def post(self) -> MyResponse:
+#         """
+#         excel文件录入sql
+#         :return:
+#         """
+#         parse: MyRequestParseUtil = MyRequestParseUtil()
+#         parse.add(name="projectID", type=int, required=True, isExist=Project)
+#         parse.add(name="fileID", type=str, required=True)
+#         fileID: str = parse.parse_args().get("fileID")
+#         file = CaseExcel.get_by_uid(fileID)
+#         projectID: int = parse.parse_args().get("projectID")
+#         filePath: str = file.filePath
+#         # from celery_task.tasks import caseExcelWrite2Sql
+#         # caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)
+#         from Utils.myExcel import MyExcel
+#         MyExcel(filePath).sheetReader(projectID, g.user.id)
+#         return MyResponse.success()
 
 
 class QueryCaseController(Resource):
@@ -129,4 +128,3 @@ class QueryCaseController(Resource):
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
 api_script.add_resource(QueryCaseController, "/query")
-api_script.add_resource(UpdateExcel2CaseController, "/upload/excel")

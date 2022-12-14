@@ -6,6 +6,8 @@
 
 from typing import Dict, NoReturn, TypeVar, List
 from werkzeug.datastructures import FileStorage
+
+from Models.CaseModel.fileModel import FileModel
 from Models.base import Base
 from App import db
 from typing import AnyStr
@@ -13,7 +15,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
 from Enums import Gender, UserTag, IntEnum, ResponseMsg
-from Utils import MyLog, delAvatar, simpleUser
+from Utils import MyLog, simpleUser
 from Comment import MyRedis
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
@@ -164,29 +166,6 @@ class User(Base):
         res = super(User, User).to_json(obj)
         res.pop("password")
         return res
-
-    @staticmethod
-    async def save_or_update_avatar(file: FileStorage) -> NoReturn:
-        """
-        存储头像
-        更新 delAvatar 删除本地原头像
-        """
-        from faker import Faker
-        from Utils import getAvatarPath
-        from werkzeug.utils import secure_filename
-        from flask import g
-        f: Faker = Faker()
-
-        user: User = g.user
-        if user.avatar:
-            delAvatar(user.avatar)
-
-        fileName: AnyStr = f.pystr() + '_' + secure_filename(file.filename)  # 头像名称
-        filePath: AnyStr = getAvatarPath(fileName)  # 头像路径
-        file.save(filePath)  # 存储头像
-
-        avatar: str = "/api/user/avatar/" + fileName
-        User.update(**{"avatar": avatar, "uid": g.user.uid})
 
     def __repr__(self):
         return f"<{User.__name__} {self.username}>"

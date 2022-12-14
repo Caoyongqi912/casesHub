@@ -23,6 +23,10 @@ class MyResponse:
         return make_response(code, None, ResponseMsg.ERROR)
 
     @staticmethod
+    def req_err() -> make_response:
+        return make_response(ResponseCode.PARAMS_ERROR, None, ResponseMsg.REQUEST_BODY_ERROR)
+
+    @staticmethod
     def server_error() -> Dict:
         return {"code": ResponseCode.SERVER_ERROR, "data": None, "msg": ResponseMsg.ERROR}
 

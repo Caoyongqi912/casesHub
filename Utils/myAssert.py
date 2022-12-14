@@ -3,6 +3,7 @@
 # @File : myAssert.py 
 # @Software: PyCharm
 # @Desc:
+from json import JSONDecodeError
 from typing import Any, Dict, List
 from requests import Response
 from Utils import MyLog
@@ -23,6 +24,7 @@ class MyAssert:
         """
         flag = True
         assert_result = []
+
         for _ in jps:
 
             jp_str = _['jp']
@@ -32,7 +34,12 @@ class MyAssert:
             log.info(f"jsonpath -> [{jp_str}]")
             log.info(f"option   -> [{option}]")
             log.info(f"expect   -> [{expect}]")
-            actual: Any = MyJsonPath(response=self.response.json(), expr=jp_str).value
+            try:
+                actual: Any = MyJsonPath(response=self.response.json(), expr=jp_str).value
+            except JSONDecodeError as e:
+                log.error(repr(e))
+                flag = False
+                return assert_result, flag
             log.info(f"actual   -> [{actual}]")
             try:
                 if option == "==":

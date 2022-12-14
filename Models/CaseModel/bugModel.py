@@ -3,7 +3,7 @@
 # @File : bugModel.py
 # @Software: PyCharm
 # @Desc: bug实体
-from typing import AnyStr, NoReturn, Dict, Any
+from typing import AnyStr, NoReturn, Dict, Any, List
 
 from flask import g
 
@@ -35,7 +35,7 @@ class Bug(Base):
     bug_type = db.Column(IntEnum(BugType), comment='bug类型')
     bug_level = db.Column(IntEnum(BugLevel), comment="BUG等级")
     bug_status = db.Column(IntEnum(BugStatus), comment="BUG状态")
-
+    files = db.Column(db.JSON, nullable=True, comment="附件uid列")
     mark = db.Column(db.String(100), nullable=True, comment="BUG备注")
 
     # bug与platform 是多对一关系、平台删除、字段置为空、可无平台
@@ -46,13 +46,12 @@ class Bug(Base):
                           comment="所属版本")
     # bug v case  ==  n v 1
     caseID = db.Column(db.INTEGER, db.ForeignKey("cases.id", ondelete="SET NULL"), nullable=True, comment="所属用例")
-    # 附件
-    file = db.relationship("FileModel", backref="bug_file", lazy="dynamic", cascade="all, delete")
 
     def __init__(self, title: AnyStr, desc: AnyStr, bug_type: BugType, bug_level: BugLevel,
                  agentID: int, agentName: str,
                  versionID: int = None, caseID: int = None, tag: str = None,
-                 bug_status: BugStatus = BugStatus.OPEN, mark: AnyStr = None, platformID: int = None
+                 bug_status: BugStatus = BugStatus.OPEN, mark: AnyStr = None, platformID: int = None,
+                 files: List[str] = None
                  ):
         self.title = title
         self.desc = desc
@@ -68,6 +67,7 @@ class Bug(Base):
         self.bug_status = bug_status
         self.mark = mark
         self.platformID = platformID
+        self.files = files
 
     @classmethod
     def update(cls, **kwargs):
@@ -77,18 +77,6 @@ class Bug(Base):
         return super(Bug, cls).update(**kwargs)
 
     @classmethod
-    def get_bug_by_uid(cls, uid) -> Dict[str, Any]:
-        """
-        获取详情、要把附件给出去
-        :param uid:
-        :return:
-        """
-        target: Bug = super(Bug, cls).get_by_uid(uid)
-        _ = target.to_json(target)
-        _["files"] = [f.to_json(f) for f in target.file.all()]
-        return _
-
-    @classmethod
     def delete_by_id(cls, uid: str) -> NoReturn:
         """
         判断是否是创建者或者管理员
@@ -96,6 +84,10 @@ class Bug(Base):
         """
         target: Bug = cls.get_by_uid(uid)
         if g.user.isAdmin or g.user.id == target.creatorID:
+            # 附件级联删除
+            if target.files:
+                for _ in target.files:
+                    FileModel.delete_by_id(_)
             target.delete()
         else:
             raise AuthException()
