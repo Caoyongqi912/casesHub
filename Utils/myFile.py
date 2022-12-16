@@ -1,10 +1,9 @@
 # @Time : 2022/7/13 20:44 
 # @Author : cyq
-# @File : myfile.py
+# @File : myFile.py
 # @Software: PyCharm
 # @Desc: 头像路径
 import os
-import time
 from typing import AnyStr, NoReturn
 
 from flask import g

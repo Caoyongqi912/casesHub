@@ -3,7 +3,9 @@
 # @File : _types.py 
 # @Software: PyCharm
 # @Desc:
-from typing import Union, Tuple, Callable, Mapping, Optional, Sequence, List
+from typing import Union, Tuple, Callable, Mapping, Optional, Sequence, List, Any
+
+from typing.io import IO
 
 """
 Optional 可选类型 参数除了给定的类型外还可以是None
@@ -15,24 +17,42 @@ Union 多种类型
 
 """
 
+PrimitiveData = Optional[Union[str, int, float, bool]]
 
-def demo(arg: Union[int, None] = 1):
-    return arg
 
+QueryParamTypes = Union[
+    "QueryParams",
+    Mapping[str, Union[PrimitiveData, Sequence[PrimitiveData]]],
+    List[Tuple[str, PrimitiveData]],
+    Tuple[Tuple[str, PrimitiveData], ...],
+    str,
+    bytes,
+]
+
+HeaderTypes = Union[
+    "Headers",
+    Mapping[str, str],
+    Mapping[bytes, bytes],
+    Sequence[Tuple[str, str]],
+    Sequence[Tuple[bytes, bytes]],
+]
+RequestData = Mapping[str, Any]
+
+FileContent = Union[IO[bytes], bytes, str]
+FileTypes = Union[
+    # file (or bytes)
+    FileContent,
+    # (filename, file (or bytes))
+    Tuple[Optional[str], FileContent],
+    # (filename, file (or bytes), content_type)
+    Tuple[Optional[str], FileContent, Optional[str]],
+    # (filename, file (or bytes), content_type, headers)
+    Tuple[Optional[str], FileContent, Optional[str], Mapping[str, str]],
+]
 
 AuthTypes = Union[
-    Mapping[str,str],
+    Mapping[str, str],
     Callable[["Request"], "Request"],
     "Auth",
 ]
 
-QueryParamTypes = Union[
-    "QueryParams",
-    Mapping[str, Union[Optional[Union[str, int, float, bool]], Sequence[Optional[Union[str, int, float, bool]]]]],
-    List[Tuple[str, Optional[Union[str, int, float, bool]]]],
-    Tuple[Tuple[str, Optional[Union[str, int, float, bool]]], ...],
-    str,
-    bytes,
-]
-if __name__ == '__main__':
-    print( demo())

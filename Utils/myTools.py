@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Mapping
 from copy import deepcopy
 
 
@@ -59,7 +59,7 @@ class MyTools:
         return _.strip(" or ")
 
     @staticmethod
-    def getValue(extracts: List[Dict[str, Any]], target: str) -> Any:
+    def getValue(extracts: List[Mapping[str, Any]], target: str) -> Any:
         """
         {{value}} -> value
         :param target:
@@ -79,7 +79,7 @@ class MyTools:
             return target
 
     @staticmethod
-    def auth(extracts: List[Dict[str, Any]] | None = None, authBody: Dict[str, str] | None = None) -> Dict | None:
+    def auth(extracts: List[Mapping[str, Any]] | None = None, authBody: Dict[str, str] | None = None) -> Dict | None:
         """
         处理auth 请求
         :param extracts: [{token:xxx}]
@@ -111,8 +111,3 @@ class MyTools:
             else:
                 left = mid + 1
         return False
-
-
-
-
-

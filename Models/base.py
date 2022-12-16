@@ -122,6 +122,19 @@ class Base(db.Model):
         return rv
 
     @classmethod
+    def query_by_field(cls, **kwargs):
+        """
+        通过字段查询
+        :param kwargs: cls field
+        :return:
+        """
+
+        rvs = cls.query.filter_by(**kwargs).all()
+        if not rvs:
+            raise ParamException(ResponseMsg.NOT_FOUND)
+        return rvs
+
+    @classmethod
     def get_by_field(cls, **kwargs):
         """
         通过字段查询
