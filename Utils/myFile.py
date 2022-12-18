@@ -51,21 +51,41 @@ class MyFile:
         :return:
         """
         fileName = UUID().getUId
-        if T == FileEnum.AVATAR:
-            verify_dir(MyFile.AVATAR)
-            target = os.path.join(MyFile.AVATAR, fileName)
-        elif T == FileEnum.Excel:
-            verify_dir(MyFile.EXCEL)
-            target = os.path.join(MyFile.EXCEL, fileName)
-        elif T == FileEnum.BUG:
-            verify_dir(MyFile.BUG)
-            target = os.path.join(MyFile.BUG, fileName)
-            MyExcel(target).sheetReader(pid, g.user.id)
+        opt = {
+            FileEnum.AVATAR: MyFile._save_avatar,
+            FileEnum.BUG: MyFile._save_bug,
+        }
+        if pid:
+            return MyFile._save_excel(file, fileName, pid)
         else:
-            raise Exception
+            return opt[T.value](file, fileName)
+
+    @staticmethod
+    def _save_avatar(file: FileStorage, fileName: str) -> FileModel:
+        verify_dir(MyFile.AVATAR)
+        target = os.path.join(MyFile.AVATAR, fileName)
         file.save(target)
         f = FileModel(fileName, file.mimetype, target)
         f.save()
+        return f
+
+    @staticmethod
+    def _save_bug(file: FileStorage, fileName: str) -> FileModel:
+        verify_dir(MyFile.BUG)
+        target = os.path.join(MyFile.AVATAR, fileName)
+        file.save(target)
+        f = FileModel(fileName, file.mimetype, target)
+        f.save()
+        return f
+
+    @staticmethod
+    def _save_excel(file: FileStorage, fileName: str, pid) -> FileModel:
+        verify_dir(MyFile.EXCEL)
+        target = os.path.join(MyFile.AVATAR, fileName)
+        file.save(target)
+        f = FileModel(fileName, file.mimetype, target)
+        f.save()
+        MyExcel(target).sheetReader(pid, g.user.id)
         return f
 
     @staticmethod
