@@ -20,7 +20,7 @@ class Api(_Api):
         :param e: the raised Exception object
         :return:MyException
         """
-        log.error(e)
+        log.error(repr(e))
         if isinstance(e, AuthException | ParamException):
             return e
         if isinstance(e, RateLimitExceeded):

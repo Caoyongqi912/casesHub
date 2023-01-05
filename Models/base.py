@@ -160,17 +160,16 @@ class Base(db.Model):
 
     @classmethod
     @pageSerialize
-    def page(cls, pageSize: int, current: int, sort: Dict = None, filter_key: Dict = None) -> Pagination:
+    def page(cls, pageSize: int, current: int, sort: Dict = None, **kwargs) -> Pagination:
         """
         paginate
         如果指定sort排序 则走sort  否则 默认 create_time.desc()
-        :param filter_key:  filter_by(**filter_key)
         :param pageSize:    pageSize
         :param current:     current
         :param sort:        order_by(sort)  'descend' or "ascend'
         :return:            Pagination
         """
-        searchData: List = getSearchData(cls, filter_key)
+        searchData: List = getSearchData(cls, **kwargs)
         sortList: List = getSortData(cls, sort)
         if sortList:
             items = db.session.query(cls).filter(or_(*searchData)) \
@@ -236,18 +235,19 @@ class Base(db.Model):
         return res
 
 
-def getSearchData(cls, kw: Dict[str, Any] = None) -> List:
+def getSearchData(cls, **kwargs) -> List:
     """
     从对应实体类里获取 数据成列
     :param cls: 目标实体
-    :param kw:  {name:xxx}
+    :param kwargs:  {name:xxx}
     :return: [] | [cls]
     """
     searchData = []
-    if not kw:
+    if not kwargs:
         return searchData
-    for k, v in kw.items():
-        searchData.append(getattr(cls, k) == v)
+    for k, v in kwargs.items():
+        if getattr(cls, k):
+            searchData.append(getattr(cls, k) == v)
     return searchData
 
 

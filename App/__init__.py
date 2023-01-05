@@ -11,6 +11,7 @@ from flask_caching import Cache
 from flask_cors import CORS
 from flask_limiter.util import get_remote_address
 from flask_sqlalchemy import SQLAlchemy
+from flask_mongoengine import MongoEngine
 from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
@@ -19,11 +20,11 @@ from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
 
 catch: Cache = Cache()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
+mg: MongoEngine = MongoEngine()
 auth: HTTPBasicAuth = HTTPBasicAuth()
 # auth: HTTPTokenAuth = HTTPTokenAuth()
 siwa = SiwaDoc(title="CaseHubAPI", ui="redoc")
 limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
-
 UID = "uid"
 
 
@@ -45,6 +46,7 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     app.config["BABEL_DEFAULT_LOCALE"] = "zh"
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
+    mg.init_app(app)  # mongodb
     app.json_encoder = JSONEncoder  # json
     siwa.init_app(app)  # swagger
     limiter.init_app(app)  # 接口频率限制

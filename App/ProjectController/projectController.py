@@ -10,7 +10,7 @@ from flask_restful import Resource
 from Models.CaseModel.hostModel import HostModel
 from MyException import Api
 from App.ProjectController import proBP
-from App import auth, siwa
+from App import auth, siwa, UID
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Models.CaseModel.caseModel import Cases
@@ -59,16 +59,16 @@ class ProjectController(Resource):
         return MyResponse.success(Project.page(**parse.page(cls=Project)))
 
     @auth.login_required
-    @siwa.doc(body=UpdateProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
+    # @siwa.doc(body=UpdateProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def put(self) -> MyResponse:
         """
         维护
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
-        parse.add(name="name", type=str, required=False)
-        parse.add(name="desc", type=str, required=False)
+        parse.add(name=UID, required=True)
+        parse.add(name="name", required=False)
+        parse.add(name="desc", required=False)
         Project.update(**parse.parse_args())
         return MyResponse.success()
 

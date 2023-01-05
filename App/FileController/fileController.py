@@ -11,6 +11,7 @@ from App.FileController import fileBp
 from Comment.myResponse import MyResponse
 from Enums.myEnum import FileEnum
 from Models.CaseModel.fileModel import FileModel
+from Models.FileModel.fileDB import FileDB
 from Models.ProjectModel.projectModel import Project
 from MyException import Api
 from Utils.myFile import MyFile
@@ -90,9 +91,21 @@ class Excel2CaseController(Resource):
 
 class AsyncClass(Resource):
 
-    async def get(self):
-        await asyncio.sleep(10)
+    def post(self):
+        file: FileStorage = request.files.get("file")
+        f = FileDB()
+        f.file = file
+        f.name = file.name
+        f.type = file.mimetype
+        f.save()
         return MyResponse.success()
+
+    def get(self):
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name="id", required=True)
+        f = FileDB.objects(**parse.parse_args()).first()
+
+        return Response(MyFile.reader(f.file), mimetype=f.fileType)
 
 
 api_script = Api(fileBp)

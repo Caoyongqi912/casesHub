@@ -79,7 +79,7 @@ class Project(Base):
         :param kwargs: Project
         """
         from flask import g
-        target = cls.get(kwargs.get('id'), f"{cls.__name__} id")
+        target = cls.get_by_uid(kwargs.get('uid'))
         if not g.user.isAdmin and not g.user.id == target.adminID:
             raise AuthException()
         return super(Project, Project).update(**kwargs)

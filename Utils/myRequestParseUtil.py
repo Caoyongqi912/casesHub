@@ -63,14 +63,13 @@ class MyRequestParseUtil:
             kwargs.setdefault("required", False)
         self.args.append(kwargs)
 
-    def page(self, cls: Generic[clsType]) -> Dict[str, int | Dict]:
+    def page(self, cls: Generic[clsType]) -> Dict[str, Any]:
         """
         分页参数校验
         pageSize ： if request get pageSize  else 10
         current ： if request get current  else 1
         sort : if request get sort  else None
         like select * from cls order by (sort)
-        filter_key : __verify_filterKey
         :param cls: 目标类
         :return: Dict
         """
@@ -78,14 +77,13 @@ class MyRequestParseUtil:
         pageSize = body.pop("pageSize") if body.get("pageSize") else 10
         current = body.pop("current") if body.get("current") else 1
         sort = body.pop("sort") if body.get("sort") else None
-        filter_key = body.pop("filter") if body.get("filter") else None
 
         pageInfo = {
             "pageSize": self._verify_pageSize(pageSize),
             "current": self._verify_current(current),
             "sort": self._verify_sort(cls, sort),
-            "filter_key": self._verify_filterKey(cls, filter_key)
         }
+        pageInfo.update(body)
         return pageInfo
 
     def parse_args(self) -> Dict:
@@ -223,37 +221,3 @@ class MyRequestParseUtil:
             return sort
         else:
             return sort
-
-    @staticmethod
-    def _verify_filterKey(cls: Generic[clsType], keys: Optional[str] = None) -> Optional[Dict[str, Any]]:
-        """
-        request get tag=1&gender=0 => {tag:1,gender:0}
-        verify: pop key
-        1.key not  in cls.__table__.columns
-        2.value == "" or None
-        :param keys:  Optional[str] = None  {"name":"p1","name":"p2"}
-        :param cls:  Generic[clsType]
-        :return: Optional[Dict[str,Any]]
-        """
-        if isinstance(keys, str):
-            try:
-                keys = json.loads(keys)
-            except JSONDecodeError as e:
-                log.error(repr(e))
-                raise ParamException(ResponseMsg.error_param("filter"))
-
-                pass
-
-            columns = cls.columns()
-            from copy import deepcopy
-            deepKEY = deepcopy(keys)
-            for k, v in deepKEY.items():
-                if k not in columns or v == "":
-                    keys.pop(k)
-
-            # 枚举转化
-            if cls is Cases:
-                return Cases.column2Enum(keys)
-            return keys
-        else:
-            return None
