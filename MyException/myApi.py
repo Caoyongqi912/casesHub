@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from flask_limiter import RateLimitExceeded
-from flask_restful import Api as _Api
+from flask_restplus import Api as _Api
 from werkzeug.exceptions import HTTPException
 from Comment.myException import MyException, AuthException, ParamException
 from Utils import MyLog
