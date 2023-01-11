@@ -59,6 +59,27 @@ class MyAssert:
 
         return assert_result, flag
 
+    def _option(self, T: str, expect: Any, actual: Any):
+        """
+        断言配置
+        :param T: 配置类型
+        :param expect: 预期值
+        :param actual: 实际值
+        :return:
+        """
+        _ = {
+            "==": self.assertEqual,
+            "!=": self.assertUnEqual,
+            ">": self.assertGreater,
+            "<": self.assertLess,
+            ">=": self.assertEqualGreater,
+            "<=": self.assertEqualLess,
+            "in": self.assertIn,
+            "notIn": self.assertNotIn
+        }
+
+        return _[T](expect, actual)
+
     @staticmethod
     def assertEqual(expect: Any, actual: Any):
         """
@@ -145,18 +166,3 @@ class MyAssert:
         """
 
         assert expect <= actual
-
-    def _option(self, T: str, expect: Any, actual: Any):
-
-        _ = {
-            "==": self.assertEqual,
-            "!=": self.assertUnEqual,
-            ">": self.assertGreater,
-            "<": self.assertLess,
-            ">=": self.assertEqualGreater,
-            "<=": self.assertEqualLess,
-            "in": self.assertIn,
-            "notIn": self.assertNotIn
-        }
-
-        return _[T](expect, actual)

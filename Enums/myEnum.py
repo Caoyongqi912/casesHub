@@ -54,9 +54,9 @@ class Gender(BaseEnum):
 
 
 class UserTag(BaseEnum):
-    QA = 1
-    PR = 2
-    DEV = 3
+    P1 = 1
+    P2 = 2
+    P3 = 3
     ADMIN = 0
 
 

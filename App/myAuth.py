@@ -9,7 +9,7 @@ from flask import g
 from App import auth
 from Comment import MyRedis
 from Comment.myException import AuthException
-from Models.DepartModel.userModel import User
+from Models.UserModel.userModel import User
 
 
 # @auth.verify_token

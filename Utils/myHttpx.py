@@ -14,7 +14,7 @@ from sqlalchemy import Column
 
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Models.CaseModel.variableModel import VariableModel
-from Models.DepartModel.userModel import User
+from Models.UserModel.userModel import User
 from Utils import MyLog, MyTools, QueryParamTypes, FileTypes, HeaderTypes, RequestData, AuthTypes
 from Utils.myAssert import MyAssert
 from Utils.myJsonpath import MyJsonPath

@@ -11,6 +11,7 @@ from sqlalchemy import asc, Column, or_
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
+from Enums.baseEnum import BaseEnum
 from Utils import MyLog, UUID, pageSerialize, MyTools
 from Comment.myException import MyException, ParamException
 
@@ -19,10 +20,10 @@ log = MyLog.get_log(__file__)
 
 class Base(db.Model):
     __abstract__ = True
-    id: Column = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid: Column = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time: Column = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
-    update_time: Column = db.Column(db.DATETIME, nullable=True, onupdate=datetime.now, comment="修改时间")
+    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid: str = db.Column(db.String(50), index=True, comment="唯一标识")
+    create_time: str = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
+    update_time: str = db.Column(db.DATETIME, nullable=True, onupdate=datetime.now, comment="修改时间")
 
     def save(self, new: bool = True) -> NoReturn:
         """
@@ -63,8 +64,8 @@ class Base(db.Model):
     @classmethod
     def update(cls, **kwargs) -> NoReturn:
         """
-        id
-        通过kwargs.get_by_uid('id') 获得实例 修改
+
+        通过kwargs.get_by_uid() 获得实例 修改
         """
         from flask import g
         kwargs.setdefault("updater", g.user.id)  # 修改人
@@ -76,7 +77,7 @@ class Base(db.Model):
                     setattr(target, k, v)
             target.save(False)
         except Exception as e:
-            log.error(e)
+            log.error(repr(e))
             raise ParamException(ResponseMsg.ERROR)
 
     @classmethod
@@ -246,7 +247,7 @@ def getSearchData(cls, **kwargs) -> List:
     if not kwargs:
         return searchData
     for k, v in kwargs.items():
-        if getattr(cls, k):
+        if hasattr(cls, k):
             searchData.append(getattr(cls, k) == v)
     return searchData
 

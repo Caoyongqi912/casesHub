@@ -15,7 +15,7 @@ from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
 from Enums import Gender, UserTag, IntEnum, ResponseMsg
-from Utils import MyLog, simpleUser
+from Utils import MyLog, simpleUser, MyTools
 from Comment import MyRedis
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
@@ -32,27 +32,29 @@ class User(Base):
     password: str = db.Column(db.String(200), comment="密码")
     email: str = db.Column(db.String(40), unique=True, comment="邮箱")
     gender: Gender = db.Column(IntEnum(Gender), comment="性别")
-    tag: UserTag = db.Column(IntEnum(UserTag), comment="标签")
     avatar: str = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin: bool = db.Column(db.Boolean, default=False, comment="管理")
     departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
+    departmentName: str = db.Column(db.String(20), nullable=True, comment="所属部门名称")
+    tagName: str = db.Column(db.String(20), nullable=True, comment="对应标签名称")
 
     def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
-                 tag: UserTag = None, isAdmin: bool = False,
+                 tagName:str = None, isAdmin: bool = False,
                  departmentID: int = None,
+                 departmentName: str = None,
                  password: str = None):
         self.username: str = username
-        self.email: str = self.username + self._mail
+        self.email: str = MyTools.pinyin(self.username) + self._mail
         self.gender: Gender = gender
         self.phone: str = phone
-        self.tag: UserTag = tag
+        self.tagName = tagName
         self.isAdmin: bool = isAdmin
         if password:
             self.hash_password(password)
         else:
             self.hash_password(username)
-
         self.departmentID: int = departmentID
+        self.departmentName: str = departmentName
 
     def addAdmin(self) -> NoReturn:
         """
@@ -126,7 +128,7 @@ class User(Base):
             data: Dict[str, str | int] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
             return cls.query.get(data['id'])
         except Exception as e:
-            log.error(e)
+            log.error(repr(e))
             raise AuthException()
 
     def verify_password(self, password: AnyStr) -> bool:

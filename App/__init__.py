@@ -16,7 +16,7 @@ from Configs.projectConfig import config
 from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
 from flask_siwadoc import SiwaDoc
-from flask_restplus import Api
+from flask_restful import Api
 from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
 
 catch: Cache = Cache()
@@ -30,7 +30,7 @@ api = Api()
 UID = "uid"
 
 
-def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
+def create_app(configName: AnyStr = "default", printSql: bool = True) -> Flask:
     """
     初始化app
     定义环境配置

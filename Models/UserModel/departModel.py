@@ -53,3 +53,14 @@ class Department(Base):
 
     def __repr__(self):
         return f"<{Department.__name__} {self.name}>"
+
+
+class UserTag(Base):
+    __tablename__ = "userTag"
+    name = db.Column(db.String(20), unique=True, comment="标签名称")
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def __repr__(self):
+        return f"<{UserTag.__name__} {self.name}>"

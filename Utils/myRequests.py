@@ -16,7 +16,7 @@ from Comment.myException import ParamException
 from Enums import ResponseMsg
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Models.CaseModel.variableModel import VariableModel
-from Models.DepartModel.userModel import User
+from Models.UserModel.userModel import User
 from Utils import MyLog, MyTools, AuthTypes, QueryParamTypes, HeaderTypes, RequestData, FileTypes
 from Utils.myAssert import MyAssert
 from Utils.myJsonpath import MyJsonPath
@@ -127,15 +127,15 @@ class MyRequest:
                 raise ParamException(ResponseMsg.error_param(method))
             return self.response
         except exceptions.Timeout as e:
-            log.error(e)
+            log,error(repr(e))
         except exceptions.InvalidURL as e:
-            log.error(e)
+            log,error(repr(e))
         except exceptions.HTTPError as e:
-            log.error(e)
+            log,error(repr(e))
         except exceptions.ConnectionError as e:
-            log.error(e)
+            log,error(repr(e))
         except Exception as e:
-            log.error(e)
+            log,error(repr(e))
             log.error(self.response.text)
             raise
 

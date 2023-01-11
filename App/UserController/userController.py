@@ -3,14 +3,17 @@
 # @File : userController.py
 # @Software: PyCharm
 # @Desc: 注册controller
-from typing import AnyStr
-from flask import g, request, Response
+from flask import g
 from flask_restful import Resource, Api
 from App import auth, UID
 from App.UserController import userBP
 from Comment.myException import MyResponse
-from Models.DepartModel.departModel import Department
-from Models.DepartModel.userModel import User
+from Models import CaseModel
+from Models.CaseModel.caseModel import Cases
+from Models.UserModel.departModel import Department, UserTag
+from Models.ProjectModel.projectModel import Project
+
+from Models.UserModel.userModel import User
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
 
@@ -58,9 +61,31 @@ class UserOptController(Resource):
         parse.add(name="username", unique=User, required=True)
         parse.add(name="phone", unique=User, required=True)
         parse.add(name="gender", enum=Gender, required=True)
-        parse.add(name="tag", enum=UserTag, required=True)
+        parse.add(name="tagName", required=True)
         parse.add(name="departmentID", type=int, isExist=Department, required=True)
         User(**parse.parse_args()).addUser()
+        return MyResponse.success()
+
+    @auth.login_required
+    @is_admin
+    def put(self) -> MyResponse:
+        """
+        管理員维护用戶
+        :return: jsonify
+        """
+
+        from Enums.myEnum import Gender, UserTag
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name=UID, required=True)
+        parse.add(name="username", required=False)
+        parse.add(name="phone", required=False)
+        parse.add(name="gender", enum=Gender, required=False)
+        parse.add(name="tagName", required=False)
+        parse.add(name="departmentID", type=int, required=False)
+        putInfo = parse.parse_args()
+        dip: Department = Department.get(putInfo.get("departmentID"))
+        putInfo["departmentName"] = dip.name
+        User.update(**putInfo)
         return MyResponse.success()
 
     @auth.login_required
@@ -115,15 +140,23 @@ class LoginController(Resource):
 class UserController(Resource):
 
     @auth.login_required
-    def post(self) -> MyResponse:
+    def get(self) -> MyResponse:
         """
-        修改密码
         :return: MyResponse
         """
-        parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="password", type=str, required=True)
-        g.user.hash_password(parse.parse_args().get("password"))
-        return MyResponse.success()
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name=UID, required=True)
+        user: User = User.get_by_uid(**parse.parse_args())
+        userProject = user.project
+        cases = Cases.query_by_field(creator=user.id)
+
+        return MyResponse.success(
+            {
+                "user": user,
+                "project": userProject,
+                "case": cases
+            }
+        )
 
 
 class SetPasswordController(Resource):
@@ -168,9 +201,43 @@ class MoHuSearch(Resource):
         return MyResponse.success(info)
 
 
+class UserTagController(Resource):
+
+    @auth.login_required
+    @is_admin
+    def post(self) -> MyResponse:
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name="name", unique=UserTag, required=True)
+        UserTag(**parse.parse_args()).save()
+        return MyResponse.success()
+
+    @auth.login_required
+    @is_admin
+    def get(self) -> MyResponse:
+        return MyResponse.success(UserTag.all())
+
+    @auth.login_required
+    @is_admin
+    def put(self):
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name="name", required=False)
+        UserTag.update(**parse.parse_args())
+        return MyResponse.success()
+
+    @auth.login_required
+    @is_admin
+    def delete(self):
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name=UID, required=True)
+        UserTag.delete_by_id(**parse.parse_args())
+        return MyResponse.success()
+
+
 api_script = Api(userBP)
 api_script.add_resource(MoHuSearch, "/search")
 api_script.add_resource(AddAdminController, "/admin")
+api_script.add_resource(UserTagController, "/tag/opt")
+api_script.add_resource(UserController, "/detail")
 api_script.add_resource(UserOptController, "/opt")
 api_script.add_resource(SetPasswordController, "/setpassword")
 api_script.add_resource(CurrentUserController, '/current')

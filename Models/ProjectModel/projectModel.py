@@ -10,7 +10,7 @@ from flask_sqlalchemy import Pagination
 from Comment.myException import AuthException, ParamException
 from Comment.myResponse import ParamError
 from Enums import ResponseMsg
-from Models.DepartModel.userModel import User
+from Models.UserModel.userModel import User
 from Models.base import Base
 from App import db
 from Utils import MyLog, variable2dict, MyTools
@@ -33,11 +33,11 @@ class Project(Base):
     adminID = db.Column(db.INTEGER, comment="项目负责人ID")
     adminName = db.Column(db.String(20), unique=True, comment="项目负责人姓名")
 
-    # 用户跟产品是 多对多 绑定
+    # 用户跟项目是 多对多 绑定
     users = db.relationship("User", backref="project", lazy="dynamic", secondary=projectUser)
-    # 版本跟产品是 多对一 关系
+    # 版本跟项目是 多对一 关系
     versions = db.relationship("Version", backref="project", lazy="dynamic")
-    # 用例 与 产品为一对多关系
+    # 用例与项目为一对多关系
     cases = db.relationship("Cases", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
     hosts = db.relationship("HostModel", backref="project", lazy="dynamic")
@@ -62,7 +62,7 @@ class Project(Base):
         """
         self.__verify_auth()
 
-        uIds = [u.id for u in self.users.all()]
+        uIds: List[int] = [u.id for u in self.users.all()]
         for uid in users:
             u: User = User.get(uid, f"uid {uid}")
             if MyTools.search(uIds, u.id):

@@ -111,3 +111,13 @@ class MyTools:
             else:
                 left = mid + 1
         return False
+
+    @staticmethod
+    def pinyin(word):
+        import pypinyin
+        s = ''
+        for i in pypinyin.pinyin(word, style=pypinyin.NORMAL):
+            s += ''.join(i)
+        return s
+
+

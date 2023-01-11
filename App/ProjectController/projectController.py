@@ -7,17 +7,12 @@ from typing import AnyStr
 
 from flask_restful import Resource
 
-from Models.CaseModel.hostModel import HostModel
 from MyException import Api
 from App.ProjectController import proBP
 from App import auth, siwa, UID
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
-from Models.CaseModel.caseModel import Cases
-from Models.CaseModel.casePartModel import CasePart
-from Models.DepartModel.userModel import User
 from Models.ProjectModel.projectModel import Project
-from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Swagger import AddProjectSwagger, BaseResponseSwagger, PageSwagger, UpdateProjectSwagger, \
     DeleteProjectSwagger
@@ -30,13 +25,12 @@ class ProjectController(Resource):
 
     @auth.login_required
     @is_admin
-    @siwa.doc(body=AddProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def post(self) -> MyResponse:
         """
         添加项目
         :return: MyResponse
         """
-        from Models.DepartModel.userModel import User
+        from Models.UserModel.userModel import User
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, unique=Project, required=True)
         parse.add(name="desc", type=str, required=False)
@@ -48,7 +42,6 @@ class ProjectController(Resource):
         return MyResponse.success()
 
     @auth.login_required
-    # @siwa.doc(query=PageSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def get(self) -> MyResponse:
         """
         分页查询
@@ -59,7 +52,6 @@ class ProjectController(Resource):
         return MyResponse.success(Project.page(**parse.page(cls=Project)))
 
     @auth.login_required
-    # @siwa.doc(body=UpdateProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def put(self) -> MyResponse:
         """
         维护
@@ -74,15 +66,14 @@ class ProjectController(Resource):
 
     @auth.login_required
     @is_admin
-    @siwa.doc(body=DeleteProjectSwagger, tags=['ProjectController'], resp=BaseResponseSwagger)
     def delete(self) -> MyResponse:
         """
         删除
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
-        Project.delete_by_id(parse.parse_args().get("id"))
+        parse.add(name=UID, required=True)
+        Project.delete_by_id(**parse.parse_args())
         return MyResponse.success()
 
 
@@ -112,7 +103,7 @@ class AddUser2ProjectController(Resource):
     @is_admin
     def post(self) -> MyResponse:
         """
-        添加用户 到项目要
+        添加用户 到项目
         :return:MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
@@ -135,8 +126,24 @@ class SearchProjectController(Resource):
         return MyResponse.success(Project.search_by_chemy(**parse.parse_args()))
 
 
+class ProjectInfoController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        获取单个项目信息
+        :return: MyResponse
+        """
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name=UID, required=True)
+        project = Project.get_by_uid(**parse.parse_args())
+
+        return MyResponse.success(project)
+
+
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
+api_script.add_resource(ProjectInfoController, "/info")
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
 api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")

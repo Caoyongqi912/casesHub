@@ -34,7 +34,7 @@ class MyRequestParseUtil:
         self.location: str = location
         self.args: List = []
         try:
-            self.body = getattr(request, self.location, {})
+            self.body = dict(getattr(request, self.location, {}))
         except Exception as e:
             log.error(repr(e))
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
@@ -42,11 +42,11 @@ class MyRequestParseUtil:
     def add(self, **kwargs):
         """
         添加请求数据与数据类型
-        :param kwargs: name
-        :param kwargs: type
-        :param kwargs: required bool default false
-        :param kwargs: default
-        :param kwargs: choices
+        :param kwargs: name  参数名称
+        :param kwargs: type  参数类型
+        :param kwargs: required bool default false 是否必传
+        :param kwargs: default 默认值
+        :param kwargs: choices 是否在区间内
         :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
         :param kwargs: unique  put 不要添加
         :param kwargs: enum 枚举字段 返回其枚举值
@@ -91,7 +91,7 @@ class MyRequestParseUtil:
         参数校验
         :return: self.body
         """
-        self.body = dict(self.body)
+
         for kw in self.args:
             #  必传
             if kw['required'] is True:
@@ -111,7 +111,7 @@ class MyRequestParseUtil:
                 self._verify_choices(self.body.get(kw["name"]), kw['choices'], kw['name'])
             #  校验cls ID
             if kw.get("isExist"):
-                cls = kw.get("isExist")
+                cls: clsType = kw.get("isExist")
                 cls.get(self.body.get(kw['name']), kw['name'])
             #   校验cls 重名
             if kw.get("unique"):

@@ -32,10 +32,12 @@ class AvatarController(Resource):
         if not file:
             return MyResponse.req_err()
         # 先校验是否有头像 存在删除历史头像
+        user = g.user
         if g.user.avatar:
             f: FileModel = FileModel.get_by_uid(g.user.avatar)
-            MyFile.delAvatar(f.filePath)
-            f.delete()  # 数据库删除
+            if f:
+                MyFile.delAvatar(f.filePath)
+                f.delete()  # 数据库删除
         file: FileModel = MyFile.writer(file, FileEnum.AVATAR)
         g.user.avatar = file.uid
         return MyResponse.success(file.uid)

@@ -11,7 +11,7 @@ from App.UserController import userBP
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.DepartModel.departModel import Department
+from Models.UserModel.departModel import Department, UserTag
 
 
 class DepartmentController(Resource):
@@ -23,12 +23,14 @@ class DepartmentController(Resource):
         添加一个部门
         :return: MyResponse
         """
-        from Models.DepartModel.userModel import User
+        from Models.UserModel.userModel import User
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="name", type=str, unique=Department, required=True)
-        parse.add(name="desc", type=str, required=False)
+        parse.add(name="name", unique=Department, required=True)
+        parse.add(name="desc", required=False)
         parse.add(name="adminID", type=int, isExist=User, required=False)
-        Department(**parse.parse_args()).save()
+        parse.add(name="tags", type=list, required=False)
+        info = parse.parse_args()
+        Department(**info).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -37,7 +39,7 @@ class DepartmentController(Resource):
         更新部门
         :return:MyResponse
         """
-        from Models.DepartModel.userModel import User
+        from Models.UserModel.userModel import User
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
         parse.add(name="name", type=str, required=False)
@@ -52,9 +54,7 @@ class DepartmentController(Resource):
         分页查询部门
         :return:MyResponse
         """
-        parse = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True)
-        return MyResponse.success(Department.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(Department.all())
 
     @auth.login_required
     @is_admin

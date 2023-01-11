@@ -4,7 +4,6 @@
 # @Software: PyCharm
 # @Desc: case view
 
-from flask import g
 from flask_restful import Resource
 from MyException import Api
 from App import auth, limiter, UID, auth
@@ -86,8 +85,7 @@ class CaseController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True)
-        return MyResponse.success(Cases.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(Cases.page(**parse.page(Cases)))
 
 
 # class UpdateExcel2CaseController(Resource):
@@ -123,6 +121,13 @@ class QueryCaseController(Resource):
         """
         parse = MyRequestParseUtil("values")
         return MyResponse.success(Cases.page(**parse.page(Cases)))
+
+
+class QueryUserCase(Resource):
+
+    @auth.login_required
+    def get(self):
+        pass
 
 
 api_script = Api(caseBP)

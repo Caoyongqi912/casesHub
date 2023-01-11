@@ -58,7 +58,7 @@ class MyFile:
         if pid:
             return MyFile._save_excel(file, fileName, pid)
         else:
-            return opt[T.value](file, fileName)
+            return opt[T](file, fileName)
 
     @staticmethod
     def _save_avatar(file: FileStorage, fileName: str) -> FileModel:
