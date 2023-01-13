@@ -10,6 +10,7 @@ from typing import AnyStr
 from Comment.myException import AuthException
 from Models.base import Base
 from App import db
+from Utils import UUID
 
 
 class Department(Base):
@@ -18,11 +19,13 @@ class Department(Base):
     desc = db.Column(db.String(40), nullable=True, comment="部门描述")
     adminID = db.Column(db.INTEGER, comment="部门负责人")
     users = db.relationship("User", backref="department", lazy="dynamic")
+    tags = db.relationship("UserTag", backref="departTags", lazy="dynamic")
 
-    def __init__(self, name: AnyStr, adminID: int, desc: AnyStr = None):
+    def __init__(self, name: AnyStr, adminID: int, desc: AnyStr = None, tags: list = None):
         self.name = name
         self.desc = desc
         self.adminID = adminID
+        self.tags = [UserTag(name=tag, departmentID=self.id) for tag in tags]
 
     @property
     def admin(self) -> int:
@@ -33,8 +36,8 @@ class Department(Base):
         return self.adminID
 
     @property
-    def product_users(self):
-        return self.users.filter_by().all()
+    def query_tags(self):
+        return self.tags.all()
 
     @classmethod
     def update(cls, **kwargs):
@@ -58,9 +61,12 @@ class Department(Base):
 class UserTag(Base):
     __tablename__ = "userTag"
     name = db.Column(db.String(20), unique=True, comment="标签名称")
+    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, departmentID: int, uid: str = UUID().getUId):
         self.name = name
+        self.departmentID = departmentID
+        self.uid = uid
 
     def __repr__(self):
         return f"<{UserTag.__name__} {self.name}>"

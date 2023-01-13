@@ -12,7 +12,8 @@ from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.departModel import Department, UserTag
-
+from Utils.myLog import MyLog
+log = MyLog.get_log(__file__)
 
 class DepartmentController(Resource):
 
@@ -77,6 +78,23 @@ class QueryDepartmentController(Resource):
         return MyResponse.success(Department.page(**parse.page(Department)))
 
 
+class QueryDepartmentTagController(Resource):
+
+    @auth.login_required
+    @is_admin
+    def get(self) -> MyResponse:
+        """
+        获取部门下标签
+        :return: MyResponse
+        """
+        parse = MyRequestParseUtil("values")
+        parse.add(name="id", required=True)
+        log.info(parse.parse_args())
+        depart: Department = Department.get(**parse.parse_args())
+        return MyResponse.success(depart.query_tags)
+
+
 api_script = Api(userBP)
 api_script.add_resource(DepartmentController, "/department/opt")
+api_script.add_resource(QueryDepartmentTagController, "/department/tags")
 api_script.add_resource(QueryDepartmentController, "/department/query")

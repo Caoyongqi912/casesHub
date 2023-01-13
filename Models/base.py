@@ -100,14 +100,14 @@ class Base(db.Model):
         return res
 
     @classmethod
-    def get(cls, ident: int | str, name: AnyStr = None):
+    def get(cls, id: int | str, name: AnyStr = None):
         """
         get entity by id
-        :param ident: field id
+        :param id: field id
         :param name: field name
         :return: get_or_NoFound
         """
-        return cls.query.get_or_NoFound(ident, name)
+        return cls.query.get_or_NoFound(id, name)
 
     @classmethod
     def get_by_uid(cls, uid):
