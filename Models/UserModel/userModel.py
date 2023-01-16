@@ -39,7 +39,7 @@ class User(Base):
     tagName: str = db.Column(db.String(20), nullable=True, comment="对应标签名称")
 
     def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
-                 tagName:str = None, isAdmin: bool = False,
+                 tagName: str = None, isAdmin: bool = False,
                  departmentID: int = None,
                  departmentName: str = None,
                  password: str = None):
@@ -52,7 +52,7 @@ class User(Base):
         if password:
             self.hash_password(password)
         else:
-            self.hash_password(username)
+            self.hash_password(MyTools.pinyin(self.username))
         self.departmentID: int = departmentID
         self.departmentName: str = departmentName
 
@@ -61,7 +61,6 @@ class User(Base):
         添加管理员
         """
         self.isAdmin: bool = True
-        self.tag: UserTag = UserTag.ADMIN
         self.save()
 
     @classmethod
@@ -84,8 +83,8 @@ class User(Base):
         isAdmin = False
         """
         self.isAdmin: bool = False
-        self.hash_password(self.username)
-        self.email: str = self.username + self._mail
+        self.hash_password(MyTools.pinyin(self.username))
+        self.email: str = MyTools.pinyin(self.username + self._mail)
         self.save()
 
     def set_password(self, old_password: str, new_password: str) -> NoReturn:
