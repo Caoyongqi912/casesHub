@@ -23,7 +23,6 @@ class AddUserTest(unittest.TestCase):
             "username": f.name(),
             "password": f.pystr(),
             "phone": f.phone_number(),
-            "email": f.email(),
             "gender": random.choices(["MALE", "FEMALE"]),
             "admin": True,
             "tag": random.choices(["QA", "PR", "DEV"])

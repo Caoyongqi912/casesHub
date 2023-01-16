@@ -30,7 +30,7 @@ api = Api()
 UID = "uid"
 
 
-def create_app(configName: AnyStr = "default", printSql: bool = True) -> Flask:
+def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     """
     初始化app
     定义环境配置

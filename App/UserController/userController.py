@@ -61,8 +61,8 @@ class UserOptController(Resource):
         parse.add(name="username", unique=User, required=True)
         parse.add(name="phone", unique=User, required=True)
         parse.add(name="gender", enum=Gender, required=True)
-        parse.add(name="tagName", required=True)
-        parse.add(name="departmentID", type=int, isExist=Department, required=True)
+        parse.add(name="tagName", required=False)
+        parse.add(name="departmentID", type=int, isExist=Department, required=False)
         User(**parse.parse_args()).addUser()
         return MyResponse.success()
 

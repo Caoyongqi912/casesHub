@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import enum
-import time
 # @Time    : 2022/9/15 下午2:46
 # @Author  : cyq
 # @File    : myRequest.py
@@ -10,7 +8,6 @@ import requests
 import urllib3
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
-from sqlalchemy import Column
 
 from Comment.myException import ParamException
 from Enums import ResponseMsg
@@ -99,6 +96,7 @@ class MyRequest:
         :param allow_redirects 是否开启重定向
         :return: response
         """
+
         log.info(f"url    ====== {url}")
         log.info(f"method ====== {method}")
         log.info(f"header ====== {headers}")
@@ -127,15 +125,15 @@ class MyRequest:
                 raise ParamException(ResponseMsg.error_param(method))
             return self.response
         except exceptions.Timeout as e:
-            log,error(repr(e))
+            log.error(repr(e))
         except exceptions.InvalidURL as e:
-            log,error(repr(e))
+            log.error(repr(e))
         except exceptions.HTTPError as e:
-            log,error(repr(e))
+            log.error(repr(e))
         except exceptions.ConnectionError as e:
-            log,error(repr(e))
+            log.error(repr(e))
         except Exception as e:
-            log,error(repr(e))
+            log.error(repr(e))
             log.error(self.response.text)
             raise
 
@@ -166,7 +164,7 @@ class MyRequest:
         }
         self.responseInfo.append(info)
 
-    def _writeResult(self, interfaceID: Column, responseInfo: List[Dict[str, Any]], status: str,
+    def _writeResult(self, interfaceID: int, responseInfo: List[Dict[str, Any]], status: str,
                      useTime: Union[str, float, int]) -> NoReturn:
         """
         测试结果入库
@@ -191,7 +189,6 @@ if __name__ == '__main__':
 
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
-    from Models.ProjectModel.projectModel import Project
 
     v: VariableModel = VariableModel.get(1)
     u = User.get(1)

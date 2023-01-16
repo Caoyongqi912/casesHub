@@ -3,9 +3,8 @@
 # @File : _types.py 
 # @Software: PyCharm
 # @Desc:
-from typing import Union, Tuple, Callable, Mapping, Optional, Sequence, List, Any
+from typing import Union, Tuple, Callable, Mapping, Optional, Sequence, List, Any,IO
 
-from typing.io import IO
 
 """
 Optional 可选类型 参数除了给定的类型外还可以是None

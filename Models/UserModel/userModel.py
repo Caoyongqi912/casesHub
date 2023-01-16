@@ -4,19 +4,16 @@
 # @Software: PyCharm
 # @Desc: 用户模型类
 
-from typing import Dict, NoReturn, TypeVar, List
-from werkzeug.datastructures import FileStorage
+from typing import Dict, NoReturn, TypeVar
 
-from Models.CaseModel.fileModel import FileModel
 from Models.base import Base
 from App import db
 from typing import AnyStr
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from Comment.myException import ParamException, AuthException
-from Enums import Gender, UserTag, IntEnum, ResponseMsg
+from Enums import Gender, IntEnum, ResponseMsg
 from Utils import MyLog, simpleUser, MyTools
-from Comment import MyRedis
 import time
 import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
 
@@ -34,7 +31,8 @@ class User(Base):
     gender: Gender = db.Column(IntEnum(Gender), comment="性别")
     avatar: str = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin: bool = db.Column(db.Boolean, default=False, comment="管理")
-    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
+    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="set null"), nullable=True,
+                                  comment="所属部门")
     departmentName: str = db.Column(db.String(20), nullable=True, comment="所属部门名称")
     tagName: str = db.Column(db.String(20), nullable=True, comment="对应标签名称")
 
@@ -63,17 +61,6 @@ class User(Base):
         self.isAdmin: bool = True
         self.save()
 
-    @classmethod
-    def search_like(cls, target: str, value: str) -> simpleUser:
-        """
-        sql执行模糊查询
-        :param target: username  cls.column
-        :param value:  search value
-        :return: execute_sql
-        """
-        sql = """Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value)
-        res = cls.execute_sql(sql)
-        return res
 
     def addUser(self) -> NoReturn:
         """
@@ -86,6 +73,19 @@ class User(Base):
         self.hash_password(MyTools.pinyin(self.username))
         self.email: str = MyTools.pinyin(self.username + self._mail)
         self.save()
+
+    @classmethod
+    def search_like(cls, target: str, value: str) -> simpleUser:
+        """
+        sql执行模糊查询
+        :param target: username  cls.column
+        :param value:  search value
+        :return: execute_sql
+        """
+        sql = """Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value)
+        res = cls.execute_sql(sql)
+        return res
+
 
     def set_password(self, old_password: str, new_password: str) -> NoReturn:
         """

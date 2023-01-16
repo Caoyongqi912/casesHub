@@ -61,7 +61,8 @@ class Department(Base):
 class UserTag(Base):
     __tablename__ = "userTag"
     name = db.Column(db.String(20), unique=True, comment="标签名称")
-    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id"), nullable=True, comment="所属部门")
+    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="set null"), nullable=True,
+                                  comment="所属部门")
 
     def __init__(self, name: str, departmentID: int, uid: str = UUID().getUId):
         self.name = name
