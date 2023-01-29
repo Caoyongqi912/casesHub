@@ -5,7 +5,7 @@
 # @Desc:
 from flask_limiter import RateLimitExceeded
 from flask_restful import Api as _Api
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, MethodNotAllowed
 from Comment.myException import MyException, AuthException, ParamException
 from Utils import MyLog
 
@@ -22,6 +22,8 @@ class Api(_Api):
         """
         log.error(repr(e))
         if isinstance(e, AuthException | ParamException):
+            return e
+        if isinstance(e, MethodNotAllowed):
             return e
         if isinstance(e, RateLimitExceeded):
             return MyException("too manny request! be wait ..")

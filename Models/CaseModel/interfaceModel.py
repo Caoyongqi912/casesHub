@@ -17,6 +17,7 @@ class InterfaceModel(Base):
     title = db.Column(db.String(40), comment="标题")
     desc = db.Column(db.String(200), nullable=True, comment="描述")
     mark = db.Column(db.String(200), nullable=True, comment="备注")
+    type = db.Column(db.String(10), default="HTTP", comment='请求类型')
     creator = db.Column(db.INTEGER, comment="创建人")
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
     connectTimeout = db.Column(db.INTEGER, nullable=True, default=6000, comment="连接超时")
@@ -35,12 +36,15 @@ class InterfaceModel(Base):
 
     def __init__(self, title: str, steps: List, desc: str = None, creator: int = None, updater: int = None,
                  mark: str = None,
-                 connectTimeout: int = None, responseTimeout: int = None, caseID: int = None, projectID: int = None,
+                 type: str = "HTTP",
+                 connectTimeout: int = None, responseTimeout
+                 : int = None, caseID: int = None, projectID: int = None,
                  partID: int = None,
                  versionID: int = None):
         self.title = title
         self.steps = steps
         self.desc = desc
+        self.type = type
         self.creator = creator if creator else g.user.id
         self.updater = updater
         self.mark = mark
@@ -51,12 +55,14 @@ class InterfaceModel(Base):
         self.partID = partID
         self.versionID = versionID
 
-    @property
-    def query_results(self):
-        return self.results.order_by("create_time").all()
 
-    def __repr__(self):
-        return f"<{InterfaceModel.__name__} {self.title}>"
+@property
+def query_results(self):
+    return self.results.order_by("create_time").all()
+
+
+def __repr__(self):
+    return f"<{InterfaceModel.__name__} {self.title}>"
 
 
 class InterfaceResultModel(Base):

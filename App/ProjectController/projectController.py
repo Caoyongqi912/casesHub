@@ -107,10 +107,10 @@ class AddUser2ProjectController(Resource):
         :return:MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="projectID", type=int, required=True)
+        parse.add(name=UID, required=True)
         parse.add(name="userIds", type=list, required=True)
         info = parse.parse_args()
-        Project.get(info['projectID'], "projectID").addUsers(info['userIds'])
+        Project.get_by_uid(info.get(UID)).addUsers(info['userIds'])
         return MyResponse.success()
 
 
@@ -137,14 +137,32 @@ class ProjectInfoController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
         project = Project.get_by_uid(**parse.parse_args())
-
         return MyResponse.success(project)
+
+
+class QueryProjectUsers(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name=UID, required=True)
+        project = Project.get_by_uid(**parse.parse_args())
+        return MyResponse.success(project.query_users)
+
+
+class QueryProjects(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        return MyResponse.success(Project.all())
 
 
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
+api_script.add_resource(QueryProjects, "/queryProjects")
 api_script.add_resource(ProjectInfoController, "/info")
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
+api_script.add_resource(QueryProjectUsers, '/users')
 api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")
 api_script.add_resource(SearchProjectController, "/search")

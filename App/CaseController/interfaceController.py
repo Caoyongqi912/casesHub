@@ -33,6 +33,7 @@ class InterfaceController(Resource):
         pare.add(name="title", type=str, required=True)
         pare.add(name="projectID", required=True, type=int)
         pare.add(name="desc", type=str)
+        pare.add(name="type", default="HTTP", type=str)
         pare.add(name="steps", type=list)
         pare.add(name="mark", type=str)
         pare.add(name="partID", type=int)

@@ -8,7 +8,7 @@
       <jdbc-url>mongodb://localhost:27017/caseHub</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="caseHub@localhost" uuid="a0709723-794e-48df-84bd-a10bce72a2d7">
+    <data-source source="LOCAL" name="caseHub@localhost" uuid="4cdf81b2-56a2-4c4d-b6d2-1ed9fd733b45">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>

@@ -120,4 +120,24 @@ class MyTools:
             s += ''.join(i)
         return s
 
+    @staticmethod
+    def list2Tree(data: List):
+        """
+        列表转树
+        :param data:
+        :return:
+        """
+        mapping: dict = dict(zip([i['id'] for i in data], data))
+        c = []
+        for d in data:
+            parent: dict = mapping.get(d['parentID'])
+            if parent is None:
+                c.append(d)
+            else:
+                children: list = parent.get("children")
+                if not children:
+                    children = []
+                children.append(d)
+                parent.update({"children":children})
+        return c
 

@@ -6,9 +6,7 @@
 
 
 from typing import AnyStr, List, NoReturn
-from flask_sqlalchemy import Pagination
 from Comment.myException import AuthException, ParamException
-from Comment.myResponse import ParamError
 from Enums import ResponseMsg
 from Models.UserModel.userModel import User
 from Models.base import Base
@@ -40,7 +38,6 @@ class Project(Base):
     # 用例与项目为一对多关系
     cases = db.relationship("Cases", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
-    hosts = db.relationship("HostModel", backref="project", lazy="dynamic")
     variables = db.relationship("VariableModel", backref="project", lazy="dynamic")
     interfaces = db.relationship("InterfaceModel", backref="project", lazy="dynamic")
 
@@ -69,7 +66,7 @@ class Project(Base):
                 raise ParamException(ResponseMsg.already_exist(str(id)))
             else:
                 self.users.append(u)
-        self.save()
+        self.save(new=False)
 
     @classmethod
     def update(cls, **kwargs):
@@ -89,12 +86,16 @@ class Project(Base):
         return self.parts.all()
 
     @property
-    def query_host(self) -> List:
-        """
-        query host
-        :return: hosts
-        """
-        return self.hosts.all()
+    def tree_casePart(self):
+        query = self.parts.all()
+        res = []
+        for part in query:
+            res.append(Base.to_json(part))
+        return res
+
+    @property
+    def query_users(self):
+        return self.users.all()
 
     @property
     def query_version(self) -> List:

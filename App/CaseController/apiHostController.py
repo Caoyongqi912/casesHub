@@ -20,20 +20,18 @@ class HostController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, required=True)
         parse.add(name="host", type=str, required=True)
-        parse.add(name="projectID", type=int, required=True)
-        HostModel(**parse.parse_args()).save_()
-
+        parse.add(name="desc")
+        HostModel(**parse.parse_args()).save()
         return MyResponse.success()
 
     @auth.login_required
     def get(self) -> MyResponse:
         """
-        get by Host ID
+        分页
         :return:
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True)
-        return MyResponse.success(HostModel.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(HostModel.page(**parse.page(HostModel)))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -41,6 +39,7 @@ class HostController(Resource):
         parse.add(name=UID, required=True)
         parse.add(name="name", type=str)
         parse.add(name="host", type=str)
+        parse.add(name="desc", type=str)
         HostModel.update(**parse.parse_args())
         return MyResponse.success()
 
@@ -56,20 +55,5 @@ class HostController(Resource):
         return MyResponse.success()
 
 
-class QueryHostController(Resource):
-
-    @auth.login_required
-    def get(self) -> MyResponse:
-        parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name="projectID", required=False)
-        pid = parse.parse_args().get("projectID")
-        if pid:
-            p: Project = Project.get(pid)
-            return MyResponse.success(p.query_host)
-
-        return MyResponse.success(HostModel.all())
-
-
 api_script = Api(caseBP)
 api_script.add_resource(HostController, "/host/opt")
-api_script.add_resource(QueryHostController, "/host/query")
