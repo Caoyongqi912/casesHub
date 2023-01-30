@@ -3,6 +3,8 @@
 # @File : casePartController.py 
 # @Software: PyCharm
 # @Desc:
+from typing import List
+
 from flask_restful import Resource
 
 from App import auth, UID, auth
@@ -46,9 +48,9 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, required=True)
-        parse.add(name="partName", type=str)
-        CasePart.update(**parse.parse_args())
+        parse.add(name="id", required=True, type=int)
+        parse.add(name="partName")
+        CasePart.update_by_id(**parse.parse_args())
         return MyResponse.success()
 
     @auth.login_required
@@ -58,8 +60,12 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, required=True)
-        CasePart.delete_by_id(**parse.parse_args())
+        parse.add(name="id", required=True, type=int)
+        part: CasePart = CasePart.get(**parse.parse_args())
+        childrens: List[CasePart] = CasePart.get_by_field(parentID=part.id)
+        for c in childrens:
+            c.delete()
+        part.delete()
         return MyResponse.success()
 
 

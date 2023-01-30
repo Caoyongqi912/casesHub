@@ -81,6 +81,25 @@ class Base(db.Model):
             raise ParamException(ResponseMsg.ERROR)
 
     @classmethod
+    def update_by_id(cls, **kwargs) -> NoReturn:
+        """
+
+        通过kwargs.get_by_uid() 获得实例 修改
+        """
+        from flask import g
+        kwargs.setdefault("updater", g.user.id)  # 修改人
+        target = cls.get(id=kwargs.pop('id'))
+        c = cls.columns()
+        try:
+            for k, v in kwargs.items():
+                if k in c:
+                    setattr(target, k, v)
+            target.save(False)
+        except Exception as e:
+            log.error(repr(e))
+            raise ParamException(ResponseMsg.ERROR)
+
+    @classmethod
     def all(cls) -> List:
         """
         返回所有
