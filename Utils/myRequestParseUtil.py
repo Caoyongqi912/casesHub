@@ -86,6 +86,7 @@ class MyRequestParseUtil:
         pageInfo.update(body)
         return pageInfo
 
+    @property
     def parse_args(self) -> Dict:
         """
         参数校验

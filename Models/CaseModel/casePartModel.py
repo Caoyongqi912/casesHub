@@ -21,7 +21,8 @@ class CasePart(Base):
     # 模块与用例是一对多关系
     parentID = db.Column(db.INTEGER, nullable=True, comment='父模块')
     cases = db.relationship("Cases", backref='case_part', lazy='dynamic')
-    interfaces = db.relationship("InterfaceModel", backref='case_part',  lazy='dynamic')
+    interfaces = db.relationship("InterfaceModel", backref='case_part', lazy='dynamic')
+
     def __init__(self, partName: str, projectID: int, parentID: int = None):
         self.partName = partName
         self.projectID = projectID
