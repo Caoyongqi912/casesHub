@@ -40,7 +40,7 @@ class BugController(Resource):
         parse.add(name="versionID", type=int, isExist=Version)
         parse.add(name="files", type=list)
 
-        Bug(**parse.parse_args()).save()
+        Bug(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -51,7 +51,7 @@ class BugController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        return MyResponse.success(Bug.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(Bug.get_by_uid(**parse.parse_args))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -73,7 +73,7 @@ class BugController(Resource):
         parse.add(name="platformID", type=int, isExist=Platform)
         parse.add(name="versionID", type=int, isExist=Version)
         parse.add(name="files", type=list)
-        Bug.update(**parse.parse_args())
+        Bug.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -85,7 +85,7 @@ class BugController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Bug.delete_by_id(**parse.parse_args())
+        Bug.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 

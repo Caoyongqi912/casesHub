@@ -30,7 +30,7 @@ class ReportController(Resource):
         parse.add(name='demands', type=list, required=False)
         parse.add(name="bugs", type=list, required=False)
         parse.add(name="players", type=list, required=False)
-        rep = parse.parse_args()
+        rep = parse.parse_args
         Report(**rep).save()
         return MyResponse.success()
 
@@ -50,7 +50,7 @@ class ReportController(Resource):
         parse.add(name='demands', type=list, required=False)
         parse.add(name="bugs", type=list, required=False)
         parse.add(name="players", type=list, required=False)
-        Report.update(**parse.parse_args())
+        Report.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -61,7 +61,7 @@ class ReportController(Resource):
         """
         parse = MyRequestParseUtil("values")
         parse.add(name="id", type=str, required=True)
-        return MyResponse.success(Report.get(parse.parse_args().get("id"), "id"))
+        return MyResponse.success(Report.get(parse.parse_args.get("id"), "id"))
 
     @auth.login_required
     def delete(self) -> MyResponse:
@@ -71,7 +71,7 @@ class ReportController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
-        Report.delete_by_id(**parse.parse_args())
+        Report.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 
@@ -83,7 +83,7 @@ class SendReport(Resource):
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
-        report = Report.get(parse.parse_args().get("id"), "id")
+        report = Report.get(parse.parse_args.get("id"), "id")
         SendMail().sendReport(report)
         return MyResponse.success()
 

@@ -30,7 +30,7 @@ class DepartmentController(Resource):
         parse.add(name="desc", required=False)
         parse.add(name="adminID", type=int, isExist=User, required=False)
         parse.add(name="tags", type=list, required=False)
-        info = parse.parse_args()
+        info = parse.parse_args
         Department(**info).save()
         return MyResponse.success()
 
@@ -46,7 +46,7 @@ class DepartmentController(Resource):
         parse.add(name="name", type=str, required=False)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, isExist=User, required=False)
-        Department.update(**parse.parse_args())
+        Department.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -66,7 +66,7 @@ class DepartmentController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Department.delete_by_id(**parse.parse_args())
+        Department.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 
@@ -89,8 +89,8 @@ class QueryDepartmentTagController(Resource):
         """
         parse = MyRequestParseUtil("values")
         parse.add(name="id", required=True)
-        log.info(parse.parse_args())
-        depart: Department = Department.get(**parse.parse_args())
+        log.info(parse.parse_args)
+        depart: Department = Department.get(**parse.parse_args)
         return MyResponse.success(depart.query_tags)
 
 

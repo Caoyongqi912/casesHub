@@ -28,7 +28,7 @@ class CasePartController(Resource):
         parse.add(name="partName", type=str, required=True)
         parse.add(name="projectID", type=int, isExist=Project, required=True)
         parse.add(name="parentID", type=int)
-        CasePart(**parse.parse_args()).save_()
+        CasePart(**parse.parse_args).save_()
         return MyResponse.success()
 
     @auth.login_required
@@ -39,7 +39,7 @@ class CasePartController(Resource):
         """
         parse = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        return MyResponse.success(CasePart.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(CasePart.get_by_uid(**parse.parse_args))
 
     @auth.login_required
     def put(self) -> MyResponse:
@@ -50,7 +50,7 @@ class CasePartController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
         parse.add(name="partName")
-        CasePart.update_by_id(**parse.parse_args())
+        CasePart.update_by_id(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -61,7 +61,7 @@ class CasePartController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
-        part: CasePart = CasePart.get(**parse.parse_args())
+        part: CasePart = CasePart.get(**parse.parse_args)
         childrens: List[CasePart] = CasePart.get_by_field(parentID=part.id)
         for c in childrens:
             c.delete()
@@ -75,7 +75,7 @@ class QueryCasePartController(Resource):
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
         parse.add(name="projectID", required=True)
-        pro: Project = Project.get(id=parse.parse_args().get("projectID"))
+        pro: Project = Project.get(id=parse.parse_args.get("projectID"))
 
         return MyResponse.success(MyTools.list2Tree(pro.tree_casePart))
 
@@ -90,7 +90,7 @@ class CasePartOrCreateController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name="partName", type=str, required=True)
         parse.add(name="projectID", type=str, required=True)
-        return MyResponse.success(CasePart.getOrCreate(**parse.parse_args()))
+        return MyResponse.success(CasePart.getOrCreate(**parse.parse_args))
 
 
 api_script = Api(caseBP)

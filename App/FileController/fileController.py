@@ -49,7 +49,7 @@ class AvatarController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        f: FileModel = FileModel.get_by_uid(**parse.parse_args())
+        f: FileModel = FileModel.get_by_uid(**parse.parse_args)
         return Response(MyFile.reader(f), mimetype=f.fileType)
 
 
@@ -72,7 +72,7 @@ class BugController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        f: FileModel = FileModel.get_by_uid(**parse.parse_args())
+        f: FileModel = FileModel.get_by_uid(**parse.parse_args)
         return Response(MyFile.reader(f), mimetype=f.fileType)
 
 
@@ -105,7 +105,7 @@ class AsyncClass(Resource):
     def get(self):
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name="id", required=True)
-        f = FileDB.objects(**parse.parse_args()).first()
+        f = FileDB.objects(**parse.parse_args).first()
 
         return Response(MyFile.reader(f.file), mimetype=f.fileType)
 

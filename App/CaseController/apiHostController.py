@@ -21,7 +21,7 @@ class HostController(Resource):
         parse.add(name="name", type=str, required=True)
         parse.add(name="host", type=str, required=True)
         parse.add(name="desc")
-        HostModel(**parse.parse_args()).save()
+        HostModel(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -40,7 +40,7 @@ class HostController(Resource):
         parse.add(name="name", type=str)
         parse.add(name="host", type=str)
         parse.add(name="desc", type=str)
-        HostModel.update(**parse.parse_args())
+        HostModel.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -51,7 +51,7 @@ class HostController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        HostModel.delete_by_id(**parse.parse_args())
+        HostModel.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 

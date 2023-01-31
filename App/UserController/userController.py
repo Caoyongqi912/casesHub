@@ -30,7 +30,7 @@ class AddAdminController(Resource):
         parse.add(name="username", type=str, unique=User, required=True)
         parse.add(name="password", type=str, required=True)
         parse.add(name="phone", type=str, unique=User, required=True)
-        User(**parse.parse_args()).addAdmin()
+        User(**parse.parse_args).addAdmin()
         return MyResponse.success()
 
 
@@ -45,7 +45,7 @@ class UserOptController(Resource):
         """
         parse = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        info = User.get_by_uid(**parse.parse_args())
+        info = User.get_by_uid(**parse.parse_args)
         return MyResponse.success(info)
 
     @auth.login_required
@@ -63,7 +63,7 @@ class UserOptController(Resource):
         parse.add(name="gender", enum=Gender, required=True)
         parse.add(name="tagName", required=False)
         parse.add(name="departmentID", type=int, isExist=Department, required=False)
-        User(**parse.parse_args()).addUser()
+        User(**parse.parse_args).addUser()
         return MyResponse.success()
 
     @auth.login_required
@@ -82,7 +82,7 @@ class UserOptController(Resource):
         parse.add(name="gender", enum=Gender, required=False)
         parse.add(name="tagName", required=False)
         parse.add(name="departmentID", type=int, required=False)
-        putInfo = parse.parse_args()
+        putInfo = parse.parse_args
         dip: Department = Department.get(putInfo.get("departmentID"))
         putInfo["departmentName"] = dip.name
         User.update(**putInfo)
@@ -97,7 +97,7 @@ class UserOptController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        User.delete_by_id(**parse.parse_args())
+        User.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 
@@ -134,7 +134,7 @@ class LoginController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="username", type=str, required=True)
         parse.add(name="password", type=str, required=True)
-        return MyResponse.success(User.login(**parse.parse_args()))
+        return MyResponse.success(User.login(**parse.parse_args))
 
 
 class UserController(Resource):
@@ -146,7 +146,7 @@ class UserController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        user: User = User.get_by_uid(**parse.parse_args())
+        user: User = User.get_by_uid(**parse.parse_args)
         userProject = user.project
         cases = Cases.query_by_field(creator=user.id)
 
@@ -171,7 +171,7 @@ class SetPasswordController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="old_password", type=str, required=True)
         parse.add(name="new_password", type=str, required=True)
-        user.set_password(**parse.parse_args())
+        user.set_password(**parse.parse_args)
         return MyResponse.success()
 
 
@@ -197,7 +197,7 @@ class MoHuSearch(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="target", type=str, required=True)
         parse.add(name="value", type=str, required=True)
-        info = User.search_like(**parse.parse_args())
+        info = User.search_like(**parse.parse_args)
         return MyResponse.success(info)
 
 
@@ -208,7 +208,7 @@ class UserTagController(Resource):
     def post(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", unique=UserTag, required=True)
-        UserTag(**parse.parse_args()).save()
+        UserTag(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -221,7 +221,7 @@ class UserTagController(Resource):
     def put(self):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", required=False)
-        UserTag.update(**parse.parse_args())
+        UserTag.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -229,7 +229,7 @@ class UserTagController(Resource):
     def delete(self):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        UserTag.delete_by_id(**parse.parse_args())
+        UserTag.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 

@@ -43,7 +43,7 @@ class CaseController(Resource):
         parse.add(name="partID", type=int, isExist=CasePart, required=False)
         parse.add(name="versionID", type=int, isExist=Version, required=False)
         parse.add(name="info", type=list, required=True)
-        Cases(**parse.parse_args()).save()
+        Cases(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -64,7 +64,7 @@ class CaseController(Resource):
         parse.add(name="projectID", type=int, required=False)
         parse.add(name="versionID", type=int, required=False)
         parse.add(name="steps", type=list, required=False)
-        Cases.update(**parse.parse_args())
+        Cases.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -75,7 +75,7 @@ class CaseController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Cases.delete_by_id(**parse.parse_args())
+        Cases.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -100,9 +100,9 @@ class CaseController(Resource):
 #         parse: MyRequestParseUtil = MyRequestParseUtil()
 #         parse.add(name="projectID", type=int, required=True, isExist=Project)
 #         parse.add(name="fileID", type=str, required=True)
-#         fileID: str = parse.parse_args().get("fileID")
+#         fileID: str = parse.parse_args.get("fileID")
 #         file = CaseExcel.get_by_uid(fileID)
-#         projectID: int = parse.parse_args().get("projectID")
+#         projectID: int = parse.parse_args.get("projectID")
 #         filePath: str = file.filePath
 #         # from celery_task.tasks import caseExcelWrite2Sql
 #         # caseExcelWrite2Sql.delay(projectID, g.user.id, filePath)

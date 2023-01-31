@@ -26,27 +26,27 @@ class VariableController(Resource):
         parse.add(name="val", type=str, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="projectID", type=int, required=True, isExist=Project)
-        key = {"key": parse.parse_args().get("key")}
+        key = {"key": parse.parse_args.get("key")}
         variable: VariableModel = VariableModel.get_by_field(**key)
         if variable:
-            variable.val = parse.parse_args().get("val")
+            variable.val = parse.parse_args.get("val")
             variable.save()
         else:
 
-            VariableModel(**parse.parse_args()).save()
+            VariableModel(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
     def get(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True, isExist=Project)
-        return MyResponse.success(VariableModel.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(VariableModel.get_by_uid(**parse.parse_args))
 
     @auth.login_required
     def delete(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, type=int, required=True)
-        VariableModel.delete_by_id(**parse.parse_args())
+        VariableModel.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 

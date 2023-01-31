@@ -29,7 +29,7 @@ class VersionController(Resource):
         parse.add(name='name', required=True, type=str)
         parse.add(name="projectID", required=True, type=int, isExist=Project)
         parse.add(name="desc", required=False, type=str)
-        Version(**parse.parse_args()).save()
+        Version(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -41,7 +41,7 @@ class VersionController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", type=int, required=True)
-        Version.delete_by_id(**parse.parse_args())
+        Version.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -53,7 +53,7 @@ class VersionController(Resource):
         parse.add(name="id", type=int, required=True)
         parse.add(name='name', required=False, type=str)
         parse.add(name="desc", required=False, type=str)
-        Version.update(**parse.parse_args())
+        Version.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -64,7 +64,7 @@ class VersionController(Resource):
         """
         parse = MyRequestParseUtil("values")
         parse.add(name="versionID", type=str, required=True)
-        return MyResponse.success(Version.get(parse.parse_args().get("versionID"), "versionID"))
+        return MyResponse.success(Version.get(parse.parse_args.get("versionID"), "versionID"))
 
 
 class PageCases(Resource):

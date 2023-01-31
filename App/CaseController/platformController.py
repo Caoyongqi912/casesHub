@@ -26,7 +26,7 @@ class PlatformController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", required=True, unique=Platform,
                   type=str)
-        Platform(**parse.parse_args()).save()
+        Platform(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -37,7 +37,7 @@ class PlatformController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        return MyResponse.success(Platform.get_by_uid(**parse.parse_args()))
+        return MyResponse.success(Platform.get_by_uid(**parse.parse_args))
 
     @auth.login_required
     def delete(self) -> MyResponse:
@@ -46,7 +46,7 @@ class PlatformController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Platform.delete_by_id(**parse.parse_args())
+        Platform.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -57,7 +57,7 @@ class PlatformController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
         parse.add(name="name", required=False)
-        Platform.update(**parse.parse_args())
+        Platform.update(**parse.parse_args)
         return MyResponse.success()
 
 

@@ -35,7 +35,7 @@ class ProjectController(Resource):
         parse.add(name="name", type=str, unique=Project, required=True)
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, required=True)
-        par = parse.parse_args()
+        par = parse.parse_args
         user = User.get(par.get("adminID"))
         par['adminName'] = user.username
         Project(**par).save()
@@ -61,7 +61,7 @@ class ProjectController(Resource):
         parse.add(name=UID, required=True)
         parse.add(name="name", required=False)
         parse.add(name="desc", required=False)
-        Project.update(**parse.parse_args())
+        Project.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -73,7 +73,7 @@ class ProjectController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Project.delete_by_id(**parse.parse_args())
+        Project.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
 
@@ -109,7 +109,7 @@ class AddUser2ProjectController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
         parse.add(name="userIds", type=list, required=True)
-        info = parse.parse_args()
+        info = parse.parse_args
         Project.get_by_uid(info.get(UID)).addUsers(info['userIds'])
         return MyResponse.success()
 
@@ -123,7 +123,7 @@ class SearchProjectController(Resource):
         :return:
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        return MyResponse.success(Project.search_by_chemy(**parse.parse_args()))
+        return MyResponse.success(Project.search_by_chemy(**parse.parse_args))
 
 
 class ProjectInfoController(Resource):
@@ -136,7 +136,7 @@ class ProjectInfoController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        project = Project.get_by_uid(**parse.parse_args())
+        project = Project.get_by_uid(**parse.parse_args)
         return MyResponse.success(project)
 
 
@@ -146,7 +146,7 @@ class QueryProjectUsers(Resource):
     def get(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
-        project = Project.get_by_uid(**parse.parse_args())
+        project = Project.get_by_uid(**parse.parse_args)
         return MyResponse.success(project.query_users)
 
 
