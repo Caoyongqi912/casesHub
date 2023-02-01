@@ -17,6 +17,7 @@ from App import auth, UID
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Enums import CaseLevel
+from Enums.myEnum import CaseAPIStatus
 from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel
@@ -35,6 +36,7 @@ class InterfaceController(Resource):
         pare.add(name="desc", type=str)
         pare.add(name="http", default="HTTP", type=str)
         pare.add(name="level", enum=CaseLevel, required=True)
+        pare.add(name="status", enum=CaseAPIStatus, required=True)
 
         pare.add(name="projectID", required=True, type=int)
         pare.add(name="casePartID", type=int)

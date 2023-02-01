@@ -25,7 +25,6 @@ class Cases(Base):
     tag = db.Column(IntEnum(CaseTag), comment="用例标签")
     case_level = db.Column(IntEnum(CaseLevel), comment="用例等级")
     case_type = db.Column(IntEnum(CaseType), comment="用例类型")
-    status = db.Column(IntEnum(CaseStatus), comment="用例状态")
 
     setup = db.Column(db.String(40), nullable=True, comment='用例前置')
     info = db.Column(db.JSON, nullable=False, comment="用例步骤与预期结果")

@@ -54,5 +54,9 @@ class CasePart(Base):
             raise ParamException(ResponseMsg.already_exist(self.partName))
         return super(CasePart, self).save()
 
+    @property
+    def query_interfaces(self):
+        return self.interfaces.all()
+
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"

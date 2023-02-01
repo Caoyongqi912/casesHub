@@ -93,7 +93,19 @@ class CasePartOrCreateController(Resource):
         return MyResponse.success(CasePart.getOrCreate(**parse.parse_args))
 
 
+class QueryInterfaceController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name='casePartID', required=True)
+        part: CasePart = CasePart.get(id=parse.parse_args.get("casePartID"))
+
+        return MyResponse.success(part.query_interfaces)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(CasePartController, "/part/opt")
+api_script.add_resource(QueryInterfaceController, "/part/interfaces")
 api_script.add_resource(QueryCasePartController, "/part/query")
 api_script.add_resource(CasePartOrCreateController, "/part/getOrCreate")

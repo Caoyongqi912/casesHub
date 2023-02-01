@@ -3,6 +3,7 @@
 # @File : myApi.py 
 # @Software: PyCharm
 # @Desc:
+import sqlalchemy.exc
 from flask_limiter import RateLimitExceeded
 from flask_restful import Api as _Api
 from werkzeug.exceptions import HTTPException, MethodNotAllowed
@@ -27,4 +28,6 @@ class Api(_Api):
             return e
         if isinstance(e, RateLimitExceeded):
             return MyException("too manny request! be wait ..")
+        if isinstance(e, sqlalchemy.exc.OperationalError):
+            return MyException("MySQL server error")
         return MyException()

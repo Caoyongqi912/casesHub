@@ -9,7 +9,8 @@
 from typing import List, Any, NoReturn
 from flask import g
 from App import db
-from Enums import CaseLevel, IntEnum
+from Enums import CaseLevel, IntEnum, CaseStatus
+from Enums.myEnum import CaseAPIStatus
 from Models.base import Base
 
 
@@ -19,7 +20,7 @@ class InterfaceModel(Base):
     desc = db.Column(db.String(200), nullable=True, comment="描述")
     http = db.Column(db.String(10), default="HTTP", comment='请求类型')
     level = db.Column(IntEnum(CaseLevel), comment="接口用例等级")
-
+    status = db.Column(IntEnum(CaseAPIStatus), comment="接口用例状态")
     steps = db.Column(db.JSON, nullable=True, comment="接口步骤")
     creator = db.Column(db.INTEGER, comment="创建人")
     updater = db.Column(db.INTEGER, nullable=True, comment="修改人")
@@ -29,21 +30,26 @@ class InterfaceModel(Base):
     connectTimeout = db.Column(db.INTEGER, nullable=True, default=6000, comment="连接超时")
     responseTimeout = db.Column(db.INTEGER, nullable=True, default=6000, comment="请求超时")
 
-    casePartID = db.Column(db.INTEGER, db.ForeignKey('case_part.id', ondelete='SET NULL'), nullable=True,
+    casePartID = db.Column(db.INTEGER, db.ForeignKey('case_part.id'), nullable=True,
                            comment="所属模块")
-    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id", ondelete="SET NULL"), nullable=False,
+    projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=False,
                           comment="所属产品")
     results = db.relationship("InterfaceResultModel", backref="interface", lazy="dynamic")
 
     def __init__(self, title: str, steps: List, desc: str = None, creator: int = None,
                  http: str = "HTTP",
-                 connectTimeout: int = None, responseTimeout
+                 connectTimeout: int = None,
+                 responseTimeout
                  : int = None, projectID: int = None,
+                 status: CaseAPIStatus = CaseAPIStatus.DEBUG.value,
+                 level: CaseLevel = None,
                  casePartID: int = None):
         self.title = title
         self.steps = steps
         self.desc = desc
         self.http = http
+        self.level = level
+        self.status = status
         self.creator = creator if creator else g.user.id
         self.creatorName = g.user.username if g.user else None
         self.connectTimeout = connectTimeout

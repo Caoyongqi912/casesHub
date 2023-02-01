@@ -8,6 +8,12 @@ class CaseLevel(BaseEnum):
     P4 = 4
 
 
+class CaseAPIStatus(BaseEnum):
+    DEBUG = 1
+    CLOSE = 2
+    NORMAL = 3
+
+
 class CaseTag(BaseEnum):
     COMMENT = 1
     SMOCK = 2
@@ -17,6 +23,8 @@ class CaseType(BaseEnum):
     COMMENT = 1
     API = 2
     PERF = 3
+
+
 
 
 class CaseStatus(BaseEnum):
