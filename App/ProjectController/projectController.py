@@ -36,8 +36,9 @@ class ProjectController(Resource):
         parse.add(name="desc", type=str, required=False)
         parse.add(name="adminID", type=int, required=True)
         par = parse.parse_args
-        user = User.get(par.get("adminID"))
-        par['adminName'] = user.username
+        user = User.get(id=par.get("adminID"))
+        par.setdefault("adminName", user.username)
+
         Project(**par).save()
         return MyResponse.success()
 

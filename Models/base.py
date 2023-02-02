@@ -148,11 +148,7 @@ class Base(db.Model):
         :param kwargs: cls field
         :return:
         """
-
-        rvs = cls.query.filter_by(**kwargs).all()
-        if not rvs:
-            raise ParamException(ResponseMsg.NOT_FOUND)
-        return rvs
+        return cls.query.filter_by(**kwargs).all()
 
     @classmethod
     def get_by_field(cls, **kwargs):
@@ -166,6 +162,8 @@ class Base(db.Model):
         if not rv:
             raise ParamException(ResponseMsg.NOT_FOUND)
         return rv
+
+
 
     @classmethod
     def verify_unique(cls, **kwargs) -> NoReturn:

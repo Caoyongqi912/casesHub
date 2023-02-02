@@ -62,9 +62,10 @@ class CasePartController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
         part: CasePart = CasePart.get(**parse.parse_args)
-        childrens: List[CasePart] = CasePart.get_by_field(parentID=part.id)
-        for c in childrens:
-            c.delete()
+        childrens: List[CasePart] = CasePart.query_by_field(parentID=part.id)
+        if childrens:
+            for c in childrens:
+                c.delete()
         part.delete()
         return MyResponse.success()
 

@@ -58,5 +58,6 @@ class CasePart(Base):
     def query_interfaces(self):
         return self.interfaces.all()
 
+
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"

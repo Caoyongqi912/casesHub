@@ -28,8 +28,9 @@ class Project(Base):
 
     name = db.Column(db.String(20), unique=True, comment="项目名称")
     desc = db.Column(db.String(100), nullable=True, comment="项目描述")
-    adminID = db.Column(db.INTEGER, comment="项目负责人ID")
-    adminName = db.Column(db.String(20), unique=True, comment="项目负责人姓名")
+
+    adminID = db.Column(db.INTEGER,  comment="项目负责人ID")
+    adminName = db.Column(db.String(20), nullable=True, comment="项目负责人姓名")
 
     # 用户跟项目是 多对多 绑定
     users = db.relationship("User", backref="project", lazy="dynamic", secondary=projectUser)
@@ -46,8 +47,8 @@ class Project(Base):
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int, adminName: AnyStr):
         self.name = name
         self.desc = desc
-        self.adminName = adminName
         self.adminID = adminID
+        self.adminName = adminName
 
     def addUsers(self, users: List[int]) -> NoReturn:
         """
