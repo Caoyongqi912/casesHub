@@ -7,7 +7,7 @@
 from sqlalchemy.engine import CursorResult
 from typing import List, AnyStr, Dict, NoReturn, Any
 from flask_sqlalchemy import Pagination
-from sqlalchemy import asc, Column, or_
+from sqlalchemy import asc, Column, or_,and_
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
@@ -163,8 +163,6 @@ class Base(db.Model):
             raise ParamException(ResponseMsg.NOT_FOUND)
         return rv
 
-
-
     @classmethod
     def verify_unique(cls, **kwargs) -> NoReturn:
         """verify_unique by field name"""
@@ -190,18 +188,18 @@ class Base(db.Model):
         searchData: List = getSearchData(cls, **kwargs)
         sortList: List = getSortData(cls, sort)
         if sortList:
-            items = db.session.query(cls).filter(or_(*searchData)) \
+            items = db.session.query(cls).filter(and_(*searchData)) \
                 .order_by(*sortList) \
                 .limit(pageSize) \
                 .offset((current - 1) * pageSize) \
                 .all()
         else:
-            items = db.session.query(cls).filter(or_(*searchData)) \
+            items = db.session.query(cls).filter(and_(*searchData)) \
                 .order_by(cls.create_time.desc()) \
                 .limit(pageSize) \
                 .offset((current - 1) * pageSize) \
                 .all()
-        total = db.session.query(cls).filter(or_(*searchData)).count()
+        total = db.session.query(cls).filter(and_(*searchData)).count()
         return Pagination(cls, current, pageSize, total, items)
 
     @classmethod

@@ -113,7 +113,17 @@ class InterfaceHistoryController(Resource):
         return MyResponse.success(InterfaceModel.get_by_uid(**pare.parse_args).query_results)
 
 
+class PageInterfaceController(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        pare: MyRequestParseUtil = MyRequestParseUtil("values")
+        info = InterfaceModel.page(**pare.page(InterfaceModel))
+        return MyResponse.success(info)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
+api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
 api_script.add_resource(RunController, "/interface/run")
