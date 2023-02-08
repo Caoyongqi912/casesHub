@@ -4,8 +4,6 @@
 # @Software: PyCharm
 # @Desc:
 from typing import Any, Dict
-
-from requests import Response
 from jsonpath import jsonpath
 
 

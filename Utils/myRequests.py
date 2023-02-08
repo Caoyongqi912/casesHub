@@ -2,7 +2,7 @@
 # @Time    : 2022/9/15 下午2:46
 # @Author  : cyq
 # @File    : myRequest.py
-
+import json
 from typing import Dict, Any, List, Optional, NoReturn, Union, Mapping
 import requests
 import urllib3
@@ -12,11 +12,9 @@ from requests.auth import HTTPBasicAuth
 from Comment.myException import ParamException
 from Enums import ResponseMsg
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
-from Models.CaseModel.variableModel import VariableModel
 from Models.UserModel.userModel import User
 from Utils import MyLog, MyTools, AuthTypes, QueryParamTypes, HeaderTypes, RequestData, FileTypes
 from Utils.myAssert import MyAssert
-from Utils.myJsonpath import MyJsonPath
 
 log = MyLog.get_log(__file__)
 
@@ -50,7 +48,6 @@ class MyRequest:
         STATUS = 'SUCCESS'
         useTime = 0
         for step in interface.steps:
-
             log.info(f"========================= request step-{step['step']} start ================================")
             response = self.todo(url=step['url'],
                                  method=step['method'],
@@ -74,6 +71,31 @@ class MyRequest:
 
         self._writeResult(interface.id, self.responseInfo, STATUS, useTime)
 
+    def runDemo(self, **kwargs):
+        """
+        运行demo
+        :param name:
+        :param kwargs:
+        :return:
+        """
+        STATUS = 'SUCCESS'
+        name = kwargs.pop("name")
+        useTime = 0
+        response = self.todo(**kwargs)
+        useTime += response.elapsed.total_seconds()
+        info = {
+            "name": name,
+            "status": STATUS,
+            "method": response.request.method,
+            "status_code": response.status_code,
+            "body": json.loads(response.request.body) if response.request.body else None,
+            "cost": useTime,
+            "headers": dict(response.headers),
+            "cookies": response.cookies.items(),
+            "response": response.text
+        }
+        return info
+
     def todo(self, url: str,
              method: str,
              body: Optional[Any] = None,
@@ -82,7 +104,8 @@ class MyRequest:
              headers: Optional[HeaderTypes] = None,
              data: Optional[RequestData] = None,
              auth: Optional[AuthTypes] = None,
-             allow_redirects: bool = False
+             allow_redirects: bool = False,
+             **kwargs
              ) -> Response:
         """
         :param url: 路由
@@ -146,6 +169,8 @@ class MyRequest:
         """
         if extract:
             for ext in extract:
+                from .myJsonpath import MyJsonPath
+
                 value = MyJsonPath(response.json(), ext.get("val")).value
                 _ = {ext["key"]: value}
                 self.extract.append(_)
@@ -190,10 +215,16 @@ if __name__ == '__main__':
     create_app().app_context().push()
     from Models.CaseModel.hostModel import HostModel
 
-    v: VariableModel = VariableModel.get(1)
+    # v: VariableModel = VariableModel.get(1)
     u = User.get(1)
-    inter = InterfaceModel.get(29)
-    hostName = HostModel.get(6).host
-    MyRequest(hostName, v.to_Dict, u).runAPI(inter)
-    # print(var)
-    # print(inter)
+    # inter = InterfaceModel.get(29)
+    # hostName = HostModel.get(6).host
+    # MyRequest(hostName, v.to_Dict, u).runAPI(inter)
+    # # print(var)
+    # # print(inter)
+    demo = {'name': '登陆', 'method': 'POST', 'url': '/api/user/login', 'headers': []}
+    host = "http://127.0.0.1:8080"
+    my = MyRequest(HOST=host, starter=u)
+    res = my.runDemo(**demo)
+
+    print(res)

@@ -21,6 +21,9 @@ from Enums.myEnum import CaseAPIStatus
 from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel
+from Utils import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class InterfaceController(Resource):
@@ -122,8 +125,26 @@ class PageInterfaceController(Resource):
         return MyResponse.success(info)
 
 
+class RunInterfaceDemo(Resource):
+
+    @auth.login_required
+    def post(self) -> MyResponse:
+        pare: MyRequestParseUtil = MyRequestParseUtil()
+        pare.add(name="method", required=True)
+        pare.add(name="name", required=False)
+        pare.add(name="url", required=True)
+        pare.add(name="headers", required=False, type=list)
+        pare.add(name="body", type=dict, required=False)
+        from Utils.myRequests import MyRequest
+        log.info(pare.parse_args)
+        response = MyRequest(HOST="http://127.0.0.1:8080", starter=g.user).runDemo(**pare.parse_args)
+        log.info(response)
+        return MyResponse.success(response)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
 api_script.add_resource(RunController, "/interface/run")
+api_script.add_resource(RunInterfaceDemo, "/interface/demo")

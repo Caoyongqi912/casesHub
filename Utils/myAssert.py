@@ -7,7 +7,7 @@ from json import JSONDecodeError
 from typing import Any, Dict, List
 from requests import Response
 from Utils import MyLog
-from myJsonpath import MyJsonPath
+from .myJsonpath import MyJsonPath
 
 log = MyLog.get_log(__file__)
 
