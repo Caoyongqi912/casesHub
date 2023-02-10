@@ -29,3 +29,12 @@ baogoa
 """
 
 import pypinyin
+import jsonpath
+
+def demo():
+    data = {"code":0,"data":"asdasdsa","msg":"ok"}
+    jp = "$.d"
+    print(jsonpath.jsonpath(data,jp))
+
+if __name__ == '__main__':
+    demo()

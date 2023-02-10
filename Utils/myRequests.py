@@ -15,6 +15,7 @@ from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Models.UserModel.userModel import User
 from Utils import MyLog, MyTools, AuthTypes, QueryParamTypes, HeaderTypes, RequestData, FileTypes
 from Utils.myAssert import MyAssert
+from Utils.myJsonpath import MyJsonPath
 
 log = MyLog.get_log(__file__)
 
@@ -53,18 +54,22 @@ class MyRequest:
                                  method=step['method'],
                                  headers=MyTools.list2Dict(self.extract, step.get("headers")),
                                  params=MyTools.list2Dict(self.extract, step.get("params")),
-                                 body=MyTools.list2Dict(self.extract, step.get("body")),
+                                 body=step.get('body'),
                                  auth=MyTools.auth(self.extract, step.get("auth")))
             useTime += response.elapsed.total_seconds()
-            log.info(f"step-{step['step']}:status_code  ====== {response.status_code}")
+            status_code = response.status_code
+            log.info(f"step-{step['step']}:status_code  ====== {status_code}")
             log.info(f"step-{step['step']}:response     ====== {response.text}")
             log.info(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
+            # 如果响应非200
+            if status_code != 200:
+                pass
             # 如果存在校验
-            verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
+            verifyInfo, flag = MyAssert(response).doAssert(step.get("asserts"))
             self._writeResponse(step.get("step"), response, verifyInfo)
             if flag is True:
                 # 如果需要提取参数
-                self._get_extract(response, step.get("extract"))
+                self._get_extract(response, step.get("extracts"))
             else:
                 STATUS = 'FAIL'
                 break
@@ -169,9 +174,7 @@ class MyRequest:
         """
         if extract:
             for ext in extract:
-                from .myJsonpath import MyJsonPath
-
-                value = MyJsonPath(response.json(), ext.get("val")).value
+                value = MyJsonPath(response, ext.get("val")).value
                 _ = {ext["key"]: value}
                 self.extract.append(_)
 
@@ -217,14 +220,6 @@ if __name__ == '__main__':
 
     # v: VariableModel = VariableModel.get(1)
     u = User.get(1)
-    # inter = InterfaceModel.get(29)
-    # hostName = HostModel.get(6).host
-    # MyRequest(hostName, v.to_Dict, u).runAPI(inter)
-    # # print(var)
-    # # print(inter)
-    demo = {'name': '登陆', 'method': 'POST', 'url': '/api/user/login', 'headers': []}
-    host = "http://127.0.0.1:8080"
-    my = MyRequest(HOST=host, starter=u)
-    res = my.runDemo(**demo)
-
-    print(res)
+    inter = InterfaceModel.get(28)
+    Host = "http://127.0.0.1:8080"
+    MyRequest(HOST=Host, starter=u).runAPI(inter)

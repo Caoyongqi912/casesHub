@@ -16,46 +16,48 @@ class MyAssert:
     def __init__(self, response: Response = None):
         self.response = response
 
-    def jpAssert(self, jps: List[Dict[str, Any]]):
+    def doAssert(self, assertList: List[Dict[str, Any]]):
         """
-        jsonpath 校验
-        :param jps: jsonpath [{jp: str, expect: Any, option: str}]
+        校验开始
+        :param assertList: demo [{"extraOpt": "jsonpath","extraValue": "$.code","assertOpt": "==","expect": "0"}]
         :return:
         """
         flag = True
         assert_result = []
+        if assertList:
+            for _ in assertList:
 
-        for _ in jps:
+                extraOpt = _["extraOpt"]
+                extraValue = _["extraValue"]
+                assertOpt = _["assertOpt"]
+                expect = _['expect']
 
-            jp_str = _['jp']
-            expect = _['expect']
-            option = _['option']
-
-            log.info(f"jsonpath -> [{jp_str}]")
-            log.info(f"option   -> [{option}]")
-            log.info(f"expect   -> [{expect}]")
-
-            # jsonpath 提取
-            try:
-                actual: Any = MyJsonPath(response=self.response.json(), expr=jp_str).value
-            except JSONDecodeError as e:
-                log.error(repr(e))
-                flag = False
-                return assert_result, flag
-            log.info(f"actual   -> [{actual}]")
-
-            # assert 断言
-            try:
-                self._option(option, expect, actual)
-                # assert expect == actual
-                _["result"] = True
-                assert_result.append(_)
-                log.info(f"assert   -> [{flag}]")
-            except Exception as e:
-                log.error(repr(e))
-                flag, _["result"] = False, False
-                assert_result.append(_)
-                log.error(f"result   -> [{flag}]")
+                log.info(f"校验方法   -> [{extraOpt}]")
+                log.info(f"校验语法   -> [{extraValue}]")
+                log.info(f"断言方法   -> [{assertOpt}]")
+                log.info(f"预期值     -> [{expect}]")
+                if extraOpt == "jsonpath":
+                    # jsonpath 提取
+                    try:
+                        actual: Any = MyJsonPath(response=self.response, expr=extraValue).value
+                    except JSONDecodeError as e:
+                        log.error(repr(e))
+                        flag = False
+                        return assert_result, flag
+                    log.info(f"实际返回   -> [{actual}]")
+                    # assert 断言
+                    try:
+                        self._option(assertOpt, expect, actual)
+                        _["result"] = True
+                        assert_result.append(_)
+                        log.info(f"assert   -> [{flag}]")
+                    except Exception as e:
+                        log.error(repr(e))
+                        flag, _["result"] = False, False
+                        assert_result.append(_)
+                        log.error(f"result   -> [{flag}]")
+                elif extraOpt == "re":
+                    pass
 
         return assert_result, flag
 
@@ -88,7 +90,7 @@ class MyAssert:
         :param actual:
         :assert expect == actual
         """
-        assert expect == actual
+        assert str(expect) == str(actual)
 
     @staticmethod
     def assertUnEqual(expect: Any, actual: Any):
@@ -109,7 +111,6 @@ class MyAssert:
         :param actual:
         :return:
         """
-
         assert expect in actual
 
     @staticmethod

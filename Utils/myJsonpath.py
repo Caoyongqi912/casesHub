@@ -3,13 +3,18 @@
 # @File : myJsonpath.py 
 # @Software: PyCharm
 # @Desc:
+from json import JSONDecodeError
 from typing import Any, Dict
 from jsonpath import jsonpath
+from requests import Response
+from Utils import MyLog
+
+log = MyLog.get_log(__file__)
 
 
 class MyJsonPath:
 
-    def __init__(self, response: Dict[str, Any], expr: str):
+    def __init__(self, response: Response, expr: str):
         """
         :param response Response
         :param expr
@@ -23,4 +28,13 @@ class MyJsonPath:
         jsonpath 解析
         :return: Any
         """
-        return jsonpath(self.response, self.expr)[0]
+        try:
+            target = self.response.json()
+            result = jsonpath(target, self.expr)
+            if result:
+                return result[0]
+            else:
+                return
+        except JSONDecodeError as e:
+            log.error(repr(e))
+            return self.response.text

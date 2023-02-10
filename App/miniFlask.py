@@ -10,12 +10,12 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 
 
-@app.route("/api/user/login", methods=["POST"])
+@app.route("/login", methods=["POST"])
 def login():
     return jsonify({"code": 0, "data": "asdasdsa", "msg": "ok"})
 
 
-@app.route("/api/user/query", methods=["POST"])
+@app.route("/query", methods=["GET"])
 def query():
     return jsonify({"code": 0, "data": [{"name": "cyq"}, {"name": "dawa"}], "msg": "ok"})
 

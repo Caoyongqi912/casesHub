@@ -37,7 +37,7 @@ class MyTools:
             return params
         D = {}
         for _ in params:
-            D[_["key"]] = _["val"]
+            D[_["key"]] = _["value"]
         DD = deepcopy(D)
         for k, v in DD.items():
             v = MyTools.getValue(extracts, v)
@@ -138,6 +138,6 @@ class MyTools:
                 if not children:
                     children = []
                 children.append(d)
-                parent.update({"children":children})
+                parent.update({"children": children})
         return c
 
