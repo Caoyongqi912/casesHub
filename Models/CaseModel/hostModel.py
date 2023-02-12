@@ -21,6 +21,7 @@ class HostModel(Base):
     __tablename__ = "api_host"
     name = db.Column(db.String(20), unique=True, comment="host 名称")
     host = db.Column(db.String(50), comment="host 值")
+    port = db.Column(db.String(10), comment="端口 值")
     desc = db.Column(db.String(100), nullable=True, comment="描述")
 
     creatorID = db.Column(db.INTEGER, comment="创建人ID")
@@ -29,9 +30,10 @@ class HostModel(Base):
     updaterID = db.Column(db.INTEGER, nullable=True, comment="修改人ID")
     updaterName = db.Column(db.String(20), nullable=True, comment="修改人")
 
-    def __init__(self, name: str, host: str, desc: str = None):
+    def __init__(self, name: str, host: str, port: str = None, desc: str = None):
         self.name = name
         self.host = host
+        self.port = port
         self.desc = desc
         self.creatorID = g.user.id
         self.creatorName = g.user.username

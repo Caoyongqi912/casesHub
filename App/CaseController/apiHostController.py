@@ -20,6 +20,7 @@ class HostController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", type=str, required=True)
         parse.add(name="host", type=str, required=True)
+        parse.add(name="port", type=str, required=True)
         parse.add(name="desc")
         HostModel(**parse.parse_args).save()
         return MyResponse.success()
