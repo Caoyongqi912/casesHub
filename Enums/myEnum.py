@@ -25,8 +25,6 @@ class CaseType(BaseEnum):
     PERF = 3
 
 
-
-
 class CaseStatus(BaseEnum):
     QUEUE = 1
     TESTING = 2

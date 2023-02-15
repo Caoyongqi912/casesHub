@@ -58,7 +58,7 @@ class InterfaceController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
-        pare.add(name=UID)
+        pare.add(name=UID,required=True)
         return MyResponse.success(InterfaceModel.get_by_uid(**pare.parse_args))
 
     @auth.login_required
