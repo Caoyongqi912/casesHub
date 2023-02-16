@@ -95,7 +95,8 @@ class MyFile:
         :param avatarPath: 绝对路径
         :return:
         """
-        os.remove(avatarPath)
+        if os.path.exists(avatarPath):
+            os.remove(avatarPath)
 
     @staticmethod
     def reader(f: FileModel):
