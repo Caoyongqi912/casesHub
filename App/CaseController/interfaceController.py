@@ -20,8 +20,9 @@ from Enums import CaseLevel
 from Enums.myEnum import CaseAPIStatus
 from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.CaseModel.interfaceModel import InterfaceModel
+from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Utils import MyLog
+from Utils.myRequests import MyRequest
 
 log = MyLog.get_log(__file__)
 
@@ -58,7 +59,7 @@ class InterfaceController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
-        pare.add(name=UID,required=True)
+        pare.add(name=UID, required=True)
         return MyResponse.success(InterfaceModel.get_by_uid(**pare.parse_args))
 
     @auth.login_required
@@ -68,11 +69,13 @@ class InterfaceController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
-        pare.add(name=UID, type=int, required=True)
+        pare.add(name=UID, required=True)
         pare.add(name="title")
         pare.add(name="desc")
         pare.add(name="http")
         pare.add(name="level", enum=CaseLevel)
+        pare.add(name="status", enum=CaseAPIStatus)
+
         pare.add(name="steps", type=list)
         pare.add(name="connectTimeout", type=int)
         pare.add(name="responseTimeout", type=int)
@@ -99,8 +102,12 @@ class RunController(Resource):
         :return:
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
-        pare.add(name="interfaceID", type=int)
-        return MyResponse.success()
+        pare.add(name=UID)
+        Host = "http://127.0.0.1:8080"
+        inter = InterfaceModel.get_by_uid(**pare.parse_args)
+        uid = MyRequest(HOST=Host, starter=g.user).runAPI(inter)
+
+        return MyResponse.success(uid)
 
 
 class InterfaceHistoryController(Resource):
@@ -131,7 +138,7 @@ class RunInterfaceDemo(Resource):
     def post(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name="method", required=True)
-        pare.add(name="name", required=False)
+        pare.add(name="name", required=True)
         pare.add(name="url", required=True)
         pare.add(name="headers", required=False, type=list)
         pare.add(name="body", type=dict, required=False)
@@ -142,9 +149,19 @@ class RunInterfaceDemo(Resource):
         return MyResponse.success(response)
 
 
+class GetInterResponse(Resource):
+
+    @auth.login_required
+    def get(self):
+        pare: MyRequestParseUtil = MyRequestParseUtil("values")
+        pare.add(name=UID, required=True)
+        return MyResponse.success(InterfaceResultModel.get_by_uid(**pare.parse_args))
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
 api_script.add_resource(RunController, "/interface/run")
+api_script.add_resource(GetInterResponse, "/interface/response")
 api_script.add_resource(RunInterfaceDemo, "/interface/demo")

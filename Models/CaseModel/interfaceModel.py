@@ -6,7 +6,7 @@
 # @Software: PyCharm
 # @Desc: 流程接口实体类
 
-from typing import List, Any, NoReturn
+from typing import List, Any, NoReturn, Mapping, Dict
 from flask import g
 from App import db
 from Enums import CaseLevel, IntEnum, CaseStatus
@@ -61,14 +61,15 @@ class InterfaceModel(Base):
     def query_results(self):
         return self.results.order_by("create_time").all()
 
-    def update(self, **kwargs) -> NoReturn:
+    @classmethod
+    def update(cls, **kwargs) -> NoReturn:
         """
         更新、添加updaterName字段
         :param kwargs:
         :return:
         """
         kwargs.setdefault("updaterName", g.user.username)
-        return super(InterfaceModel, self).update()
+        return super(InterfaceModel, cls).update(**kwargs)
 
     def __repr__(self):
         return f"<{InterfaceModel.__name__} {self.title}>"
@@ -77,10 +78,13 @@ class InterfaceModel(Base):
 class InterfaceResultModel(Base):
     __tablename__ = 'interface_result'
     interfaceID = db.Column(db.INTEGER, db.ForeignKey('interface.id', ondelete='CASCADE'), comment="所属用例")
+    interfaceName = db.Column(db.String(20), comment="用例名称")
+    interfaceSteps = db.Column(db.INTEGER, comment="用例步长")
+    interfaceLog = db.Column(db.TEXT, comment="运行日志")
+    useTime = db.Column(db.String(20), comment="用时")
     resultInfo = db.Column(db.JSON, nullable=True, comment="响应结果")
     starterID = db.Column(db.INTEGER, comment="运行人ID")
     starterName = db.Column(db.String(20), comment="运行人姓名")
-    useTime = db.Column(db.String(20), comment="用时")
     status = db.Column(db.Enum('SUCCESS', 'FAIL'), nullable=False, comment="运行状态")
 
     def __repr__(self):
