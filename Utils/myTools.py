@@ -22,13 +22,13 @@ class MyTools:
     def list2Dict(extracts: List | None = None, params: List[Dict[str, str]] | None = None, ) -> Dict[str, str] | None:
         """
         1、参数转换 extracts ↓
-        [{"key":"Content-Type","val":"application/json"},{"key":"token","val":"{{token}}"}]
+       [{'id': 1677578978008, 'key': 'Authorization', 'value': '{{token}}'}]
         ==>
         {"Content-Type":"application/json",token:  {{token}}}
         2、提取转换  params  ↓
-        [{token:xxx}]
+        [{'token': 0}]
         ===> 返回
-        {"Content-Type":"application/json",token:xxx}
+        {"Content-Type":"application/json",token:0}
         :param extracts: [{token:xxx}]
         :param params:   [{"key":"Content-Type","val":"application/json"},{"key":"token","val":"{{token}}"}]
         :return:
@@ -71,8 +71,8 @@ class MyTools:
             _ = target.replace("{{", "").replace("}}", "")
             for ext in extracts:
                 v = ext.get(val)
-                if v:
-                    return _.replace(val, v)
+                if v is not None:
+                    return _.replace(val, str(v))
                 else:
                     continue
         else:
@@ -141,3 +141,13 @@ class MyTools:
                 parent.update({"children": children})
         return c
 
+    @classmethod
+    def to_ms(cls, number: int | float) -> str:
+        return f"{round(number * 1000, 2)}ms"
+
+
+if __name__ == '__main__':
+    e = [{'id': 1677578978008, 'key': 'Authorization', 'value': '{{token}}'}]
+    p = [{'token': 0}]
+
+    MyTools.list2Dict(p, e)

@@ -15,7 +15,15 @@
       <jdbc-url>jdbc:mysql://localhost:3306/caseHub</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="CBS" uuid="8ada2bb3-ca39-44db-ae90-6d942e1e41d3">
+    <data-source source="LOCAL" name="NJ_CBS" uuid="8ada2bb3-ca39-44db-ae90-6d942e1e41d3">
+      <driver-ref>oracle.19</driver-ref>
+      <synchronize>true</synchronize>
+      <auto-commit>false</auto-commit>
+      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+      <jdbc-url>jdbc:oracle:thin:@10.10.105.110:1521/cbsdbt</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="HZ_CBS" uuid="83a54512-59ea-4257-8f13-8da04388b7e2">
       <driver-ref>oracle.19</driver-ref>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>

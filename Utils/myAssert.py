@@ -45,6 +45,8 @@ class MyAssert:
                         flag = False
                         return assert_result, flag
                     log.info(f"实际返回   -> [{actual}]")
+
+                    _['actual'] = actual
                     # assert 断言
                     try:
                         self._option(assertOpt, expect, actual)

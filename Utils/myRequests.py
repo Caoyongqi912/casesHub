@@ -102,7 +102,7 @@ class MyRequest:
             "method": response.request.method,
             "status_code": response.status_code,
             "body": json.loads(response.request.body) if response.request.body else None,
-            "cost": USETIME,
+            "cost": MyTools.to_ms(USETIME),
             "headers": dict(response.headers),
             "cookies": response.cookies.items(),
             "response": response.text
@@ -145,14 +145,26 @@ class MyRequest:
         self.responseInfo.append(info)
 
     def _writeResponse(self, stepID: int, response: Response = None,
-                       verifyInfo: Any = None):
-
+                       verifyInfo: Any = None) -> NoReturn:
+        """
+        记录人每步请求结果信息
+        :param stepID: 步骤
+        :param response: 相应
+        :param verifyInfo: 断言结果
+        """
         info = {
             "step": stepID,
+            "request": {
+                "method": response.request.method,
+                "headers": dict(response.request.headers),
+
+            },
             "response": {
                 "status_code": response.status_code,
                 "response": response.text,
-                "elapsed": response.elapsed.total_seconds()
+                "headers": dict(response.headers),
+                "cookie": response.cookies.items(),
+                "elapsed": MyTools.to_ms(response.elapsed.total_seconds())
             },
             "verify": verifyInfo
         }
@@ -160,7 +172,7 @@ class MyRequest:
 
     def _writeResult(self, interfaceID: int, interfaceName: str, interfaceSteps: int,
                      responseInfo: List[Dict[str, Any]], status: str,
-                     useTime: Union[str, float, int]) -> str:
+                     useTime: Union[str, float, int]) -> InterfaceModel.uid:
         """
         测试结果入库
         :param interfaceID: 接口id
@@ -176,7 +188,7 @@ class MyRequest:
         interfaceResult.resultInfo = responseInfo
         interfaceResult.interfaceLog = "".join(self.LOG)
         interfaceResult.status = status
-        interfaceResult.useTime = useTime
+        interfaceResult.useTime = MyTools.to_ms(useTime)
         interfaceResult.starterID = self.starter.id
         interfaceResult.starterName = self.starter.username
         interfaceResult.save()
