@@ -34,7 +34,7 @@ class MyBaseRequest:
         log.info(kwargs)
         if kwargs.get("auth", None):
             kwargs['auth'] = HTTPBasicAuth(**kwargs['auth'])
-        kwargs["url"] = self.host + kwargs['url']
+        kwargs["url"] = kwargs.pop("http").lower() + "://" + self.host + kwargs['url']
         method = method.lower()
         try:
             self.response = getattr(self.request_obj, method)(**kwargs)

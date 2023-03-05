@@ -18,6 +18,7 @@ from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Enums import CaseLevel
 from Enums.myEnum import CaseAPIStatus
+from Models.CaseModel.hostModel import HostModel
 from MyException import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
@@ -103,10 +104,10 @@ class RunController(Resource):
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name=UID)
-        Host = "http://127.0.0.1:8080"
-        inter = InterfaceModel.get_by_uid(**pare.parse_args)
+        pare.add(name="HostID")
+        Host = HostModel.get_by_uid(pare.parse_args.get("HostID"))
+        inter = InterfaceModel.get_by_uid(pare.parse_args.get(UID))
         uid = MyRequest(HOST=Host, starter=g.user).runAPI(inter)
-
         return MyResponse.success(uid)
 
 

@@ -56,5 +56,17 @@ class HostController(Resource):
         return MyResponse.success()
 
 
+class QueryHost(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        """
+        获取hosts
+        :return:
+        """
+        return MyResponse.success(HostModel.all())
+
+
 api_script = Api(caseBP)
 api_script.add_resource(HostController, "/host/opt")
+api_script.add_resource(QueryHost, "/host/query")

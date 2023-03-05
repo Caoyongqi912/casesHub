@@ -22,7 +22,7 @@ class MyTools:
     def list2Dict(extracts: List | None = None, params: List[Dict[str, str]] | None = None, ) -> Dict[str, str] | None:
         """
         1、参数转换 extracts ↓
-       [{'id': 1677578978008, 'key': 'Authorization', 'value': '{{token}}'}]
+        [{'id': 1677578978008, 'key': 'Authorization', 'value': 'hahah - {{token}}'}]
         ==>
         {"Content-Type":"application/json",token:  {{token}}}
         2、提取转换  params  ↓
@@ -147,7 +147,8 @@ class MyTools:
 
 
 if __name__ == '__main__':
-    e = [{'id': 1677578978008, 'key': 'Authorization', 'value': '{{token}}'}]
+    e = [{'id': 1677578978008, 'key': 'Authorization', 'value': 'hahah - {{token}}'}]
     p = [{'token': 0}]
 
-    MyTools.list2Dict(p, e)
+    res = MyTools.list2Dict(p, e)
+    print(res)

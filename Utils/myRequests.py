@@ -9,9 +9,8 @@ import urllib3
 from requests import Response, exceptions
 from requests.auth import HTTPBasicAuth
 
-from Comment.myException import ParamException
-from Enums import ResponseMsg
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
+from Models.CaseModel.hostModel import HostModel
 from Models.UserModel.userModel import User
 from Utils import MyLog, MyTools, AuthTypes, QueryParamTypes, HeaderTypes, RequestData, FileTypes
 from Utils.myAssert import MyAssert
@@ -25,7 +24,7 @@ class MyRequest:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
-    def __init__(self, HOST: str, variable: Mapping[str, Any] = None, starter: User = None):
+    def __init__(self, HOST: HostModel, variable: Mapping[str, Any] = None, starter: User = None):
         """
         :param HOST:      host
         :param variable:  使用得环境变量
@@ -34,7 +33,7 @@ class MyRequest:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
-        self.worker = MyBaseRequest(host=HOST)
+        self.worker = MyBaseRequest(host=HOST.host + ":" + HOST.port)
         if variable:
             self.extract.append(variable)
         self.LOG = []
@@ -53,7 +52,7 @@ class MyRequest:
             log.info(f"========================= request step-{step['step']} start ================================")
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
-            response = self.run(**step)
+            response = self.run(interface.http, **step)
             # 如果响应报错
             if isinstance(response, Exception):
                 self._writeError(step.get("step"), repr(response))
@@ -113,6 +112,7 @@ class MyRequest:
 
         response = self.worker.todo(url=kwargs['url'],
                                     method=kwargs['method'],
+                                    http=args[0],
                                     headers=MyTools.list2Dict(self.extract, kwargs.get("headers")),
                                     params=MyTools.list2Dict(self.extract, kwargs.get("params")),
                                     json=kwargs.get('body'),
@@ -203,6 +203,6 @@ if __name__ == '__main__':
 
     # v: VariableModel = VariableModel.get(1)
     u = User.get(1)
-    inter = InterfaceModel.get(39)
-    Host = "http://127.0.0.1:8080"
+    inter = InterfaceModel.get_by_uid("wpjhYVlxIXrXgaRRVoHv")
+    Host = HostModel.get_by_uid("FmOSZlPBfBgwNNwPLJOh")
     MyRequest(HOST=Host, starter=u).runAPI(inter)
