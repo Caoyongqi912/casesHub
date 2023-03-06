@@ -3,16 +3,14 @@
 # @Author  : cyq
 # @File    : myRequest.py
 import json
-from typing import Dict, Any, List, Optional, NoReturn, Union, Mapping
-import requests
-import urllib3
-from requests import Response, exceptions
-from requests.auth import HTTPBasicAuth
+
+from typing import Dict, Any, List, NoReturn, Union, Mapping
+from requests import Response
 
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Models.CaseModel.hostModel import HostModel
 from Models.UserModel.userModel import User
-from Utils import MyLog, MyTools, AuthTypes, QueryParamTypes, HeaderTypes, RequestData, FileTypes
+from Utils import MyLog, MyTools
 from Utils.myAssert import MyAssert
 from Utils.myBaseRequests import MyBaseRequest
 from Utils.myJsonpath import MyJsonPath
@@ -21,7 +19,6 @@ log = MyLog.get_log(__file__)
 
 
 class MyRequest:
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
     def __init__(self, HOST: HostModel, variable: Mapping[str, Any] = None, starter: User = None):
@@ -49,28 +46,25 @@ class MyRequest:
         STATUS = 'SUCCESS'
         useTime = 0
         for step in interface.steps:
-            log.info(f"========================= request step-{step['step']} start ================================")
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
             response = self.run(interface.http, **step)
             # 如果响应报错
-            if isinstance(response, Exception):
+            if isinstance(response, Exception) or response.status_code != 200:
+                STATUS = "FAIL"
                 self._writeError(step.get("step"), repr(response))
+                self.LOG.append(f"step-{step['step']}:response     ====== {repr(response)}\n")
                 break
+
             else:
                 useTime += response.elapsed.total_seconds()
                 status_code = response.status_code
-                log.info(f"step-{step['step']}:status_code  ====== {status_code}")
-                log.info(f"step-{step['step']}:response     ====== {response.text}")
-                log.info(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
                 self.LOG.append(f"step-{step['step']}:status_code  ====== {status_code}\n")
-                self.LOG.append(f"step-{step['step']}:response     ====== {response.text}\n")
+                self.LOG.append(f"step-{step['step']}:response     ====== {response.text}")
                 self.LOG.append(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s \n")
-                # 如果响应非200
-                if status_code != 200:
-                    pass
                 # 如果存在校验
-                verifyInfo, flag = MyAssert(response).doAssert(step.get("asserts"))
+                verifyInfo, flag, verifyLog = MyAssert(response).doAssert(step.get("step"), step.get("asserts"))
+                self.LOG.extend(verifyLog)
                 self._writeResponse(step.get("step"), response, verifyInfo)
                 if flag is True:
                     # 如果需要提取参数
@@ -78,7 +72,7 @@ class MyRequest:
                 else:
                     STATUS = 'FAIL'
                     break
-
+        self.LOG.append(f"\n case {interface.title} 结束 . 共用时{useTime}s \n")
         return self._writeResult(interface.id, interface.title, len(interface.steps), self.responseInfo, STATUS,
                                  useTime)
 
@@ -110,13 +104,27 @@ class MyRequest:
 
     def run(self, *args, **kwargs):
 
-        response = self.worker.todo(url=kwargs['url'],
-                                    method=kwargs['method'],
-                                    http=args[0],
-                                    headers=MyTools.list2Dict(self.extract, kwargs.get("headers")),
-                                    params=MyTools.list2Dict(self.extract, kwargs.get("params")),
-                                    json=kwargs.get('body'),
-                                    auth=MyTools.auth(self.extract, kwargs.get("auth")))
+        headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
+        params = MyTools.list2Dict(self.extract, kwargs.get("params"))
+        auth = MyTools.auth(self.extract, kwargs.get("auth"))
+        body = kwargs.get('body')
+        method = kwargs['method']
+        url = kwargs['url']
+        http = args[0],
+
+        self.LOG.append(f"step-{kwargs['step']}:url  ====== {url}\n")
+        self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
+        self.LOG.append(f"step-{kwargs['step']}:headers  ====== {headers}\n")
+        self.LOG.append(f"step-{kwargs['step']}:params  ====== {params}\n")
+        self.LOG.append(f"step-{kwargs['step']}:body  ====== {body}\n")
+
+        response = self.worker.todo(url=url,
+                                    http=http,
+                                    method=method,
+                                    headers=headers,
+                                    params=params,
+                                    json=body,
+                                    auth=auth)
         return response
 
     def _get_extract(self, response: Response, extract: List[Dict[str, str]] | None = None):

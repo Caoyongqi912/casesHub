@@ -15,10 +15,12 @@ log = MyLog.get_log(__file__)
 class MyAssert:
     def __init__(self, response: Response = None):
         self.response = response
+        self.LOG = []
 
-    def doAssert(self, assertList: List[Dict[str, Any]]):
+    def doAssert(self, step: int, assertList: List[Dict[str, Any]]):
         """
         校验开始
+        :param  step 步骤id
         :param assertList: demo [{"extraOpt": "jsonpath","extraValue": "$.code","assertOpt": "==","expect": "0"}]
         :return:
         """
@@ -36,6 +38,11 @@ class MyAssert:
                 log.info(f"校验语法   -> [{extraValue}]")
                 log.info(f"断言方法   -> [{assertOpt}]")
                 log.info(f"预期值     -> [{expect}]")
+                self.LOG.append(f"step-{step}:校验方法  ====== {extraOpt}\n")
+                self.LOG.append(f"step-{step}:校验语法  ====== {extraValue}\n")
+                self.LOG.append(f"step-{step}:断言方法  ====== {assertOpt}\n")
+                self.LOG.append(f"step-{step}:预期值  ====== {expect}\n")
+
                 if extraOpt == "jsonpath":
                     # jsonpath 提取
                     try:
@@ -45,6 +52,7 @@ class MyAssert:
                         flag = False
                         return assert_result, flag
                     log.info(f"实际返回   -> [{actual}]")
+                    self.LOG.append(f"step-{step}:实际返回  ====== {actual}\n")
 
                     _['actual'] = actual
                     # assert 断言
@@ -61,7 +69,7 @@ class MyAssert:
                 elif extraOpt == "re":
                     pass
 
-        return assert_result, flag
+        return assert_result, flag, self.LOG
 
     def _option(self, T: str, expect: Any, actual: Any):
         """

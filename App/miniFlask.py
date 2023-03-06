@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 @app.route("/login", methods=["POST"])
 def login():
-    return jsonify({"code": 0, "data": "asdasdsa", "msg": "ok"})
+    return jsonify({"code": 0, "data": "im token", "msg": "ok"})
 
 
 @app.route("/query", methods=["GET"])
