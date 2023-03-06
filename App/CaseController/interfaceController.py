@@ -138,14 +138,16 @@ class RunInterfaceDemo(Resource):
     @auth.login_required
     def post(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil()
+        pare.add(name="HostID", required=True)
         pare.add(name="method", required=True)
         pare.add(name="name", required=True)
         pare.add(name="url", required=True)
         pare.add(name="headers", required=False, type=list)
         pare.add(name="body", type=dict, required=False)
         from Utils.myRequests import MyRequest
-        log.info(pare.parse_args)
-        response = MyRequest(HOST="http://127.0.0.1:8080", starter=g.user).runDemo(**pare.parse_args)
+        host = HostModel.get_by_uid(pare.parse_args.get("HostID"))
+        response = MyRequest(HOST=host, starter=g.user).runDemo(
+            **pare.parse_args)
         log.info(response)
         return MyResponse.success(response)
 

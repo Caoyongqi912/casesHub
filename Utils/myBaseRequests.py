@@ -25,16 +25,18 @@ class MyBaseRequest:
 
     def todo(self,
              method: str,
+             http: str,
              **kwargs
              ) -> Response | Exception:
         """
+        :param http: http
         :param method : 请求方法
         :return: response
         """
         log.info(kwargs)
         if kwargs.get("auth", None):
             kwargs['auth'] = HTTPBasicAuth(**kwargs['auth'])
-        kwargs["url"] = kwargs.pop("http").lower() + "://" + self.host + kwargs['url']
+        kwargs["url"] = http.lower() + "://" + self.host + kwargs['url']
         method = method.lower()
         try:
             self.response = getattr(self.request_obj, method)(**kwargs)

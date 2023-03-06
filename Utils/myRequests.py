@@ -102,7 +102,7 @@ class MyRequest:
         }
         return info
 
-    def run(self, *args, **kwargs):
+    def run(self, http="http", **kwargs):
 
         headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
         params = MyTools.list2Dict(self.extract, kwargs.get("params"))
@@ -110,7 +110,6 @@ class MyRequest:
         body = kwargs.get('body')
         method = kwargs['method']
         url = kwargs['url']
-        http = args[0],
 
         self.LOG.append(f"step-{kwargs['step']}:url  ====== {url}\n")
         self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
