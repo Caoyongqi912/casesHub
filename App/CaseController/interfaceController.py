@@ -139,16 +139,10 @@ class RunInterfaceDemo(Resource):
     def post(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name="HostID", required=True)
-        pare.add(name="method", required=True)
-        pare.add(name="name", required=True)
-        pare.add(name="url", required=True)
-        pare.add(name="headers", required=False, type=list)
-        pare.add(name="body", type=dict, required=False)
+        pare.add(name="step", type=dict, required=False)
         from Utils.myRequests import MyRequest
-        host = HostModel.get_by_uid(pare.parse_args.get("HostID"))
-        response = MyRequest(HOST=host, starter=g.user).runDemo(
-            **pare.parse_args)
-        log.info(response)
+        host = HostModel.get_by_uid(uid=pare.parse_args.pop("HostID"))
+        response = MyRequest(HOST=host, starter=g.user)
         return MyResponse.success(response)
 
 

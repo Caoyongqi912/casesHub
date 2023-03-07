@@ -4,7 +4,7 @@
 # @File    : myRequest.py
 import json
 
-from typing import Dict, Any, List, NoReturn, Union, Mapping
+from typing import Dict, Any, List, NoReturn, Union, Mapping, AnyStr
 from requests import Response
 
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
@@ -76,33 +76,7 @@ class MyRequest:
         return self._writeResult(interface.id, interface.title, len(interface.steps), self.responseInfo, STATUS,
                                  useTime)
 
-    def runDemo(self, **kwargs):
-        """
-        运行demo
-        :param name:
-        :param kwargs:
-        :return:
-        """
-        STATUS = 'SUCCESS'
-        USETIME = 0
-        name = kwargs.pop("name")
-        log.info(kwargs)
-        response = self.run(**kwargs)
-        USETIME += response.elapsed.total_seconds()
-        info = {
-            "name": name,
-            "status": STATUS,
-            "method": response.request.method,
-            "status_code": response.status_code,
-            "body": json.loads(response.request.body) if response.request.body else None,
-            "cost": MyTools.to_ms(USETIME),
-            "headers": dict(response.headers),
-            "cookies": response.cookies.items(),
-            "response": response.text
-        }
-        return info
-
-    def run(self, http="http", **kwargs):
+    def run(self, http, **kwargs):
 
         headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
         params = MyTools.list2Dict(self.extract, kwargs.get("params"))
