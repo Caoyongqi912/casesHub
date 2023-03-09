@@ -29,6 +29,7 @@ class ProjectConfig:
     HOST = "127.0.0.1"
     REDIS_PORT = 6379
     MYSQL_PORT = 3306
+    ORAClE_PORT = 1521
     MONGODB_PORT = 27017
     MYSQL_DATABASE = 'caseHub'
     MONGODB_DB = 'caseHub'

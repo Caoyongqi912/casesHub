@@ -141,8 +141,9 @@ class RunInterfaceDemo(Resource):
         pare.add(name="HostID", required=True)
         pare.add(name="step", type=dict, required=False)
         from Utils.myRequests import MyRequest
-        host = HostModel.get_by_uid(uid=pare.parse_args.pop("HostID"))
-        response = MyRequest(HOST=host, starter=g.user)
+        reqData = pare.parse_args
+        host = HostModel.get_by_uid(uid=reqData.pop("HostID"))
+        response = MyRequest(HOST=host, starter=g.user).runText(reqData.get("step"))
         return MyResponse.success(response)
 
 

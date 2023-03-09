@@ -41,7 +41,7 @@ class MyRequest:
         """
         运行api
         进行校验与结果入库
-        :param interface:
+        :param interface: InterfaceModel
         """
         STATUS = 'SUCCESS'
         useTime = 0
@@ -76,20 +76,50 @@ class MyRequest:
         return self._writeResult(interface.id, interface.title, len(interface.steps), self.responseInfo, STATUS,
                                  useTime)
 
-    def run(self, http, **kwargs):
+    def runText(self, step: dict, http: str = "http"):
 
+        """
+        单步骤调试
+        :param http: default http
+        :param step: 步骤入参
+        :return:
+        """
+        STATUS = 'SUCCESS'
+        USETIME = 0
+        response: Response = self.run(http, **step)
+
+        if step.get("extracts"):
+            self._get_extract(response, step.get("extracts"))
+        verifyInfo, flag, verifyLog = MyAssert(response).doAssert(step.get("step"), step.get("asserts"))
+        USETIME += response.elapsed.total_seconds()
+
+        info = {
+            "status": STATUS,
+            "method": response.request.method,
+            "status_code": response.status_code,
+            "body": json.loads(response.request.body) if response.request.body else None,
+            "cost": MyTools.to_ms(USETIME),
+            "headers": dict(response.headers),
+            "cookies": response.cookies.items(),
+            "response": response.text,
+            "extracts": self.extract,
+            "asserts": verifyInfo
+        }
+        return info
+
+    def run(self, http, **kwargs):
         headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
         params = MyTools.list2Dict(self.extract, kwargs.get("params"))
         auth = MyTools.auth(self.extract, kwargs.get("auth"))
         body = kwargs.get('body')
         method = kwargs['method']
-        url = kwargs['url']
+        url = kwargs["url"].split("?")[0]
 
-        self.LOG.append(f"step-{kwargs['step']}:url  ====== {url}\n")
+        self.LOG.append(f"step-{kwargs['step']}:url     ====== {url}\n")
         self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
-        self.LOG.append(f"step-{kwargs['step']}:headers  ====== {headers}\n")
+        self.LOG.append(f"step-{kwargs['step']}:headers ====== {headers}\n")
         self.LOG.append(f"step-{kwargs['step']}:params  ====== {params}\n")
-        self.LOG.append(f"step-{kwargs['step']}:body  ====== {body}\n")
+        self.LOG.append(f"step-{kwargs['step']}:body    ====== {body}\n")
 
         response = self.worker.todo(url=url,
                                     http=http,
@@ -107,7 +137,7 @@ class MyRequest:
         :param response:
         :param extract:[{"key":"token","val":"$.data.token"}] -> self.extract = [{"token":"xxxx"}]
         """
-        if extract:
+        if extract and response.status_code == 200:
             for ext in extract:
                 value = MyJsonPath(response, ext.get("val")).value
                 _ = {ext["key"]: value}
