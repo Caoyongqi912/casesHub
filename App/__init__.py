@@ -67,7 +67,8 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     from .FileController import fileBp
     app.register_blueprint(fileBp)
 
-    from .reqhook import logWrite, resp
+    from .reqhook import logWrite, resp, register_errors
     app.before_request(logWrite)
     app.after_request(resp)
+    register_errors(app)
     return app

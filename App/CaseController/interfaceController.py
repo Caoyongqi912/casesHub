@@ -9,8 +9,6 @@
 5、补全
 
 """
-from typing import Dict, Any
-
 from flask import g
 from flask_restful import Resource
 from App import auth, UID
@@ -19,7 +17,7 @@ from Comment.myResponse import MyResponse
 from Enums import CaseLevel
 from Enums.myEnum import CaseAPIStatus
 from Models.CaseModel.hostModel import HostModel
-from MyException import Api
+from flask_restful import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
 from Utils import MyLog

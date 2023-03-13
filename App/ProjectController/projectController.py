@@ -7,7 +7,7 @@ from typing import AnyStr
 
 from flask_restful import Resource
 
-from MyException import Api
+from flask_restful import Api
 from App.ProjectController import proBP
 from App import auth, siwa, UID
 from App.myAuth import is_admin

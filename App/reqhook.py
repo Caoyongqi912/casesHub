@@ -1,6 +1,11 @@
 from typing import Union, NoReturn
-from flask import request, Response
 
+import sqlalchemy
+from flask import request, Response
+from flask_limiter import RateLimitExceeded
+from werkzeug.exceptions import HTTPException, MethodNotAllowed
+
+from Comment.myException import AuthException, ParamException, MyException
 from Comment.myResponse import MyResponse
 from Utils import MyLog
 
@@ -17,8 +22,8 @@ def logWrite() -> NoReturn:
         f"request url = {request.url} \n"
         f"request Host = {request.host} \n"
         f"request Method = {request.method} ")
-
     log.info(request.headers)
+
 
 def resp(response: Response) -> Union[MyResponse, Response]:
     """
@@ -31,12 +36,18 @@ def resp(response: Response) -> Union[MyResponse, Response]:
     log.info(
         f"[ response body = {response.json} ]"
     )
-    # if response.status_code == 404:
-    #     return jsonify(MyResponse.not_find())
-    # elif response.status_code == 500:
-    #     return jsonify(MyResponse.error(ResponseCode.SERVER_ERROR))
-    # elif response.status_code == 403:
-    #     return jsonify(AuthError.error())
     return response
 
 
+def register_errors(app):
+    @app.errorhandler(Exception)
+    def framework_error(e):
+        if isinstance(e, AuthException | ParamException):
+            return e
+        if isinstance(e, MethodNotAllowed):
+            return e
+        if isinstance(e, RateLimitExceeded):
+            return MyException("too manny request! be wait ..")
+        if isinstance(e, sqlalchemy.exc.OperationalError):
+            return MyException("MySQL server error")
+        return MyException()

@@ -13,7 +13,7 @@ from Enums.myEnum import FileEnum
 from Models.CaseModel.fileModel import FileModel
 from Models.FileModel.fileDB import FileDB
 from Models.ProjectModel.projectModel import Project
-from MyException import Api
+from flask_restful import Api
 from Utils.myFile import MyFile
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from werkzeug.datastructures import FileStorage

@@ -2,7 +2,7 @@ from flask_restful import Resource
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Models.ProjectModel.projectModel import Project
-from MyException import Api
+from flask_restful import Api
 from App import auth, UID
 from Models.CaseModel.variableModel import VariableModel
 from Utils.myRequestParseUtil import MyRequestParseUtil

@@ -25,7 +25,6 @@ class ResponseMsg:
     LIMITER_ERROR = "to many request! wait.."
     PARAM_ERROR = "params error ! place check"
 
-
     @staticmethod
     def miss(target: AnyStr) -> AnyStr:
         return f"miss {target} arg !"

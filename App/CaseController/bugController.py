@@ -7,7 +7,7 @@ from flask_restful import Resource
 
 from Models.CaseModel.platformsModel import Platform
 from Models.ProjectModel.versions import Version
-from MyException import Api
+from flask_restful import Api
 from App import auth, UID, auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse

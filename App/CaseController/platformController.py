@@ -6,7 +6,7 @@
 from flask_restful import Resource
 
 from Models.ProjectModel.projectModel import Project
-from MyException import Api
+from flask_restful import Api
 from App import auth, UID, auth
 from Comment.myException import MyResponse
 from App.CaseController import caseBP

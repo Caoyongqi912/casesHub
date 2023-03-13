@@ -5,7 +5,7 @@
 # @Desc:
 
 from flask_restful import Resource
-from MyException import Api
+from flask_restful import Api
 from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse

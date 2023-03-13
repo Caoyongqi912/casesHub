@@ -12,7 +12,7 @@ from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Models.CaseModel.casePartModel import CasePart
 from Models.ProjectModel.projectModel import Project
-from MyException import Api
+from flask_restful import Api
 from Utils import MyTools
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
