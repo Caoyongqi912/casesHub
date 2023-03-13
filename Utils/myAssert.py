@@ -45,15 +45,12 @@ class MyAssert:
 
                 if extraOpt == "jsonpath":
                     # jsonpath 提取
-                    try:
-                        actual: Any = MyJsonPath(response=self.response, expr=extraValue).value
-                    except JSONDecodeError as e:
-                        log.error(repr(e))
+                    actual: Any = MyJsonPath(response=self.response, expr=extraValue).value
+                    if isinstance(actual, JSONDecodeError):
                         flag = False
                         return assert_result, flag
                     log.info(f"实际返回   -> [{actual}]")
                     self.LOG.append(f"step-{step}:实际返回  ====== {actual}\n")
-
                     _['actual'] = actual
                     # assert 断言
                     try:

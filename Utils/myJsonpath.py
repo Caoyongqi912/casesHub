@@ -35,6 +35,7 @@ class MyJsonPath:
                 return result[0]
             else:
                 return
+        # 可能不是json
         except JSONDecodeError as e:
             log.error(repr(e))
-            return self.response.text
+            return

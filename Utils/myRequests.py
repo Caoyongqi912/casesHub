@@ -48,20 +48,26 @@ class MyRequest:
         for step in interface.steps:
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
-            response = self.run(interface.http, **step)
+            response: Union[Response, Exception] = self.run(interface.http, **step)
             # 如果响应报错
-            if isinstance(response, Exception) or response.status_code != 200:
+            if isinstance(response, Exception):
                 STATUS = "FAIL"
                 self._writeError(step.get("step"), repr(response))
-                self.LOG.append(f"step-{step['step']}:response     ====== {repr(response)}\n")
+                self.LOG.append(f"step-{step['step']}:response                 ====== {repr(response)}\n")
                 break
-
+            # 如果相应非200
+            elif response.status_code != 200:
+                STATUS = "FAIL"
+                self.LOG.append(f"step-{step['step']}:response.text            ====== {repr(response.text)}\n")
+                self.LOG.append(f"step-{step['step']}:response.status_code     ====== {repr(response.status_code)}\n")
+                break
             else:
                 useTime += response.elapsed.total_seconds()
                 status_code = response.status_code
-                self.LOG.append(f"step-{step['step']}:status_code  ====== {status_code}\n")
-                self.LOG.append(f"step-{step['step']}:response     ====== {response.text}")
-                self.LOG.append(f"step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s \n")
+                self.LOG.append(f"step-{step['step']}:response.text            ====== {response.text}\n")
+                self.LOG.append(f"step-{step['step']}:response.status_code     ====== {status_code}\n")
+                self.LOG.append(
+                    f"step-{step['step']}:response.useTime         ====== {MyTools.to_ms(response.elapsed.total_seconds())}\n")
                 # 如果存在校验
                 verifyInfo, flag, verifyLog = MyAssert(response).doAssert(step.get("step"), step.get("asserts"))
                 self.LOG.extend(verifyLog)
@@ -72,17 +78,16 @@ class MyRequest:
                 else:
                     STATUS = 'FAIL'
                     break
-        self.LOG.append(f"\n case {interface.title} 结束 . 共用时{useTime}s \n")
+        self.LOG.append(f"case {interface.title} 结束 . 共用时{MyTools.to_ms(useTime)}\n")
         return self._writeResult(interface.id, interface.title, len(interface.steps), self.responseInfo, STATUS,
                                  useTime)
 
-    def runText(self, step: dict, http: str = "http"):
-
+    def runText(self, step: dict, http: str = "http") -> Dict[str, Any]:
         """
         单步骤调试
         :param http: default http
         :param step: 步骤入参
-        :return:
+        :return: info
         """
         STATUS = 'SUCCESS'
         USETIME = 0
@@ -92,7 +97,6 @@ class MyRequest:
             self._get_extract(response, step.get("extracts"))
         verifyInfo, flag, verifyLog = MyAssert(response).doAssert(step.get("step"), step.get("asserts"))
         USETIME += response.elapsed.total_seconds()
-
         info = {
             "status": STATUS,
             "method": response.request.method,
@@ -107,7 +111,14 @@ class MyRequest:
         }
         return info
 
-    def run(self, http, **kwargs):
+    def run(self, http, **kwargs) -> Response:
+        """
+        接口调用运行
+        处理已提取的参入回写到 header、params、auth
+        :param http: http
+        :param kwargs: 请求参数
+        :return: Response
+        """
         headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
         params = MyTools.list2Dict(self.extract, kwargs.get("params"))
         auth = MyTools.auth(self.extract, kwargs.get("auth"))
@@ -204,16 +215,3 @@ class MyRequest:
         interfaceResult.starterName = self.starter.username
         interfaceResult.save()
         return interfaceResult.uid
-
-
-if __name__ == '__main__':
-    from App import create_app
-
-    create_app().app_context().push()
-    from Models.CaseModel.hostModel import HostModel
-
-    # v: VariableModel = VariableModel.get(1)
-    u = User.get(1)
-    inter = InterfaceModel.get_by_uid("wpjhYVlxIXrXgaRRVoHv")
-    Host = HostModel.get_by_uid("FmOSZlPBfBgwNNwPLJOh")
-    MyRequest(HOST=Host, starter=u).runAPI(inter)
