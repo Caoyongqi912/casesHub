@@ -8,6 +8,7 @@
 from typing import AnyStr
 
 from Comment.myException import AuthException
+from Models.UserModel.userModel import User
 from Models.base import Base
 from App import db
 from Utils import UUID
@@ -18,6 +19,7 @@ class Department(Base):
     name = db.Column(db.String(20), unique=True, comment="用户名")
     desc = db.Column(db.String(40), nullable=True, comment="部门描述")
     adminID = db.Column(db.INTEGER, comment="部门负责人")
+    adminName = db.Column(db.String(10), comment="部门负责人名称")
     users = db.relationship("User", backref="department", lazy="dynamic")
     tags = db.relationship("UserTag", backref="departTags", lazy="dynamic")
 
@@ -25,6 +27,7 @@ class Department(Base):
         self.name = name
         self.desc = desc
         self.adminID = adminID
+        self.adminName = User.get(adminID).username
         self.tags = [UserTag(name=tag, departmentID=self.id) for tag in tags]
 
     @property

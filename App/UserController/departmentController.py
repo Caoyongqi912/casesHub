@@ -13,7 +13,9 @@ from Comment.myException import MyResponse
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.UserModel.departModel import Department, UserTag
 from Utils.myLog import MyLog
+
 log = MyLog.get_log(__file__)
+
 
 class DepartmentController(Resource):
 
@@ -31,7 +33,12 @@ class DepartmentController(Resource):
         parse.add(name="adminID", type=int, isExist=User, required=False)
         parse.add(name="tags", type=list, required=False)
         info = parse.parse_args
-        Department(**info).save()
+        department = Department(**info)
+        department.save()
+
+        user = User.get(info.get("adminID"))
+        user.departmentID = department.id
+        user.save()
         return MyResponse.success()
 
     @auth.login_required
@@ -70,7 +77,7 @@ class DepartmentController(Resource):
         return MyResponse.success()
 
 
-class QueryDepartmentController(Resource):
+class PageDepartmentController(Resource):
 
     @auth.login_required
     def get(self) -> MyResponse:
@@ -97,4 +104,4 @@ class QueryDepartmentTagController(Resource):
 api_script = Api(userBP)
 api_script.add_resource(DepartmentController, "/department/opt")
 api_script.add_resource(QueryDepartmentTagController, "/department/tags")
-api_script.add_resource(QueryDepartmentController, "/department/query")
+api_script.add_resource(PageDepartmentController, "/department/page")
