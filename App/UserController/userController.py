@@ -112,7 +112,7 @@ class GetTokenController(Resource):
         return MyResponse.success(t)
 
 
-class QueryUserController(Resource):
+class PageUserController(Resource):
     @auth.login_required
     @is_admin
     def get(self) -> MyResponse:
@@ -241,6 +241,6 @@ api_script.add_resource(UserController, "/detail")
 api_script.add_resource(UserOptController, "/opt")
 api_script.add_resource(SetPasswordController, "/setpassword")
 api_script.add_resource(CurrentUserController, '/current')
-api_script.add_resource(QueryUserController, "/query")
+api_script.add_resource(PageUserController, "/query")
 api_script.add_resource(GetTokenController, "/getToken")
 api_script.add_resource(LoginController, "/login")

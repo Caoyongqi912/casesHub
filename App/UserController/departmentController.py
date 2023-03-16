@@ -30,15 +30,16 @@ class DepartmentController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", unique=Department, required=True)
         parse.add(name="desc", required=False)
-        parse.add(name="adminID", type=int, isExist=User, required=False)
+        parse.add(name="adminID", type=int, required=False)
         parse.add(name="tags", type=list, required=False)
         info = parse.parse_args
         department = Department(**info)
         department.save()
 
-        user = User.get(info.get("adminID"))
-        user.departmentID = department.id
-        user.save()
+        if info.get("adminID"):
+            user = User.get(info.get("adminID"))
+            user.departmentID = department.id
+            user.save()
         return MyResponse.success()
 
     @auth.login_required
@@ -47,12 +48,11 @@ class DepartmentController(Resource):
         更新部门
         :return:MyResponse
         """
-        from Models.UserModel.userModel import User
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
-        parse.add(name="name", type=str, required=False)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, isExist=User, required=False)
+        parse.add(name=UID, required=True)
+        parse.add(name="name", required=False)
+        parse.add(name="desc", required=False)
+        parse.add(name="adminID", type=int, required=False)
         Department.update(**parse.parse_args)
         return MyResponse.success()
 
@@ -82,7 +82,9 @@ class PageDepartmentController(Resource):
     @auth.login_required
     def get(self) -> MyResponse:
         parse = MyRequestParseUtil("values")
-        return MyResponse.success(Department.page(**parse.page(Department)))
+        departPage = Department.page(**parse.page(Department))
+
+        return MyResponse.success(departPage)
 
 
 class QueryDepartmentTagController(Resource):

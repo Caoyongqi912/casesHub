@@ -39,7 +39,6 @@ class User(Base):
     def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
                  tagName: str = None, isAdmin: bool = False,
                  departmentID: int = None,
-                 departmentName: str = None,
                  password: str = None):
         self.username: str = username
         self.email: str = MyTools.pinyin(self.username) + self._mail
@@ -52,7 +51,8 @@ class User(Base):
         else:
             self.hash_password(MyTools.pinyin(self.username))
         self.departmentID: int = departmentID
-        self.departmentName: str = departmentName
+        from Models.UserModel.departModel import Department
+        self.departmentName: str = Department.get(departmentID).name if departmentID else None
 
     def addAdmin(self) -> NoReturn:
         """
@@ -60,7 +60,6 @@ class User(Base):
         """
         self.isAdmin: bool = True
         self.save()
-
 
     def addUser(self) -> NoReturn:
         """
@@ -85,7 +84,6 @@ class User(Base):
         sql = """Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value)
         res = cls.execute_sql(sql)
         return res
-
 
     def set_password(self, old_password: str, new_password: str) -> NoReturn:
         """

@@ -5,7 +5,9 @@
 # @Desc: 部门库
 
 
-from typing import AnyStr
+from typing import AnyStr, Dict
+
+from flask_sqlalchemy import Pagination
 
 from Comment.myException import AuthException
 from Models.UserModel.userModel import User
@@ -18,17 +20,18 @@ class Department(Base):
     __tablename__ = "department"
     name = db.Column(db.String(20), unique=True, comment="用户名")
     desc = db.Column(db.String(40), nullable=True, comment="部门描述")
-    adminID = db.Column(db.INTEGER, comment="部门负责人")
-    adminName = db.Column(db.String(10), comment="部门负责人名称")
+    adminID = db.Column(db.INTEGER, nullable=True, comment="部门负责人")
+    adminName = db.Column(db.String(10), nullable=True, comment="部门负责人名称")
     users = db.relationship("User", backref="department", lazy="dynamic")
     tags = db.relationship("UserTag", backref="departTags", lazy="dynamic")
 
-    def __init__(self, name: AnyStr, adminID: int, desc: AnyStr = None, tags: list = None):
+    def __init__(self, name: AnyStr, adminID: int = None, desc: AnyStr = None, tags: list = None):
         self.name = name
         self.desc = desc
         self.adminID = adminID
-        self.adminName = User.get(adminID).username
-        self.tags = [UserTag(name=tag, departmentID=self.id) for tag in tags]
+        self.adminName = User.get(adminID).username if adminID else None
+        if tags:
+            self.tags = [UserTag(name=tag, departmentID=self.id) for tag in tags]
 
     @property
     def admin(self) -> int:
@@ -51,10 +54,9 @@ class Department(Base):
         :return:
         """
         from flask import g
-        target = cls.get(kwargs.pop('id'), f"{cls.__name__} id")
+        target = cls.get_by_uid(kwargs.get('uid'))
         if not g.user.isAdmin or not g.user.id != target.adminID:
             raise AuthException()
-
         return super(Department, Department).update(**kwargs)
 
     def __repr__(self):

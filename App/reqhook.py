@@ -42,6 +42,7 @@ def resp(response: Response) -> Union[MyResponse, Response]:
 def register_errors(app):
     @app.errorhandler(Exception)
     def framework_error(e):
+        log.error(repr(e))
         if isinstance(e, AuthException | ParamException):
             return e
         if isinstance(e, MethodNotAllowed):
