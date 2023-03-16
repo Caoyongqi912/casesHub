@@ -106,7 +106,7 @@ class MyRequest:
             "headers": dict(response.headers),
             "cookies": response.cookies.items(),
             "response": response.text,
-            "extracts": self.extract,
+            "extracts": [i for i in self.extract] if self.extract else [],
             "asserts": verifyInfo
         }
         return info

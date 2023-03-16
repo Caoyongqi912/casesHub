@@ -4,7 +4,6 @@
 # @Software: PyCharm
 # @Desc:
 from App import create_app, db
-from Models import CaseModel
 if __name__ == '__main__':
     create_app(printSql=True).app_context().push()
     db.create_all()
