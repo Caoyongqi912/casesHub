@@ -7,7 +7,7 @@
 from sqlalchemy.engine import CursorResult
 from typing import List, AnyStr, Dict, NoReturn, Any
 from flask_sqlalchemy import Pagination
-from sqlalchemy import asc, Column, or_,and_
+from sqlalchemy import asc, Column, or_, and_
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
@@ -64,35 +64,14 @@ class Base(db.Model):
     @classmethod
     def update(cls, **kwargs) -> NoReturn:
         """
-
         通过kwargs.get_by_uid() 获得实例 修改
         """
         from flask import g
         kwargs.setdefault("updater", g.user.id)  # 修改人
         target = cls.get_by_uid(kwargs.pop('uid'))
-        c = cls.columns()
         try:
             for k, v in kwargs.items():
-                if k in c:
-                    setattr(target, k, v)
-            target.save(False)
-        except Exception as e:
-            log.error(repr(e))
-            raise ParamException(ResponseMsg.ERROR)
-
-    @classmethod
-    def update_by_id(cls, **kwargs) -> NoReturn:
-        """
-
-        通过kwargs.get_by_uid() 获得实例 修改
-        """
-        from flask import g
-        kwargs.setdefault("updater", g.user.id)  # 修改人
-        target = cls.get(id=kwargs.pop('id'))
-        c = cls.columns()
-        try:
-            for k, v in kwargs.items():
-                if k in c:
+                if k in cls.columns():
                     setattr(target, k, v)
             target.save(False)
         except Exception as e:

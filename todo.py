@@ -31,10 +31,11 @@ baogoa
 import pypinyin
 import jsonpath
 
-def demo():
-    data = {"code":0,"data":"asdasdsa","msg":"ok"}
-    jp = "$.d"
-    print(jsonpath.jsonpath(data,jp))
+
+def demo(name: str):
+    print(name.__doc__)
+    print(globals())
+
 
 if __name__ == '__main__':
-    demo()
+    demo("13")

@@ -8,11 +8,8 @@ from flask_restful import Resource, Api
 from App import auth, UID
 from App.UserController import userBP
 from Comment.myException import MyResponse
-from Models import CaseModel
 from Models.CaseModel.caseModel import Cases
 from Models.UserModel.departModel import Department, UserTag
-from Models.ProjectModel.projectModel import Project
-
 from Models.UserModel.userModel import User
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
@@ -81,11 +78,8 @@ class UserOptController(Resource):
         parse.add(name="phone", required=False)
         parse.add(name="gender", enum=Gender, required=False)
         parse.add(name="tagName", required=False)
-        parse.add(name="departmentID", type=int, required=False)
-        putInfo = parse.parse_args
-        dip: Department = Department.get(putInfo.get("departmentID"))
-        putInfo["departmentName"] = dip.name
-        User.update(**putInfo)
+        parse.add(name="departmentID", type=str, required=False)
+        User.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -191,14 +185,16 @@ class MoHuSearch(Resource):
     @auth.login_required
     def post(self) -> MyResponse:
         """
-        模糊查询
+        用户模糊查询
         :return:MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="target", type=str, required=True)
-        parse.add(name="value", type=str, required=True)
-        info = User.search_like(**parse.parse_args)
-        return MyResponse.success(info)
+        parse.add(name="target")
+        parse.add(name="value")
+        if parse.parse_args.get("value"):
+            info = User.search_like(**parse.parse_args)
+            return MyResponse.success(info)
+        return MyResponse.success()
 
 
 class UserTagController(Resource):

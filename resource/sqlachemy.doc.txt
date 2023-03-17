@@ -26,7 +26,9 @@ default	为这列定义默认值
 关系表参数
 
 ondelete: 级联删除
-CASCADE 级联删除、 SET NULL 只有父表被删除，子表修改为NULL 、 RESTRICT 阻止删除数据
+CASCADE 级联删除、
+SET NULL 只有父表被删除，子表修改为NULL 、
+RESTRICT 阻止删除数据
 比如
 productID = db.Column(db.INTEGER, db.ForeignKey("product.id",ondelete="CASCADE"), comment="所属产品")
 
@@ -44,6 +46,7 @@ delete-orphan:表示当对一个ORM对象解除了父表中的关联对象的时
 merge:默认选项。当在使用session.merge，合并一个对象的时候，会将使用了relationship相关联的对象也进行merge操作
 expunge:移除操作的时候，会将相关联的对象也进行移除。这个操作只是从session中移除，并不会真正的从数据库中删除。
 all:是对save-update，merge，refresh-expire，expunge，delete几种的填写
+
 比如
 articles = relationship("Article",cascade="save-update,delete")
 with_entities

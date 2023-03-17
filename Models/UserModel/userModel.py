@@ -31,10 +31,12 @@ class User(Base):
     gender: Gender = db.Column(IntEnum(Gender), comment="性别")
     avatar: str = db.Column(db.String(400), nullable=True, comment="头像")
     isAdmin: bool = db.Column(db.Boolean, default=False, comment="管理")
-    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="set null"), nullable=True,
-                                  comment="所属部门")
-    departmentName: str = db.Column(db.String(20), nullable=True, comment="所属部门名称")
-    tagName: str = db.Column(db.String(20), nullable=True, comment="对应标签名称")
+    departmentID: int | None = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="set null"), nullable=True,
+                                         comment="所属部门ID")
+    departmentName = db.Column(db.String(20), nullable=True,
+                               comment="对应标签名称")
+    tagName: str = db.Column(db.String(20), nullable=True,
+                             comment="对应标签名称")
 
     def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
                  tagName: str = None, isAdmin: bool = False,
@@ -53,6 +55,22 @@ class User(Base):
         self.departmentID: int = departmentID
         from Models.UserModel.departModel import Department
         self.departmentName: str = Department.get(departmentID).name if departmentID else None
+
+    @classmethod
+    def update(cls, **kwargs) -> NoReturn:
+        """
+        用户信息更新
+        :param kwargs:
+        :return:
+        """
+        from Models.UserModel.departModel import Department
+        if kwargs.get("departmentID"):
+            department: Department = Department.get(kwargs.get("departmentID"), "departmentID")
+            kwargs["departmentName"] = department.name
+        else:
+            kwargs["departmentName"] = None
+            kwargs["tagName"] = None
+        return super(User, cls).update(**kwargs)
 
     def addAdmin(self) -> NoReturn:
         """

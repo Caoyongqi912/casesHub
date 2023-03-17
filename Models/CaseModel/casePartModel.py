@@ -5,6 +5,8 @@
 # @Desc:
 from typing import List, Dict, Any, NoReturn
 
+from flask import g
+
 from App import db
 from Comment.myException import ParamException
 from Enums import ResponseMsg
@@ -27,6 +29,32 @@ class CasePart(Base):
         self.partName = partName
         self.projectID = projectID
         self.parentID = parentID
+
+    @classmethod
+    def update(cls, **kwargs) -> NoReturn:
+        """
+        比较特殊 通过id 修改
+        :param kwargs:
+        :return:
+        """
+        kwargs.setdefault("updater", g.user.id)  # 修改人
+        target = cls.get(kwargs.pop('id'))
+        try:
+            for k, v in kwargs.items():
+                if k in cls.columns():
+                    setattr(target, k, v)
+            target.save(False)
+        except Exception as e:
+            raise ParamException(ResponseMsg.ERROR)
+
+    @classmethod
+    def part_delete(cls, id: int | str) -> NoReturn:
+        part: CasePart = CasePart.get(id, "id")
+        childrenList: List[CasePart] = CasePart.query_by_field(parentID=part.id)
+        if childrenList:
+            for c in childrenList:
+                c.delete()
+        part.delete()
 
     @classmethod
     def getOrCreate(cls, partName: str, projectID: str | int) -> List[Dict[str, Any]] | Dict[str, Any]:
@@ -57,7 +85,6 @@ class CasePart(Base):
     @property
     def query_interfaces(self):
         return self.interfaces.all()
-
 
     def __repr__(self):
         return f"<{CasePart.__name__} {self.part}>"

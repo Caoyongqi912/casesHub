@@ -5,10 +5,7 @@
 # @Desc: 部门库
 
 
-from typing import AnyStr, Dict
-
-from flask_sqlalchemy import Pagination
-
+from typing import AnyStr, NoReturn
 from Comment.myException import AuthException
 from Models.UserModel.userModel import User
 from Models.base import Base
@@ -23,7 +20,7 @@ class Department(Base):
     adminID = db.Column(db.INTEGER, nullable=True, comment="部门负责人")
     adminName = db.Column(db.String(10), nullable=True, comment="部门负责人名称")
     users = db.relationship("User", backref="department", lazy="dynamic")
-    tags = db.relationship("UserTag", backref="departTags", lazy="dynamic")
+    tags = db.relationship("UserTag", backref="departTags", cascade="all,delete", lazy="dynamic")  # 级联删除
 
     def __init__(self, name: AnyStr, adminID: int = None, desc: AnyStr = None, tags: list = None):
         self.name = name
@@ -59,6 +56,18 @@ class Department(Base):
             raise AuthException()
         return super(Department, Department).update(**kwargs)
 
+    @classmethod
+    def delete_by_id(cls, uid: str) -> NoReturn:
+        """
+        部门删除 、 部门名称、用户标签置空
+        :param uid:
+        """
+        users = cls.get_by_uid(uid)
+        for user in users:
+            user.departmentName = None
+            user.save()
+        return super(Department, cls).delete_by_id(uid)
+
     def __repr__(self):
         return f"<{Department.__name__} {self.name}>"
 
@@ -66,7 +75,7 @@ class Department(Base):
 class UserTag(Base):
     __tablename__ = "userTag"
     name = db.Column(db.String(20), unique=True, comment="标签名称")
-    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="set null"), nullable=True,
+    departmentID: int = db.Column(db.INTEGER, db.ForeignKey("department.id", ondelete="CASCADE"), nullable=True,
                                   comment="所属部门")
 
     def __init__(self, name: str, departmentID: int, uid: str = UUID().getUId):

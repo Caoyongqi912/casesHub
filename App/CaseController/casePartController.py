@@ -50,7 +50,7 @@ class CasePartController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
         parse.add(name="partName")
-        CasePart.update_by_id(**parse.parse_args)
+        CasePart.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
@@ -61,12 +61,7 @@ class CasePartController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="id", required=True, type=int)
-        part: CasePart = CasePart.get(**parse.parse_args)
-        childrens: List[CasePart] = CasePart.query_by_field(parentID=part.id)
-        if childrens:
-            for c in childrens:
-                c.delete()
-        part.delete()
+        CasePart.part_delete(**parse.parse_args)
         return MyResponse.success()
 
 

@@ -4,8 +4,7 @@
 # @Software: PyCharm
 # @Desc: 部门controller
 
-from flask_restful import Resource
-from flask_restful import Api
+from flask_restful import Resource,Api
 from App import auth, UID
 from App.UserController import userBP
 from App.myAuth import is_admin
@@ -97,9 +96,9 @@ class QueryDepartmentTagController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="id", required=True)
+        parse.add(name=UID, required=True)
         log.info(parse.parse_args)
-        depart: Department = Department.get(**parse.parse_args)
+        depart: Department = Department.get_by_uid(**parse.parse_args)
         return MyResponse.success(depart.query_tags)
 
 

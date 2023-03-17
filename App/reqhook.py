@@ -43,9 +43,7 @@ def register_errors(app):
     @app.errorhandler(Exception)
     def framework_error(e):
         log.error(repr(e))
-        if isinstance(e, AuthException | ParamException):
-            return e
-        if isinstance(e, MethodNotAllowed):
+        if isinstance(e, AuthException | ParamException | MethodNotAllowed):
             return e
         if isinstance(e, RateLimitExceeded):
             return MyException("too manny request! be wait ..")
