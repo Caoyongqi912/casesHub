@@ -62,8 +62,8 @@ class Department(Base):
         部门删除 、 部门名称、用户标签置空
         :param uid:
         """
-        users = cls.get_by_uid(uid)
-        for user in users:
+        depart: Department = cls.get_by_uid(uid)
+        for user in depart.users:
             user.departmentName = None
             user.save()
         return super(Department, cls).delete_by_id(uid)

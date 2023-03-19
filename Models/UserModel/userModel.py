@@ -40,7 +40,7 @@ class User(Base):
 
     def __init__(self, username: str, phone: str, gender: Gender = Gender.MALE,
                  tagName: str = None, isAdmin: bool = False,
-                 departmentID: int = None,
+                 departmentID: str = None,
                  password: str = None):
         self.username: str = username
         self.email: str = MyTools.pinyin(self.username) + self._mail
@@ -52,7 +52,7 @@ class User(Base):
             self.hash_password(password)
         else:
             self.hash_password(MyTools.pinyin(self.username))
-        self.departmentID: int = departmentID
+        self.departmentID = departmentID
         from Models.UserModel.departModel import Department
         self.departmentName: str = Department.get(departmentID).name if departmentID else None
 

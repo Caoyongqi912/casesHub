@@ -7,7 +7,7 @@ from App import create_app
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
-app = create_app()
+app = create_app(printSql=True)
 
 if __name__ == '__main__':
     # config = Config()

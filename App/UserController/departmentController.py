@@ -96,9 +96,9 @@ class QueryDepartmentTagController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True)
+        parse.add(name="id", required=True)
         log.info(parse.parse_args)
-        depart: Department = Department.get_by_uid(**parse.parse_args)
+        depart: Department = Department.get(**parse.parse_args)
         return MyResponse.success(depart.query_tags)
 
 

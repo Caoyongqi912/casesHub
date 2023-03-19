@@ -78,7 +78,7 @@ class UserOptController(Resource):
         parse.add(name="phone", required=False)
         parse.add(name="gender", enum=Gender, required=False)
         parse.add(name="tagName", required=False)
-        parse.add(name="departmentID", type=str, required=False)
+        parse.add(name="departmentID", type=int, required=False)
         User.update(**parse.parse_args)
         return MyResponse.success()
 

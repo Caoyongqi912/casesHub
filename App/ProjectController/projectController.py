@@ -158,12 +158,26 @@ class QueryProjects(Resource):
         return MyResponse.success(Project.all())
 
 
+class DelProjectUser(Resource):
+
+    @auth.login_required
+    def post(self) -> MyResponse:
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name="projectID", required=True)
+        parse.add(name="uid", required=True)
+
+        p: Project = Project.get_by_uid(parse.parse_args.get("projectID"))
+        p.delUser(parse.parse_args.get("uid"))
+        return MyResponse.success()
+
+
 api_script = Api(proBP)
 api_script.add_resource(ProjectController, "/opt")
 api_script.add_resource(QueryProjects, "/queryProjects")
 api_script.add_resource(ProjectInfoController, "/info")
 api_script.add_resource(QueryHostController, '/<string:projectID>/query_host')
 api_script.add_resource(QueryProjectUsers, '/users')
+api_script.add_resource(DelProjectUser, '/user/del')
 api_script.add_resource(QueryVariableIDController, '/<string:projectID>/query_variable')
 api_script.add_resource(AddUser2ProjectController, "/addUser")
 api_script.add_resource(SearchProjectController, "/search")

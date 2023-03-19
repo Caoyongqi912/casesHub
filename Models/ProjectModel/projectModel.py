@@ -17,8 +17,8 @@ log = MyLog.get_log(__file__)
 
 projectUser = db.Table(
     "project_user",
-    db.Column("project_id", db.INTEGER, db.ForeignKey("project.id"), primary_key=True),
-    db.Column("user_id", db.INTEGER, db.ForeignKey("user.id"), primary_key=True)
+    db.Column("project_id", db.INTEGER, db.ForeignKey("project.id", ondelete='CASCADE'), primary_key=True),
+    db.Column("user_id", db.INTEGER, db.ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
 
 )
 
@@ -29,11 +29,12 @@ class Project(Base):
     name = db.Column(db.String(20), unique=True, comment="项目名称")
     desc = db.Column(db.String(100), nullable=True, comment="项目描述")
 
-    adminID = db.Column(db.INTEGER,  comment="项目负责人ID")
+    adminID = db.Column(db.INTEGER, comment="项目负责人ID")
     adminName = db.Column(db.String(20), nullable=True, comment="项目负责人姓名")
 
     # 用户跟项目是 多对多 绑定
-    users = db.relationship("User", backref="project", lazy="dynamic", secondary=projectUser)
+    users = db.relationship("User", backref="project", lazy="dynamic",
+                            secondary=projectUser)
     # 版本跟项目是 多对一 关系
     versions = db.relationship("Version", backref="project", lazy="dynamic")
     # 用例与项目为一对多关系
@@ -64,10 +65,20 @@ class Project(Base):
         for uid in users:
             u: User = User.get(uid, f"uid {uid}")
             if MyTools.search(uIds, u.id):
-                raise ParamException(ResponseMsg.already_exist(str(id)))
+                raise ParamException(ResponseMsg.already_exist(u.username))
             else:
                 self.users.append(u)
         self.save(new=False)
+
+    def delUser(self, uid: str) -> NoReturn:
+        """
+        删除单个用户
+        :param uid: 用户uid
+        :return:
+        """
+        self.__verify_auth()
+        u = User.get_by_uid(uid)
+        self.users.remove(u)
 
     @classmethod
     def update(cls, **kwargs):

@@ -27,19 +27,22 @@ class AvatarController(Resource):
         上传用户头像
         :return:MyResponse
         """
+        url = "http://localhost:5000/api/file/avatar?uid="
+
         from werkzeug.datastructures import FileStorage
         file: FileStorage = request.files.get("file")
         if not file:
             return MyResponse.req_err()
         # 先校验是否有头像 存在删除历史头像
-        user = g.user
-        if g.user.avatar:
-            f: FileModel = FileModel.get_by_uid(g.user.avatar)
+        uid = g.user.avatar
+        if uid:
+            f: FileModel = FileModel.get_by_uid(uid.replace(url, ""))
             if f:
                 MyFile.delAvatar(f.filePath)
                 f.delete()  # 数据库删除
         file: FileModel = MyFile.writer(file, FileEnum.AVATAR)
-        g.user.avatar = file.uid
+
+        g.user.avatar = url + file.uid
         return MyResponse.success(file.uid)
 
     def get(self) -> Response:
