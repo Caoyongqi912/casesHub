@@ -28,14 +28,19 @@ baogoa
 
 """
 
-import pypinyin
-import jsonpath
-
-
-def demo(name: str):
-    print(name.__doc__)
-    print(globals())
-
-
-if __name__ == '__main__':
-    demo("13")
+#FayShelbie
+import os
+import openai
+openai.organization = "org-5v8dDJZbk121QxKBznYe2nNC"
+openai.api_key = "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"
+response = openai.Completion.create(
+  model="text-davinci-003",
+  prompt="hi",
+  temperature=0,
+  max_tokens=100,
+  top_p=1.0,
+  frequency_penalty=0.2,
+  presence_penalty=0.0,
+  stop=[" Human:", " AI:"]
+)
+print(response)

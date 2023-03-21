@@ -145,14 +145,22 @@ class MyRequest:
         """
         1、提取上个接口变量变成参数
         2、提取全局变量变成参数
-        :param response:
-        :param extract:[{"key":"token","val":"$.data.token"}] -> self.extract = [{"token":"xxxx"}]
+        :param response: Response
+        :param extract:[{"key":"token","val":"$.data.token",target:"1"}] -> self.extract = [{"token":"xxxx"}]
         """
+        from Enums import ExtractTargetEnum
+
         if extract and response.status_code == 200:
             for ext in extract:
-                value = MyJsonPath(response, ext.get("val")).value
-                _ = {ext["key"]: value}
-                self.extract.append(_)
+                target = ext.get("target")
+                mjp = MyJsonPath(response, ext.get("val"))
+                value = None
+                if target == ExtractTargetEnum.JSON.value:
+                    value = mjp.value
+                elif target == ExtractTargetEnum.HEADER.value:
+                    value = mjp.getHeaderValue
+                ext["val"] = value
+                self.extract.append(ext)
 
     def _writeError(self, stepID: int, response: Any):
         info = {

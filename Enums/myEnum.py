@@ -82,5 +82,11 @@ EnumDict = {
 
 }
 
+
+class ExtractTargetEnum(BaseEnum):
+    JSON = "1"
+    HEADER = "2"
+
+
 if __name__ == '__main__':
     print(CaseType.getValue("dsf"))

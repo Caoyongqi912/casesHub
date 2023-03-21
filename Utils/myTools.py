@@ -24,12 +24,8 @@ class MyTools:
         1、参数转换 extracts ↓
         [{'id': 1677578978008, 'key': 'Authorization', 'value': 'hahah - {{token}}'}]
         ==>
-        {"Content-Type":"application/json",token:  {{token}}}
-        2、提取转换  params  ↓
-        [{'token': 0}]
-        ===> 返回
-        {"Content-Type":"application/json",token:0}
-        :param extracts: [{token:xxx}]
+        {"Content-Type":"application/json","Authorization": "{{token}}"}
+        :param extracts: [{'id': 1679377815262, 'key': 'token', 'val': 'im token', 'target': '1'}]
         :param params:   [{"key":"Content-Type","val":"application/json"},{"key":"token","val":"{{token}}"}]
         :return:
         """
@@ -45,6 +41,32 @@ class MyTools:
         return D
 
     @staticmethod
+    def getValue(extracts: List[Mapping[str, Any]], target: str) -> Any:
+        """
+        target :'hahah - {{token}}
+        提取转换   extracts ↓
+        target :'hahah - im token'
+        ===> 返回
+        :param target: 'hahah - {{token}}
+        :param extracts:[{'id': 1679377815262, 'key': 'token', 'val': 'im token', 'target': '1'}]
+        :return:
+        """
+
+        # 如果是字符串 并且符合{{}}规则
+        if isinstance(target, str) and "{{" in target and "}}" in target:
+            val = re.findall(r"\{\{(.*?)\}\}", target)[0]
+            _ = target.replace("{{", "").replace("}}", "")
+            for ext in extracts:
+                if ext.get("key") == val:
+                    v = ext.get("val")
+                    if v is not None:
+                        return _.replace(val, str(v))
+                else:
+                    continue
+        else:
+            return target
+
+    @staticmethod
     def kw2str(**kwargs):
         """
         {name:cyq,age:13}
@@ -57,26 +79,6 @@ class MyTools:
         for k, v in kwargs.items():
             _ += f"`{k}`" + " = " + f"'{str(v)}'" + ' or '
         return _.strip(" or ")
-
-    @staticmethod
-    def getValue(extracts: List[Mapping[str, Any]], target: str) -> Any:
-        """
-        {{value}} -> value
-        :param target:
-        :param extracts
-        :return:
-        """
-        if isinstance(target, str) and "{{" in target and "}}" in target:
-            val = re.findall(r"\{\{(.*?)\}\}", target)[0]
-            _ = target.replace("{{", "").replace("}}", "")
-            for ext in extracts:
-                v = ext.get(val)
-                if v is not None:
-                    return _.replace(val, str(v))
-                else:
-                    continue
-        else:
-            return target
 
     @staticmethod
     def auth(extracts: List[Mapping[str, Any]] | None = None, authBody: Dict[str, str] | None = None) -> Dict | None:
@@ -147,8 +149,12 @@ class MyTools:
 
 
 if __name__ == '__main__':
-    e = [{'id': 1677578978008, 'key': 'Authorization', 'value': 'hahah - {{token}}'}]
-    p = [{'token': 0}]
+    e = [{'id': 1677578978008, 'key': 'Authorization', 'value': "{{token}}", },
+         {'id': 1677578978008, 'key': 'Authorization2', 'value': 'hahah - {{token2}}'},
+         {'id': 1677578978008, 'key': 'Authorization3', 'value': 'hahah - {{token3}}'}]
+    p = [{'id': 1679377815262, 'key': 'token', 'val': {"haha": 123}, 'target': '1'},
+         {'id': 1679377815262, 'key': 'token2', 'val': 'im token2', 'target': '1'},
+         {'id': 1679377815262, 'key': 'token3', 'val': 'im token3', 'target': '1'}]
 
     res = MyTools.list2Dict(p, e)
     print(res)

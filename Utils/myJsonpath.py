@@ -23,6 +23,15 @@ class MyJsonPath:
         self.expr = expr
 
     @property
+    def getHeaderValue(self):
+        """
+        获取header value
+        :return:
+        """
+        header = self.response.headers
+        return header.get(self.expr)
+
+    @property
     def value(self) -> Any:
         """
         jsonpath 解析
