@@ -3,9 +3,14 @@
 # @File : myTools.py 
 # @Software: PyCharm
 # @Desc:
+import copy
 import re
 from typing import List, Dict, Any, Mapping
 from copy import deepcopy
+from httpx import Response as HTTPxResponse
+from requests import Response as RequestResponse
+
+from Utils.myJsonpath import MyJsonPath
 
 
 class MyTools:
@@ -35,9 +40,10 @@ class MyTools:
         for _ in params:
             D[_["key"]] = _["value"]
         DD = deepcopy(D)
-        for k, v in DD.items():
-            v = MyTools.getValue(extracts, v)
-            D[k] = v
+        if extracts:  # 如果存在待提取的参数
+            for k, v in DD.items():
+                v = MyTools.getValue(extracts, v)
+                D[k] = v
         return D
 
     @staticmethod
@@ -147,6 +153,42 @@ class MyTools:
     def to_ms(cls, number: int | float) -> str:
         return f"{round(number * 1000, 2)}ms"
 
+    @classmethod
+    def delKey(cls, **kwargs):
+        """
+        如果value为空直接删除key
+        :param kwargs:
+        :return:
+        """
+        DICT = copy.deepcopy(kwargs)
+        for k, v in DICT.items():
+            if v is None or v == []:
+                kwargs.pop(k)
+        return kwargs
+
+    @classmethod
+    def get_extract_from_response(cls, response: HTTPxResponse | RequestResponse,
+                                  extract: List[Dict[str, Any]]):
+        """
+        从请求响应解析想要的值
+        :param response: HTTPxResponse | RequestResponse
+        :param extract:
+        :return:
+        """
+        from Enums import ExtractTargetEnum
+
+        if extract and response.status_code == 200:
+            for ext in extract:
+                target = ext.get("target")
+                mjp = MyJsonPath(response, ext.get("val"))
+                value = None
+                if target == ExtractTargetEnum.JSON.value:
+                    value = mjp.value
+                elif target == ExtractTargetEnum.HEADER.value:
+                    value = mjp.getHeaderValue
+                ext["val"] = value
+            return extract
+
 
 if __name__ == '__main__':
     e = [{'id': 1677578978008, 'key': 'Authorization', 'value': "{{token}}", },
@@ -155,6 +197,14 @@ if __name__ == '__main__':
     p = [{'id': 1679377815262, 'key': 'token', 'val': {"haha": 123}, 'target': '1'},
          {'id': 1679377815262, 'key': 'token2', 'val': 'im token2', 'target': '1'},
          {'id': 1679377815262, 'key': 'token3', 'val': 'im token3', 'target': '1'}]
+    extracts = [
+        {
+            "id": 1679377815262,
+            "key": "token",
+            "val": "$.data",
+            "target": "1"
+        }
+    ]
 
     res = MyTools.list2Dict(p, e)
     print(res)

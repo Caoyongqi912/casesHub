@@ -1,46 +1,37 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-# @Time : 2023-01-05
-# @Author : cyq
-# @File : casesHub
-# @Software: PyCharm
-# @Desc:
+import asyncio
+import time
 
 
-"""
-log 处理
-1、用例运行实时log
-2、全局log 定位异常
+async def async_function(n):
+    """
+    async修饰的异步函数，在该函数中可以添加await进行暂停并切换到其他异步函数中
+    :return:
+    """
+    now = time.time()
+    # 当执行await future这行代码时（future对象就是被await修饰的函数），
+    # 首先future检查它自身是否已经完成，如果没有完成，挂起自身，告知当前的Task（任务）等待future完成。
+    await asyncio.sleep(n)
+    print('花费时间：{}秒'.format(time.time() - now))
+    return "done"
 
 
-用户数据
-1、用户绑定bug、case、msg。。
-
-fastfds
-1、存储备件
+def callBack(future):
+    print(future.result())
 
 
-baogoa
-1、运行后产出报告
-2、具体内容
-3、简单内容
+def demo():
+    loop = asyncio.get_event_loop()  # 通过get_event_loop方法获取事件循环对象
+
+    events = [loop.create_task(async_function(num)) for num in range(1, 4)]  # 创建协程事件列表
+
+    task = asyncio.wait(events)
+
+    print(task)
+    # task.add_done_callback(callBack)
+    loop.run_until_complete(task)  # 直接运行event 直到其运行结束
+
+    loop.close()
 
 
-"""
-
-#FayShelbie
-import os
-import openai
-openai.organization = "org-5v8dDJZbk121QxKBznYe2nNC"
-openai.api_key = "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"
-response = openai.Completion.create(
-  model="text-davinci-003",
-  prompt="hi",
-  temperature=0,
-  max_tokens=100,
-  top_p=1.0,
-  frequency_penalty=0.2,
-  presence_penalty=0.0,
-  stop=[" Human:", " AI:"]
-)
-print(response)
+if __name__ == '__main__':
+    print(demo())

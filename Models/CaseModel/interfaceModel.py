@@ -89,3 +89,16 @@ class InterfaceResultModel(Base):
 
     def __repr__(self):
         return f"<{InterfaceResultModel.__name__} {self.interfaceID}>"
+
+
+class InterfaceGroupResultModel(Base):
+    __tabename__ = "interface_group_result"
+    totalNumber = db.Column(db.INTEGER, comment="总运行数量")
+    successNumber = db.Column(db.INTEGER, comment="成功数量")
+    failNumber = db.Column(db.INTEGER, comment="失败梳理")
+    starter = db.Column(db.String(20), comment="运行人")
+    totalUseTime = db.Column(db.String(20), comment="运行时间")
+    detail = db.Column(db.JSON, comment="运行详情")
+
+    def __repr__(self):
+        return f"<{InterfaceGroupResultModel.__name__}>"

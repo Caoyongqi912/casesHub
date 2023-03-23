@@ -48,7 +48,8 @@ class MyRequest:
         for step in interface.steps:
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
-            response: Union[Response, Exception] = self.run(interface.http, **step)
+            response: Union[Response, Exception] = self.worker.run(interface.http, self.extract, **step)
+            self.LOG.extend(self.worker.LOG)
             # 如果响应报错
             if isinstance(response, Exception):
                 STATUS = "FAIL"
@@ -91,7 +92,7 @@ class MyRequest:
         """
         STATUS = 'SUCCESS'
         USETIME = 0
-        response: Response = self.run(http, **step)
+        response: Response = self.worker.run(http, self.extract, **step)
 
         if step.get("extracts"):
             self._get_extract(response, step.get("extracts"))
@@ -110,36 +111,6 @@ class MyRequest:
             "asserts": verifyInfo
         }
         return info
-
-    def run(self, http, **kwargs) -> Response:
-        """
-        接口调用运行
-        处理已提取的参入回写到 header、params、auth
-        :param http: http
-        :param kwargs: 请求参数
-        :return: Response
-        """
-        headers = MyTools.list2Dict(self.extract, kwargs.get("headers"))
-        params = MyTools.list2Dict(self.extract, kwargs.get("params"))
-        auth = MyTools.auth(self.extract, kwargs.get("auth"))
-        body = kwargs.get('body')
-        method = kwargs['method']
-        url = kwargs["url"].split("?")[0]
-
-        self.LOG.append(f"step-{kwargs['step']}:url     ====== {url}\n")
-        self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
-        self.LOG.append(f"step-{kwargs['step']}:headers ====== {headers}\n")
-        self.LOG.append(f"step-{kwargs['step']}:params  ====== {params}\n")
-        self.LOG.append(f"step-{kwargs['step']}:body    ====== {body}\n")
-
-        response = self.worker.todo(url=url,
-                                    http=http,
-                                    method=method,
-                                    headers=headers,
-                                    params=params,
-                                    json=body,
-                                    auth=auth)
-        return response
 
     def _get_extract(self, response: Response, extract: List[Dict[str, str]] | None = None):
         """

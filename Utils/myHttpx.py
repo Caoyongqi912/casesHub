@@ -1,197 +1,241 @@
-# @Time : 2022/12/1 20:11 
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# @Time : 2023-03-23
 # @Author : cyq
-# @File : myHttpx.py 
+# @File : casesHub
 # @Software: PyCharm
 # @Desc:
-import time
-from typing import Dict, Any, List, Coroutine, Optional, Mapping, Union, NoReturn
 
-from requests.auth import HTTPBasicAuth
+from typing import NoReturn, List, Any, Dict, Optional, Union, Mapping, Tuple
 from httpx import AsyncClient, Response
 import asyncio
 
-from sqlalchemy import Column
-
-from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
-from Models.CaseModel.variableModel import VariableModel
+from Models.CaseModel.hostModel import HostModel
+from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceGroupResultModel
 from Models.UserModel.userModel import User
-from Utils import MyLog, MyTools, QueryParamTypes, FileTypes, HeaderTypes, RequestData, AuthTypes
+from Utils import MyLog, QueryParamTypes, HeaderTypes, RequestData, AuthTypes, MyTools
 from Utils.myAssert import MyAssert
-from Utils.myJsonpath import MyJsonPath
 
 log = MyLog.get_log(__file__)
 
 
-def _writeResponse(stepID: int, response: Response = None,
-                   verifyInfo: Any = None) -> Mapping[str, Any]:
-    info = {
-        "step": stepID,
-        "response": {
-            "status_code": response.status_code,
-            "response": response.text,
-            "elapsed": round(response.elapsed.total_seconds(), 2)
-        },
-        "verify": verifyInfo
-    }
-    return info
-
-
-def _get_extract(response: Response, extract: List[Dict[str, str]] | None = None):
-    """
-    1、提取上个接口变量变成参数
-    2、提取全局变量变成参数
-    :param response:
-    :param extract:[{"key":"token","val":"$.data.token"}] -> self.extract = [{"token":"xxxx"}]
-    """
-    ex = []
-    if extract:
-        for ext in extract:
-            value = MyJsonPath(response.json(), ext.get("val")).value
-            _ = {ext["key"]: value}
-            ex.append(_)
-    return ex
-
-
 class MyHttpx:
 
-    def __init__(self, HOST: str, jobList: List[InterfaceModel], variable: Mapping[str, Any] = None,
-                 starter: User = None):
-        self.HOST = HOST
-        self.jobList = jobList
-        self.taskList = []
-        self.variable = variable
+    def __init__(self, interfaces: List[InterfaceModel], starter: User, Host: HostModel):
+        """
+        :param interfaces: 接口组
+        :param Host: 请求host
+        :param variable: 全局变量
+
+        """
+        self.interfaces = interfaces
         self.starter = starter
-
-    async def todo(self, url: str,
-                   client: AsyncClient,
-                   method: str,
-                   body: Optional[Any] = None,
-                   params: Optional[QueryParamTypes] = None,
-                   file: Optional[FileTypes] = None,
-                   headers: Optional[HeaderTypes] = None,
-                   data: Optional[RequestData] = None,
-                   auth: Optional[AuthTypes] = None,
-                   follow_redirects: bool = False
-                   ) -> Response:
-        """
-                :param client: AsyncClient
-                :param url: 路由
-                :param method: 请求方法
-                :param body: 请求体
-                :param params: 请求参数
-                :param file: 上传文件
-                :param headers: 请求头
-                :param data: 请求数据
-                :param auth: auth
-                :param follow_redirects 是否开启重定向
-                :return: response
-        """
-
-        log.info(f"url    ====== {url}")
-        log.info(f"method ====== {method}")
-        log.info(f"header ====== {headers}")
-        log.info(f"body   ====== {body}")
-        log.info(f"params ====== {params}")
-        log.info(f'auth   ====== {auth}')
-        if auth:
-            auth = HTTPBasicAuth(**auth)
-        if method == "GET":
-            response = await client.get(self.HOST + url, params=params, headers=headers,
-                                        follow_redirects=follow_redirects, auth=auth)
-            log.info(response.status_code)
-
-        elif method == "POST":
-            response = await client.post(self.HOST + url, json=body, params=params, headers=headers,
-                                         files=file,
-                                         data=data, follow_redirects=follow_redirects, auth=auth)
-        elif method == "PUT":
-            response = await client.put(self.HOST + url, json=body, params=params, headers=headers,
-                                        files=file,
-                                        data=data, follow_redirects=follow_redirects, auth=auth)
-        else:
-            response = await client.delete(self.HOST + url, params=params, headers=headers,
-                                           follow_redirects=follow_redirects,
-                                           auth=auth)
-        return response
+        self.host = Host.host + ":" + Host.port
+        self.interfacesDetail = []
+        self.successNumber = 0
+        self.failNumber = 0
+        self.totalUseTime = 0
 
     async def worker(self, interface: InterfaceModel, client: AsyncClient):
         """
-        运行api
-        进行校验与结果入库
-        :param interface:
-        :param client:
+        todo:
+
+        1、处理interface 信息
+        2、发送请求
+
+        :param interface: 接口信息
+        :param client: worker client
         :return:
         """
-        responseInfo = []
-        extract = []
-        if self.variable:
-            extract.append(self.variable)
-        STATUS = 'SUCCESS'
+        STATUS = "SUCCESS"
         useTime = 0
+        extracts = []
+        stepsInfo = []
+        LOG = []
         for step in interface.steps:
-            log.info(
-                f"========================= request -{interface.title} step-{step['step']} todo-{step['name']} start ================================")
-            response = await self.todo(
-                client=client,
-                url=step['url'],
-                method=step['method'],
-                headers=MyTools.list2Dict(extract, step.get("headers")),
-                params=MyTools.list2Dict(extract, step.get("params")),
-                body=MyTools.list2Dict(extract, step.get("body")),
-                auth=MyTools.auth(extract, step.get("auth")))
-            useTime += response.elapsed.total_seconds()
-            log.info(f"-{interface.title}- step-{step['step']}:status_code  ====== {response.status_code}")
-            log.info(f"-{interface.title}- step-{step['step']}:response     ====== {response.text}")
-            log.info(f"-{interface.title}- step-{step['step']}:useTime      ====== {response.elapsed.total_seconds()}s")
-            # 如果存在校验
-            verifyInfo, flag = MyAssert(response).jpAssert(step.get("jsonpath"))
-            responseInfo.append(_writeResponse(step.get("step"), response, verifyInfo))
-            if flag is True:
-                # 如果需要提取参数
-                extract.extend(_get_extract(response, step.get("extract")))
-            else:
-                STATUS = 'FAIL'
+            log.info(f"========= {interface.title} step-{step['step']} start =========  ")
+            LOG.append(f"========= {interface.title} step-{step['step']} start =========\n")
+            response, responseLog = await self.to_sender(client, interface,
+                                                         extracts,
+                                                         **step)
+            LOG.extend(responseLog)
+            if isinstance(response, Exception) or response.status_code != 200:
+                STATUS = "FAIL"
+                stepsInfo.append(await self._writeError(step['step'], response))
                 break
-        self._writeResult(interface.id, responseInfo, STATUS, useTime)
+            else:
+                useTime += response.elapsed.total_seconds()
+                verifyInfo, flag, verifyLog = MyAssert(response).doAssert(step["step"], step.get('asserts'))
+                LOG.extend(verifyLog)
+                if flag:  # 如果请求成功，去获取预期响应参数
+                    ext = MyTools.get_extract_from_response(response, step.get("extracts"))
+                    if ext:
+                        extracts.extend(ext)
+                else:
+                    STATUS = "FAIL"
+                    break
+                stepsInfo.append(await self.write_interface_steps(step['step'], response, verifyInfo))
+        await self.write_interface_response(interface, stepsInfo, STATUS, useTime, LOG)
 
-    def _writeResult(self, interfaceID: Column, responseInfo: List[Mapping[str, Any]], status: str,
-                     useTime: Union[float]) -> NoReturn:
-        """
-        测试结果入库
-        :param interfaceID: 接口id
-        :param responseInfo: 测试结果信息
-        :param status: 测试结果
-        :param useTime:用时
-        :return:NoReturn
-        """
-        interfaceResult = InterfaceResultModel()
-        interfaceResult.interfaceID = interfaceID
-        interfaceResult.resultInfo = responseInfo
-        interfaceResult.status = status
-        interfaceResult.useTime = useTime
-        interfaceResult.starterID = self.starter.id
-        interfaceResult.starterName = self.starter.username
-        interfaceResult.save()
-        log.info(f"save {interfaceID} success")
+    @staticmethod
+    async def _writeError(stepID: int, response: Response | Exception):
+        info = {
+            "step": stepID,
+            "response": {
+                "status_code": None,
+                "response": repr(response),
+                "elapsed": None
+            },
+            "verify": None
+        }
 
-    async def master(self):
+        return info
+
+    @staticmethod
+    async def write_interface_steps(stepID: int, response: Response, verifyInfo) -> Dict[str, Any]:
+        """
+        接口响应详情
+        :param response: 响应对应
+        :param stepID: 步骤ID
+        :param verifyInfo: 断言详情
+        :return:
+        """
+        step = {
+            "step": stepID,
+            "request": {
+                "method": response.request.method,
+                "headers": dict(response.request.headers),
+            },
+            "response": {
+                "status_code": response.status_code,
+                "response": response.text,
+                "headers": dict(response.headers),
+                "cookie": [{k: v} for k, v in response.cookies.items()],
+                "elapsed": MyTools.to_ms(response.elapsed.total_seconds())
+            },
+            "verifyInfo": verifyInfo
+        }
+        return step
+
+    async def write_interface_response(self, interface: InterfaceModel, stepsInfo: List[Dict[str, Any]],
+                                       status: str,
+                                       useTime: int | float,
+                                       Log: List[str] = None
+                                       ):
+        """
+        单个用例构建详情
+        :param interface:
+        :param useTime:
+        :param Log:
+        :param status:
+        :param stepsInfo:
+        :return:
+        """
+        if status == "SUCCESS":
+            self.successNumber += 1
+        else:
+            self.failNumber += 1
+        self.totalUseTime += useTime
+        detail = {
+            "interfaceUid": interface.uid,
+            "interfaceName": interface.title,
+            "interfaceLog": "".join(Log),
+            "interfaceStatus": status,
+            "interfaceUseTimes": MyTools.to_ms(useTime),
+            "interfaceSteps": stepsInfo,
+        }
+        self.interfacesDetail.append(detail)
+
+    async def write_result(self) -> InterfaceGroupResultModel.uid:
+        """
+        结果入库
+        :return: InterfaceGroupResultModel.uid
+        """
+
+        interfaceGroupResultModel = InterfaceGroupResultModel()
+        interfaceGroupResultModel.totalNumber = len(self.interfaces)
+        interfaceGroupResultModel.successNumber = self.successNumber
+        interfaceGroupResultModel.failNumber = self.failNumber
+        interfaceGroupResultModel.starter = self.starter.username
+        interfaceGroupResultModel.totalUseTime = MyTools.to_ms(self.totalUseTime)
+        interfaceGroupResultModel.detail = self.interfacesDetail
+        interfaceGroupResultModel.save()
+        return interfaceGroupResultModel.uid
+
+    async def to_sender(self, client: AsyncClient,
+                        interface: InterfaceModel,
+                        extract: Optional[List[Mapping[str, str]]] = None,
+                        **kwargs
+                        ):
+        """
+        :todo
+        数据处理， 提取数据写入
+        :param client:
+        :param interface
+        :param extract
+
+        :return:
+        """
+        headers = MyTools.list2Dict(extract, kwargs.get("headers"))
+        params = MyTools.list2Dict(extract, kwargs.get("params"))
+        auth = MyTools.auth(extract, kwargs.get("auth"))
+        url = interface.http.lower() + "://" + self.host + kwargs.get("url").split("?")[0]
+        method = kwargs.get("method").lower()
+        body = kwargs.get("body")
+        data = kwargs.get("data")
+        return await self.sender(client=client,
+                                 method=method,
+                                 headers=headers,
+                                 params=params,
+                                 auth=auth,
+                                 url=url,
+                                 json=body,
+                                 data=data)
+
+    @staticmethod
+    async def sender(client: AsyncClient, method: str, **kwargs) -> Tuple[Response, List[str]] | Tuple[
+        Exception, List[str]]:
+        """
+        发送请求
+        :param client: worker client
+        :param method: 请求方法
+        :param kwargs: 请求信息
+        :return: Response
+        """
+        kwargs = MyTools.delKey(**kwargs)
+        log.info(kwargs)
+        LOG = [f"{k} : {v} \n" for k, v in kwargs.items()]
+        try:
+            response = await getattr(client, method)(**kwargs)
+            LOG.append(f"response : {response.text}")
+            return response, LOG
+        except Exception as e:
+            log.error(repr(e))
+            LOG.append(f"response : {repr(e)}")
+            return e, LOG
+
+    async def master(self) -> NoReturn:
+        """
+        master 入口
+        创建任务、分发给worker
+        """
+        taskList = []
         async with AsyncClient() as client:
-            for inter in self.jobList:
-                worker = self.worker(inter, client)
-                task = asyncio.create_task(worker)  # 创建任务
-                self.taskList.append(task)
-            await asyncio.gather(*self.taskList)  # 收集任务
+            for interface in self.interfaces:
+                task = asyncio.create_task(
+                    self.worker(interface=interface, client=client)
+                )
+                taskList.append(task)
+            await asyncio.gather(*taskList)
+            await self.write_result()
 
 
 if __name__ == '__main__':
     from App import create_app
 
     create_app().app_context().push()
-    from Models.CaseModel.hostModel import HostModel
-
-    v: VariableModel = VariableModel.get(1)
-    u = User.get(1)
-    inters = InterfaceModel.query_by_field(partID=1)
-    hostName = HostModel.get(6).host
-    h = MyHttpx(hostName, inters, v.to_Dict, u)
-    asyncio.run(h.master())
+    host=HostModel.get_by_uid("KcyzFXXCMFepXWIVAlat")
+    interfaces = InterfaceModel.all()
+    user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
+    my = MyHttpx(interfaces,user,host)
+    asyncio.run(my.master())

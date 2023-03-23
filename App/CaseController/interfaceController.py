@@ -9,13 +9,22 @@
 5、补全
 
 """
-from flask import g
+import time
+from datetime import datetime
+from typing import List
+
+from Models.UserModel.userModel import User
+from Utils.myHttpx import MyHttpx
+import asyncio
+
+from flask import g, current_app
 from flask_restful import Resource
-from App import auth, UID
+from App import auth, UID, create_app
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Enums import CaseLevel
 from Enums.myEnum import CaseAPIStatus
+from Models.CaseModel.casePartModel import CasePart
 from Models.CaseModel.hostModel import HostModel
 from flask_restful import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -154,10 +163,69 @@ class GetInterResponse(Resource):
         return MyResponse.success(InterfaceResultModel.get_by_uid(**pare.parse_args))
 
 
+async def execute_task(myHttpx: MyHttpx):
+    await myHttpx.master()
+
+
+class InterfaceGroupController(Resource):
+
+    def __init__(self):
+        pare: MyRequestParseUtil = MyRequestParseUtil()
+        pare.add(name="hostID", required=True)
+        pare.add(name="partUID", required=False)
+        pare.add(name="interfaceIDs", type=list, required=False)
+        self.host = HostModel.get_by_uid(pare.parse_args.get("hostID"))
+        self.interfaceIDs: List[str] = pare.parse_args.get("interfaceIDs")
+
+    @auth.login_required
+    async def post(self) -> MyResponse:
+        loop = asyncio.get_event_loop()
+        if self.interfaceIDs:
+            # interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
+            interfaces = InterfaceModel.all()
+            httpx = MyHttpx(interfaces, g.user, self.host)
+            task = loop.create_task(httpx.master())
+            resp = MyResponse.success()
+            await task
+            return resp
+        else:
+            return MyResponse.success("err")
+
+
+class AsyncDemo(Resource):
+    def get(self):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.ensure_future(self.sleep1(10)))
+        loop.close()
+        return MyResponse.success()
+
+    async def sleep1(self, n):
+        print(f'[sleep start]{datetime.now().strftime("%Y/%m/%d %H:%M:%S")}')
+        time.sleep(n)
+        print('slept!!')
+        print(f'[sleep   end]{datetime.now().strftime("%Y/%m/%d %H:%M:%S")}')
+
+    @auth.login_required
+    def post(self):
+        from gevent import spawn
+        spawn(self.todo)
+        return MyResponse.success()
+
+    def todo(self):
+        create_app().app_context().push()
+        host = HostModel.get_by_uid("KcyzFXXCMFepXWIVAlat")
+        interfaces = InterfaceModel.all()
+        user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
+        my = MyHttpx(interfaces, user, host)
+        asyncio.run(my.master())
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
+api_script.add_resource(InterfaceGroupController, "/interface/group/run")
 api_script.add_resource(RunController, "/interface/run")
 api_script.add_resource(GetInterResponse, "/interface/response")
 api_script.add_resource(RunInterfaceDemo, "/interface/demo")
+api_script.add_resource(AsyncDemo, "/interface/async")

@@ -5,6 +5,8 @@
 # @File : casesHub
 # @Software: PyCharm
 # @Desc:
+import time
+
 from flask import Flask, jsonify
 
 app = Flask(__name__)
@@ -12,11 +14,13 @@ app = Flask(__name__)
 
 @app.route("/login", methods=["POST"])
 def login():
+    time.sleep(3)
     return jsonify({"code": 0, "data": "im token", "msg": "ok"})
 
 
 @app.route("/query", methods=["GET"])
 def query():
+    time.sleep(3)
     return jsonify({"code": 0, "data": [{"name": "cyq"}, {"name": "dawa"}], "msg": "ok"})
 
 
