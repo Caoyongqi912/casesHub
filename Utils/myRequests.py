@@ -30,7 +30,7 @@ class MyRequest:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
-        self.worker = MyBaseRequest(host=HOST.host + ":" + HOST.port)
+        self.worker = MyBaseRequest(HOST)
         if variable:
             self.extract.append(variable)
         self.LOG = []
@@ -48,19 +48,23 @@ class MyRequest:
         for step in interface.steps:
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
+            log.info(f"========================= request step-{step['step']} start ================================")
             response: Union[Response, Exception] = self.worker.run(interface.http, self.extract, **step)
             self.LOG.extend(self.worker.LOG)
             # 如果响应报错
             if isinstance(response, Exception):
                 STATUS = "FAIL"
-                self._writeError(step.get("step"), repr(response))
-                self.LOG.append(f"step-{step['step']}:response                 ====== {repr(response)}\n")
+                self._writeError(step.get("step"), response)
+                log.error(repr(response))
+                self.LOG.append(f"step-{step['step']}:response      ====== {repr(response)}\n")
                 break
             # 如果相应非200
             elif response.status_code != 200:
                 STATUS = "FAIL"
-                self.LOG.append(f"step-{step['step']}:response.text            ====== {repr(response.text)}\n")
-                self.LOG.append(f"step-{step['step']}:response.status_code     ====== {repr(response.status_code)}\n")
+                log.info(
+                    f"step-{step['step']}:response.text            ====== {response.text}\n")
+                self.LOG.append(f"step-{step['step']}:response.text            ====== {response.text}\n")
+                self.LOG.append(f"step-{step['step']}:response.status_code     ====== {response.status_code}\n")
                 break
             else:
                 useTime += response.elapsed.total_seconds()
@@ -138,7 +142,7 @@ class MyRequest:
             "step": stepID,
             "response": {
                 "status_code": None,
-                "response": response,
+                "response": repr(response),
                 "elapsed": None
             },
             "verify": None
@@ -194,3 +198,14 @@ class MyRequest:
         interfaceResult.starterName = self.starter.username
         interfaceResult.save()
         return interfaceResult.uid
+
+
+if __name__ == '__main__':
+    from App import create_app
+
+    create_app().app_context().push()
+    host = HostModel.get_by_uid("iKlAESPwDxQIKTditbpC")
+    interface = InterfaceModel.get_by_uid("KiBBggmgqRDfQDhADrpS")
+    user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
+    m = MyRequest(host, None, user)
+    m.runAPI(interface)

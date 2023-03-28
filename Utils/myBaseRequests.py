@@ -5,31 +5,39 @@
 # @File : casesHub
 # @Software: PyCharm
 # @Desc:
+import gevent
 from typing import List
 
 import requests
 import urllib3
 from requests import Response, exceptions
 
+from Models.CaseModel.hostModel import HostModel
 from Utils import MyLog, MyTools
 from requests.auth import HTTPBasicAuth
 
 log = MyLog.get_log(__file__)
 
 
+def getHost(host: HostModel):
+    if host.port:
+        return host.host + ":" + host.port
+    return host.host
+
+
 class MyBaseRequest:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
-    def __init__(self, host: str):
-        self.host = host
+    def __init__(self, host: HostModel):
+        self.host = getHost(host)
         self.request_obj = requests.session()
         self.LOG = []
 
-    def run(self, http, extract: List, **kwargs) -> Response:
+    def run(self, http, extract: List, **kwargs) -> Response | Exception:
         """
         请求接口前参数处理
-        :param http:
+        :param http: HTTP / HTTPS
         :param extract:
         :param kwargs:
         :return:
@@ -40,6 +48,7 @@ class MyBaseRequest:
         body = kwargs.get('body')
         method = kwargs['method']
         url = kwargs["url"].split("?")[0]
+
 
         self.LOG.append(f"step-{kwargs['step']}:url     ====== {url}\n")
         self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
@@ -66,7 +75,7 @@ class MyBaseRequest:
         :param method : 请求方法
         :return: response
         """
-        log.info(kwargs)
+        kwargs = MyTools.delKey(**kwargs)
         if kwargs.get("auth", None):
             kwargs['auth'] = HTTPBasicAuth(**kwargs['auth'])
         kwargs["url"] = http.lower() + "://" + self.host + kwargs['url']
@@ -75,5 +84,5 @@ class MyBaseRequest:
             self.response = getattr(self.request_obj, method)(**kwargs)
             return self.response
         except Exception as e:
-            log.error(repr(e))
+            log.error(e)
             return e
