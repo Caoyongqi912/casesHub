@@ -28,16 +28,11 @@ class MyAssert:
         assert_result = []
         if assertList:
             for _ in assertList:
-
                 extraOpt = _["extraOpt"]
                 extraValue = _["extraValue"]
                 assertOpt = _["assertOpt"]
                 expect = _['expect']
 
-                log.info(f"校验方法   -> [{extraOpt}]")
-                log.info(f"校验语法   -> [{extraValue}]")
-                log.info(f"断言方法   -> [{assertOpt}]")
-                log.info(f"预期值     -> [{expect}]")
                 self.LOG.append(f"step-{step}:校验方法  ====== {extraOpt}\n")
                 self.LOG.append(f"step-{step}:校验语法  ====== {extraValue}\n")
                 self.LOG.append(f"step-{step}:断言方法  ====== {assertOpt}\n")
@@ -49,7 +44,6 @@ class MyAssert:
                     if isinstance(actual, JSONDecodeError):
                         flag = False
                         return assert_result, flag
-                    log.info(f"实际返回   -> [{actual}]")
                     self.LOG.append(f"step-{step}:实际返回  ====== {actual}\n")
                     _['actual'] = actual
                     # assert 断言

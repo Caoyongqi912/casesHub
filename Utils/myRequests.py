@@ -21,7 +21,7 @@ log = MyLog.get_log(__file__)
 class MyRequest:
     response: Response = None
 
-    def __init__(self, HOST: HostModel, variable: Mapping[str, Any] = None, starter: User = None):
+    def __init__(self, variable: Mapping[str, Any] = None, starter: User = None):
         """
         :param HOST:      host
         :param variable:  使用得环境变量
@@ -30,7 +30,7 @@ class MyRequest:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
-        self.worker = MyBaseRequest(HOST)
+        self.worker = MyBaseRequest()
         if variable:
             self.extract.append(variable)
         self.LOG = []
@@ -204,8 +204,7 @@ if __name__ == '__main__':
     from App import create_app
 
     create_app().app_context().push()
-    host = HostModel.get_by_uid("iKlAESPwDxQIKTditbpC")
     interface = InterfaceModel.get_by_uid("KiBBggmgqRDfQDhADrpS")
     user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
-    m = MyRequest(host, None, user)
+    m = MyRequest(None, user)
     m.runAPI(interface)

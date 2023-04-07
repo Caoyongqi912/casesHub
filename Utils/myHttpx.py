@@ -21,20 +21,19 @@ log = MyLog.get_log(__file__)
 
 class MyHttpx:
 
-    def __init__(self, interfaces: List[InterfaceModel], starter: User, Host: HostModel):
+    def __init__(self, interfaces: List[InterfaceModel], starter: User):
         """
         :param interfaces: 接口组
-        :param Host: 请求host
-        :param variable: 全局变量
-
         """
         self.interfaces = interfaces
-        self.starter = starter
-        self.host = Host.host + ":" + Host.port
         self.interfacesDetail = []
         self.successNumber = 0
         self.failNumber = 0
         self.totalUseTime = 0
+        self.interfaceGroupResultModel = InterfaceGroupResultModel()
+        self.interfaceGroupResultModel.starter = starter.username
+        self.interfaceGroupResultModel.save()
+        log.info(f"start uid = {self.interfaceGroupResultModel.uid}")
 
     async def worker(self, interface: InterfaceModel, client: AsyncClient):
         """
@@ -58,6 +57,7 @@ class MyHttpx:
             response, responseLog = await self.to_sender(client, interface,
                                                          extracts,
                                                          **step)
+            log.info(f"========= {interface.title} step-{step['step']} response {response.text} =========  ")
             LOG.extend(responseLog)
             if isinstance(response, Exception) or response.status_code != 200:
                 STATUS = "FAIL"
@@ -152,15 +152,13 @@ class MyHttpx:
         :return: InterfaceGroupResultModel.uid
         """
 
-        interfaceGroupResultModel = InterfaceGroupResultModel()
-        interfaceGroupResultModel.totalNumber = len(self.interfaces)
-        interfaceGroupResultModel.successNumber = self.successNumber
-        interfaceGroupResultModel.failNumber = self.failNumber
-        interfaceGroupResultModel.starter = self.starter.username
-        interfaceGroupResultModel.totalUseTime = MyTools.to_ms(self.totalUseTime)
-        interfaceGroupResultModel.detail = self.interfacesDetail
-        interfaceGroupResultModel.save()
-        return interfaceGroupResultModel.uid
+        self.interfaceGroupResultModel.totalNumber = len(self.interfaces)
+        self.interfaceGroupResultModel.successNumber = self.successNumber
+        self.interfaceGroupResultModel.failNumber = self.failNumber
+        self.interfaceGroupResultModel.totalUseTime = MyTools.to_ms(self.totalUseTime)
+        self.interfaceGroupResultModel.detail = self.interfacesDetail
+        self.interfaceGroupResultModel.result_status = "DONE"
+        self.interfaceGroupResultModel.save(new=False)
 
     async def to_sender(self, client: AsyncClient,
                         interface: InterfaceModel,
@@ -179,7 +177,7 @@ class MyHttpx:
         headers = MyTools.list2Dict(extract, kwargs.get("headers"))
         params = MyTools.list2Dict(extract, kwargs.get("params"))
         auth = MyTools.auth(extract, kwargs.get("auth"))
-        url = interface.http.lower() + "://" + self.host + kwargs.get("url").split("?")[0]
+        url = interface.http.lower() + "://" + kwargs.get("host") + kwargs.get("url").split("?")[0]
         method = kwargs.get("method").lower()
         body = kwargs.get("body")
         data = kwargs.get("data")
@@ -221,6 +219,7 @@ class MyHttpx:
         """
         taskList = []
         async with AsyncClient() as client:
+            client.timeout = 60 * 60
             for interface in self.interfaces:
                 task = asyncio.create_task(
                     self.worker(interface=interface, client=client)
@@ -234,8 +233,3 @@ if __name__ == '__main__':
     from App import create_app
 
     create_app().app_context().push()
-    host=HostModel.get_by_uid("KcyzFXXCMFepXWIVAlat")
-    interfaces = InterfaceModel.all()
-    user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
-    my = MyHttpx(interfaces,user,host)
-    asyncio.run(my.master())
