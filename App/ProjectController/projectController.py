@@ -9,13 +9,12 @@ from flask_restful import Resource
 
 from flask_restful import Api
 from App.ProjectController import proBP
-from App import auth, siwa, UID
+from App import auth, UID
 from App.myAuth import is_admin
 from Comment.myException import MyResponse
 from Models.ProjectModel.projectModel import Project
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Swagger import AddProjectSwagger, BaseResponseSwagger, PageSwagger, UpdateProjectSwagger, \
-    DeleteProjectSwagger
+
 from Utils import MyLog
 
 log = MyLog.get_log(__file__)

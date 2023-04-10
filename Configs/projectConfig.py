@@ -60,6 +60,8 @@ class DevelopmentConfig(ProjectConfig):
 
     # mysql
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:root@{ProjectConfig.HOST}:{ProjectConfig.MYSQL_PORT}/{ProjectConfig.MYSQL_DATABASE}"
+
+    SQLALCHEMY_BIND = {"oracle": "xzzxc"}
     # SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
