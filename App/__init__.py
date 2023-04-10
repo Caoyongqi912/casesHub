@@ -46,7 +46,6 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     app.config.from_object(config[configName])
     app.config["BABEL_DEFAULT_LOCALE"] = "zh"
     api.init_app(app)
-    swagger
     catch.init_app(app)  # 支持缓存
     db.init_app(app)  # db绑定app
     mg.init_app(app)  # mongodb
