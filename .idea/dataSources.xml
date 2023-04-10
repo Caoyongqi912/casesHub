@@ -40,13 +40,5 @@
       <jdbc-url>jdbc:oracle:thin:@10.10.105.110:1521/cbsdbt</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="BJ_CBS" uuid="081e18bf-ca7a-49de-9506-7364e5cc38d9">
-      <driver-ref>oracle.19</driver-ref>
-      <synchronize>true</synchronize>
-      <auto-commit>false</auto-commit>
-      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
-      <jdbc-url>jdbc:oracle:thin:@10.10.105.110:1521/cbsdbt</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
   </component>
 </project>
