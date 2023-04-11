@@ -17,15 +17,15 @@ from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
 from flask_restful import Api
 from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
-from flask_restful_swagger_2 import swagger
 
 catch: Cache = Cache()
-db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 mg: MongoEngine = MongoEngine()
 auth: HTTPBasicAuth = HTTPBasicAuth()
 # auth: HTTPTokenAuth = HTTPTokenAuth()
 limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
 api = Api()
+db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
+
 UID = "uid"
 
 
@@ -64,6 +64,9 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
 
     from .FileController import fileBp
     app.register_blueprint(fileBp)
+
+    from .CBSController import cbsBP
+    app.register_blueprint(cbsBP)
 
     from .reqhook import logWrite, resp, register_errors
     app.before_request(logWrite)

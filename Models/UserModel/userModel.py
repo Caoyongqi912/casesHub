@@ -15,8 +15,9 @@ from Comment.myException import ParamException, AuthException
 from Enums import Gender, IntEnum, ResponseMsg
 from Utils import MyLog, simpleUser, MyTools
 import time
-import jwt  # py3.10+ 需要修改   from collections.abc  import Mapping
+import jwt  # py3.10+F 需要修改   from collections.abc  import Mapping
 
+#
 log = MyLog.get_log(__file__)
 UserType = TypeVar("UserType", bound=Base)
 
@@ -130,6 +131,7 @@ class User(Base):
         :return: token
         """
         token = {"id": self.id, "expires_time": time.time() + expires_time}
+
         return jwt.encode(token, current_app.config["SECRET_KEY"], algorithm="HS256")
 
     @classmethod
@@ -140,7 +142,7 @@ class User(Base):
         :return: UserType
         """
         try:
-            data: Dict[str, str | int] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithm=["HS256"])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             return cls.query.get(data['id'])
         except Exception as e:
             log.error(repr(e))
@@ -166,7 +168,8 @@ class User(Base):
         user = cls.query.filter(User.username == username).first()
         if user:
             if user.verify_password(password):
-                token = user.generate_token().decode("utf-8")
+                token = user.generate_token()
+                print(token)
                 # MyRedis().handle_redis_token(user.uid,token)
                 return {'token': token}
             raise ParamException("password err!")

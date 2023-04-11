@@ -13,13 +13,10 @@ from Models.UserModel.departModel import Department, UserTag
 from Models.UserModel.userModel import User
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from App.myAuth import is_admin
-from flask_restful_swagger import swagger
-from Swagger import *
 
 
 class AddAdminController(Resource):
 
-    @swagger.operation(**my_custom_operation)
     def post(self) -> MyResponse:
         """
         添加管理员

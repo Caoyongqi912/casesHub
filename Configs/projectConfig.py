@@ -16,7 +16,7 @@ SQLALCHEMY_MAX_OVERFLOW 控制在连接池达到最大值后可以创建的连�
 SQLALCHEMY_TRACK_MODIFICATIONS 如果设置成 True (默认情况)，Flask-SQLAlchemy 将会追踪对象的修改并且发送信号。这需要额外的内存， 如果不必要的可以禁用它。
 """
 import os
-
+import cx_Oracle as cx
 basedir = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -61,9 +61,9 @@ class DevelopmentConfig(ProjectConfig):
     # mysql
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:root@{ProjectConfig.HOST}:{ProjectConfig.MYSQL_PORT}/{ProjectConfig.MYSQL_DATABASE}"
 
-    SQLALCHEMY_BIND = {"oracle": "xzzxc"}
+    SQLALCHEMY_BINDS = {"nj_cbs": "oracle://SCM:QGVdUD4xjQuO8Grj@10.10.105.110:1521/?service_name=cbsdbt"}
     # SQLALCHEMY_ECHO = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # redis
     RATELIMIT_STORAGE_URI = 'redis://{}:{}/1'.format(ProjectConfig.HOST, ProjectConfig.REDIS_PORT)
