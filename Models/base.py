@@ -5,9 +5,9 @@
 # @Desc: 模型基类
 
 from sqlalchemy.engine import CursorResult
-from typing import List, AnyStr, Dict, NoReturn, Any
-from flask_sqlalchemy import Pagination
-from sqlalchemy import asc, Column, or_, and_
+from typing import List, AnyStr, Dict, NoReturn, Any, TypeVar
+from flask_sqlalchemy.pagination import Pagination
+from sqlalchemy import asc, Column, or_, and_, INTEGER, String, DATETIME, ColumnElement
 from App import db
 from datetime import datetime
 from Enums import ResponseMsg
@@ -20,10 +20,10 @@ log = MyLog.get_log(__file__)
 
 class Base(db.Model):
     __abstract__ = True
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    uid = db.Column(db.String(50), index=True, comment="唯一标识")
-    create_time = db.Column(db.DATETIME, default=datetime.now, comment="创建时间")
-    update_time = db.Column(db.DATETIME, nullable=True, onupdate=datetime.now, comment="修改时间")
+    id = Column(INTEGER, primary_key=True, autoincrement=True)
+    uid = Column(String(50), index=True, comment="唯一标识")
+    create_time = Column(DATETIME, default=datetime.now, comment="创建时间")
+    update_time = Column(DATETIME, nullable=True, onupdate=datetime.now, comment="修改时间")
 
     def save(self, new: bool = True) -> NoReturn:
         """
@@ -167,19 +167,15 @@ class Base(db.Model):
         searchData: List = getSearchData(cls, **kwargs)
         sortList: List = getSortData(cls, sort)
         if sortList:
-            items = db.session.query(cls).filter(and_(*searchData)) \
-                .order_by(*sortList) \
-                .limit(pageSize) \
-                .offset((current - 1) * pageSize) \
-                .all()
+            query = db.session.query(cls).filter(and_(*searchData)) \
+                .order_by(*sortList)
         else:
-            items = db.session.query(cls).filter(and_(*searchData)) \
-                .order_by(cls.create_time.desc()) \
-                .limit(pageSize) \
-                .offset((current - 1) * pageSize) \
-                .all()
-        total = db.session.query(cls).filter(and_(*searchData)).count()
-        return Pagination(cls, current, pageSize, total, items)
+            query = db.session.query(cls).filter(and_(*searchData)) \
+                .order_by(cls.create_time.desc())
+        try:
+            return query.paginate(page=current, per_page=pageSize)
+        except Exception as e:
+            log.error(e)
 
     @classmethod
     def columns(cls) -> List[str]:

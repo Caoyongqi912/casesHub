@@ -10,13 +10,15 @@ from flask_restful import Resource, Api
 from Comment.myResponse import MyResponse
 from Models.CBSModel.PrefModel import RrefSettingModel
 from App.CBSController import cbsBP
-from App import db
+from Utils.myRequestParseUtil import MyRequestParseUtil
 
 
 class PerfSettingController(Resource):
 
     def get(self):
-        data = RrefSettingModel.all()
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
+        parse.add(name="city", default="bj", required=False, type=str)
+        data = RrefSettingModel.get_all(**parse.parse_args)
         return MyResponse.success(data)
 
 

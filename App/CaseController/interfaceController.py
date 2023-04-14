@@ -137,6 +137,8 @@ class PageInterfaceController(Resource):
     def get(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil("values")
         info = InterfaceModel.page(**pare.page(InterfaceModel))
+
+        log.info(info)
         return MyResponse.success(info)
 
 

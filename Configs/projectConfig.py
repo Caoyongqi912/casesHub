@@ -17,6 +17,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS 如果设置成 True (默认情况)，Flask-SQLAl
 """
 import os
 import cx_Oracle as cx
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -61,7 +62,10 @@ class DevelopmentConfig(ProjectConfig):
     # mysql
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://root:root@{ProjectConfig.HOST}:{ProjectConfig.MYSQL_PORT}/{ProjectConfig.MYSQL_DATABASE}"
 
-    SQLALCHEMY_BINDS = {"nj_cbs": "oracle://SCM:QGVdUD4xjQuO8Grj@10.10.105.110:1521/?service_name=cbsdbt"}
+    SQLALCHEMY_BINDS = {"bj": "oracle://SCM:QGVdUD4xjQuO8Grj@10.10.105.110:1521/?service_name=cbsdbt",
+                        "hz": "oracle://HZ_SCM:p9bv0h21GMWk40Fy@10.10.105.110:1521/?service_name=cbsdbt",
+                        "nj": "oracle://NJ_SCM:p9bv0h21GMWk40Fy@10.10.105.110:1521/?service_name=cbsdbt"
+                        }
     # SQLALCHEMY_ECHO = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

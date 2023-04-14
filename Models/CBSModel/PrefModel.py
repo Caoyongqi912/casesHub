@@ -3,26 +3,35 @@
 # @File : PrefModel.py 
 # @Software: PyCharm
 # @Desc:
-from typing import List, Dict
+from typing import List, Dict, NoReturn
 
 from App import db
 from sqlalchemy import Column, INTEGER, CursorResult
 
 from Models.base import Base
 from sqlalchemy import text
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, scoped_session
+
+
+def get_engine(city: str):
+    SQLALCHEMY_BINDS = {"bj": "oracle://SCM:QGVdUD4xjQuO8Grj@10.10.105.110:1521/?service_name=cbsdbt",
+                        "hz": "oracle://HZ_SCM:p9bv0h21GMWk40Fy@10.10.105.110:1521/?service_name=cbsdbt",
+                        "nj": "oracle://NJ_SCM:p9bv0h21GMWk40Fy@10.10.105.110:1521/?service_name=cbsdbt"
+                        }
+    return create_engine(SQLALCHEMY_BINDS[city])
 
 
 class RrefSettingModel(Base):
     __tablename__ = "PERF_MAINT_SETINFO"
-    __bind_key__ = "nj_cbs"
-
+    __bind_key__ = None
     id = None
     uid = None
     create_time = None
     update_time = None
 
-    SET_INFO_ID = Column(INTEGER, primary_key=True)
-    CORP_ID = Column(INTEGER, nullable=True)
+    SET_INFO_ID = Column(INTEGER, primary_key=True, comment="主键")
+    CORP_ID = Column(INTEGER, nullable=True, comment="法人公司id")
     BEGEARGEAR_SWITCH = Column(INTEGER, comment="偏离度档位开关")
     STATUS = Column(INTEGER, comment="状态1:待执行;2:执行中;3:无效")
     COMPANYID = Column(INTEGER, comment="公司id")
@@ -30,7 +39,7 @@ class RrefSettingModel(Base):
     CALPERCENTWAY = Column(INTEGER, comment="计算比例得方式1默认比例 2计算比例")
     PARKINGORAUCTION = Column(INTEGER, comment="用途为车位或者法拍时是否产生维护人业绩（1：是 2：否）")
     USERLEAVE = Column(INTEGER, comment="维护人离职业绩处理 1：充公  2：给成交人")
-    MAINTAINTOTAL = Column(INTEGER, comment="房源维护总分")
+    MAINTAINTOTAL = Column(INTEGER, comment="房源维护总分房源维护总分")
     HOUSECHECKOPTIONS = Column(INTEGER, comment="是否勾选了房源考核项  1：是  2：否")
     COUNTSTANDARD = Column(INTEGER, comment="计算基准（1：低价 2：对外报价）'")
     COUNTSTANDARDHOURS = Column(INTEGER, comment="价格取值时间")
@@ -40,22 +49,46 @@ class RrefSettingModel(Base):
     MAINTAINTOTALFLAG = Column(INTEGER, comment="是否启用房源维护总分 1：是  2：否")
     COUNTSTANDARDFLAG = Column(INTEGER, comment="是否启用计算基准价 1：启用 2：不启用")
     DEALBEFORE_TIMEFLAG = Column(INTEGER, comment="是否启用 报成交前（）小时维护人 1：是 2：否")
-    ARGUEHOUSEINPUTFLAG = Column(INTEGER, comment="是否启用议价偏离度生成维护业绩需要满足房源录入时间是在成交（）小时 1：是 2：否")
+    ARGUEHOUSEINPUTFLAG = Column(INTEGER,
+                                 comment="是否启用议价偏离度生成维护业绩需要满足房源录入时间是在成交（）小时 1：是 2：否")
     ARGUEHOUSEINPUT = Column(INTEGER, comment="议价偏离度生成维护业绩需要满足房源录入时间是在成交（）小时前")
-    MAINTSCOREHOUSEINPUTFLAG = Column(INTEGER, comment="是否启用 维护分生成维护业绩需要满足房源录入时间在成交前（）小时 1：是  2：否")
+
+    MAINTSCOREHOUSEINPUTFLAG = Column(INTEGER,
+                                      comment="是否启用 维护分生成维护业绩需要满足房源录入时间在成交前（）小时 1：是  2：否")
     MAINTSCOREHOUSEINPUT = Column(INTEGER, comment="维护分生成维护业绩需要满足房源录入时间是成交（）小时前")
     SIGNTODEALHOURSFLAG = Column(INTEGER, comment="是否启用了录入到成交不足（）小时维护人逻辑")
     SIGNTODEALHOURS = Column(INTEGER, comment="录入到报成交不足（）小时维护人逻辑")
-    MAINTCHOOSE = Column(INTEGER, comment="录入到报成交不足（）小时后维护人取值范围1：录入后首次生成的维护人  2：成交时维护人")
+    MAINTCHOOSE = Column(INTEGER,
+                         comment="录入到报成交不足（）小时后维护人取值范围1：录入后首次生成的维护人  2：成交时维护人")
     DEPTID = Column(INTEGER, comment="部门id")
     BUSINESSTYPE = Column(INTEGER, comment="业务类型 1：租赁 2：买卖")
     DEALBEFOREHOURS = Column(INTEGER, comment="报成交前（）小时维护人")
-    VALUE_NODE = Column(INTEGER, comment="议价偏离度取值节点(1-报意向,2-报成交)")
-
-
 
     def __repr__(self):
-        return f"<{RrefSettingModel.__name__} {self.SET_INFO_ID}>"
+        return f"<{RrefSettingModel.__name__}>"
+
+    @staticmethod
+    def get_all(city: str):
+        engine = get_engine(city)
+        session = scoped_session(sessionmaker(bind=engine))
+        entities = session.query(RrefSettingModel).all()
+        session.close()
+
+        return entities
+
+    @staticmethod
+    def update(cls, city, SET_INFO_ID, **kwargs) -> NoReturn:
+        engine = get_engine(city)
+        session = scoped_session(sessionmaker(bind=engine))
+        entity = session.query(RrefSettingModel).filter(RrefSettingModel.SET_INFO_ID == SET_INFO_ID).first()
+        if entity is None:
+            raise ValueError(f'Entity with id={SET_INFO_ID} not found')
+        for k, v in kwargs.items():
+            if k in cls.columns():
+                setattr(entity, k, v)
+        session.add(entity)
+        session.commit()
+        session.close()
 
 
 """
