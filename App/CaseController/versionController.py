@@ -9,7 +9,7 @@ from App import auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Models.CaseModel.bugModel import Bug
-from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.caseOldModel import Cases
 from Models.ProjectModel.projectModel import Project
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.ProjectModel.versions import Version

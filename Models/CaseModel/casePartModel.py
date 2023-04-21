@@ -22,7 +22,7 @@ class CasePart(Base):
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=True, comment="所属产品")
     # 模块与用例是一对多关系
     parentID = db.Column(db.INTEGER, nullable=True, comment='父模块')
-    cases = db.relationship("Cases", backref='case_part', lazy='dynamic')
+    cases = db.relationship("CaseModel", backref='case_part', lazy='dynamic')
     interfaces = db.relationship("InterfaceModel", backref='case_part', lazy='dynamic')
 
     def __init__(self, partName: str, projectID: int, parentID: int = None):

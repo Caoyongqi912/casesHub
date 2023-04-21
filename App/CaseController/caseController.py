@@ -10,7 +10,7 @@ from App import auth, limiter, UID, auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
 from Enums import CaseTag, CaseLevel, CaseType
-from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.caseOldModel import Cases
 from Models.CaseModel.casePartModel import CasePart
 from Models.CaseModel.platformsModel import Platform
 from Models.ProjectModel.projectModel import Project

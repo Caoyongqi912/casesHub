@@ -8,7 +8,7 @@ from flask_restful import Resource, Api
 from App import auth, UID
 from App.UserController import userBP
 from Comment.myException import MyResponse
-from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.caseOldModel import Cases
 from Models.UserModel.departModel import Department, UserTag
 from Models.UserModel.userModel import User
 from Utils.myRequestParseUtil import MyRequestParseUtil

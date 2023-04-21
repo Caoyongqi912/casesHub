@@ -38,12 +38,10 @@ class Project(Base):
     # 版本跟项目是 多对一 关系
     versions = db.relationship("Version", backref="project", lazy="dynamic")
     # 用例与项目为一对多关系
-    cases = db.relationship("Cases", backref="project", lazy="dynamic")
+    cases = db.relationship("CaseModel", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")
     variables = db.relationship("VariableModel", backref="project", lazy="dynamic")
     interfaces = db.relationship("InterfaceModel", backref="project", lazy="dynamic")
-
-    # apis = db.relationship("ApiModel", backref="project", lazy="dynamic")
 
     def __init__(self, name: AnyStr, desc: AnyStr, adminID: int, adminName: AnyStr):
         self.name = name

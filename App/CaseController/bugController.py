@@ -15,7 +15,7 @@ from Enums import BugLevel, BugType
 from Models.CaseModel.bugModel import Bug
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
-from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.caseOldModel import Cases
 
 
 class BugController(Resource):

@@ -10,7 +10,7 @@ from flask_restful import Api
 from App import auth, UID, auth
 from Comment.myException import MyResponse
 from App.CaseController import caseBP
-from Models.CaseModel.caseModel import Cases
+from Models.CaseModel.caseOldModel import Cases
 from Models.CaseModel.platformsModel import Platform
 from Utils.myRequestParseUtil import MyRequestParseUtil
 
