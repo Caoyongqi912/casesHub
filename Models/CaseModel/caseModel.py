@@ -53,11 +53,11 @@ class Cases(Base):
                  partID: Optional[int] = None,
                  projectID: Optional[int] = None,
                  platformID: Optional[int] = None,
-                 creator: int = None,
                  versionID: Optional[int] = None):
         self.title = title
         self.desc = desc
-        self.creator = creator if creator else g.user.id
+        self.creatorID = g.user.id
+        self.creatorName = g.user.username
         self.status = status
         self.projectID = projectID
         self.platformID = platformID

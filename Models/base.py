@@ -238,7 +238,7 @@ def getSearchData(cls, **kwargs) -> List:
         return searchData
     for k, v in kwargs.items():
         if hasattr(cls, k):
-            searchData.append(getattr(cls, k) == v)
+            searchData.append(getattr(cls, k) == v.split())
     return searchData
 
 

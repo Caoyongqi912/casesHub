@@ -6,6 +6,8 @@
 
 from typing import Dict, NoReturn, TypeVar
 
+from sqlalchemy import text
+
 from Models.base import Base
 from App import db
 from typing import AnyStr
@@ -100,7 +102,7 @@ class User(Base):
         :param value:  search value
         :return: execute_sql
         """
-        sql = """Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value)
+        sql = text("""Select id,uid,username,create_time,update_time From user Where {} Like '{}%'""".format(target, value))
         res = cls.execute_sql(sql)
         return res
 

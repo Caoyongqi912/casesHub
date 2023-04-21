@@ -6,7 +6,7 @@
 import enum
 import json
 from json import JSONDecodeError
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn, Optional
+from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn, Optional, Type
 from flask import request
 from Comment.myException import ParamException
 from Models.CaseModel.caseModel import Cases
@@ -19,11 +19,13 @@ log = MyLog.get_log(__file__)
 
 clsType = TypeVar("clsType", bound=Base)
 enumType = TypeVar("enumType", bound=BaseEnum)
+StrType = TypeVar("StrType", bound=str)
 
 
 class MyRequestParseUtil:
     """
-    待改造、 去除多余参数
+    请求参数解析工具类。该类用于验证请求参数的正确性，
+    支持参数类型校验、必填项校验、区间校验、枚举校验、分页参数校验等。
     """
 
     def __init__(self, location: str = "json"):
@@ -151,7 +153,7 @@ class MyRequestParseUtil:
             raise ParamException(ResponseMsg.empty(filed))
 
     @staticmethod
-    def _verify_type(target: Any, t: type, param: str) -> NoReturn:
+    def _verify_type(target: Any, t: Type[StrType], param: str) -> NoReturn:
         """
         校验类型
         :param target: 目标值

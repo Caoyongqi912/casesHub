@@ -4,7 +4,7 @@
 # @Software: PyCharm
 # @Desc:
 from json import JSONDecodeError
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 from requests import Response
 from Utils import MyLog
 from .myJsonpath import MyJsonPath
@@ -17,7 +17,7 @@ class MyAssert:
         self.response = response
         self.LOG = []
 
-    def doAssert(self, step: int, assertList: List[Dict[str, Any]]):
+    def doAssert(self, step: int, assertList: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], bool, List[str]]:
         """
         校验开始
         :param  step 步骤id
@@ -28,7 +28,6 @@ class MyAssert:
         assert_result = []
         if assertList:
             for _ in assertList:
-
                 extraOpt = _["extraOpt"]
                 extraValue = _["extraValue"]
                 assertOpt = _["assertOpt"]

@@ -90,7 +90,6 @@ def simpleUser(func):
    """
 
 
-
 def variable2dict(func):
     @wraps(func)
     def decorator(self):
