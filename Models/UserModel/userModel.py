@@ -144,11 +144,7 @@ class User(Base):
         :return: UserType
         """
         try:
-<<<<<<< HEAD
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
-=======
             data: Dict[str, str | int] = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
->>>>>>> master
             return cls.query.get(data['id'])
         except Exception as e:
             log.error(repr(e))
@@ -175,11 +171,6 @@ class User(Base):
         if user:
             if user.verify_password(password):
                 token = user.generate_token()
-<<<<<<< HEAD
-                print(token)
-=======
->>>>>>> master
-                # MyRedis().handle_redis_token(user.uid,token)
                 return {'token': token}
             raise ParamException("password err!")
         else:
