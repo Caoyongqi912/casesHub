@@ -68,6 +68,7 @@ class Base(db.Model):
         """
         from flask import g
         kwargs.setdefault("updater", g.user.id)  # 修改人
+        kwargs.setdefault("updaterName", g.user.username)
         target = cls.get_by_uid(kwargs.pop('uid'))
         try:
             for k, v in kwargs.items():

@@ -6,10 +6,9 @@
 import enum
 import json
 from json import JSONDecodeError
-from typing import AnyStr, Dict, Any, List, Union, TypeVar, Generic, NoReturn, Optional, Type
+from typing import AnyStr, Dict, Any, List, TypeVar, Generic, NoReturn, Optional, Type
 from flask import request
 from Comment.myException import ParamException
-from Models.CaseModel.caseOldModel import Cases
 from Models.base import Base
 from Utils.myLog import MyLog
 from Enums import ResponseMsg

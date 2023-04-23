@@ -36,7 +36,7 @@ class Project(Base):
     users = db.relationship("User", backref="project", lazy="dynamic",
                             secondary=projectUser)
     # 版本跟项目是 多对一 关系
-    versions = db.relationship("Version", backref="project", lazy="dynamic")
+    # versions = db.relationship("Version", backref="project", lazy="dynamic")
     # 用例与项目为一对多关系
     cases = db.relationship("CaseModel", backref="project", lazy="dynamic")
     parts = db.relationship("CasePart", backref="project", lazy="dynamic")

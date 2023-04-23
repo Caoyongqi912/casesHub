@@ -8,7 +8,6 @@ from flask_restful import Resource, Api
 from App import auth, UID
 from App.UserController import userBP
 from Comment.myException import MyResponse
-from Models.CaseModel.caseOldModel import Cases
 from Models.UserModel.departModel import Department, UserTag
 from Models.UserModel.userModel import User
 from Utils.myRequestParseUtil import MyRequestParseUtil
@@ -131,26 +130,26 @@ class LoginController(Resource):
         return MyResponse.success(User.login(**parse.parse_args))
 
 
-class UserController(Resource):
-
-    @auth.login_required
-    def get(self) -> MyResponse:
-        """
-        :return: MyResponse
-        """
-        parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True)
-        user: User = User.get_by_uid(**parse.parse_args)
-        userProject = user.project
-        cases = Cases.query_by_field(creator=user.id)
-
-        return MyResponse.success(
-            {
-                "user": user,
-                "project": userProject,
-                "case": cases
-            }
-        )
+# class UserController(Resource):
+#
+#     @auth.login_required
+#     def get(self) -> MyResponse:
+#         """
+#         :return: MyResponse
+#         """
+#         parse: MyRequestParseUtil = MyRequestParseUtil("values")
+#         parse.add(name=UID, required=True)
+#         user: User = User.get_by_uid(**parse.parse_args)
+#         userProject = user.project
+#         cases = Cases.query_by_field(creator=user.id)
+#
+#         return MyResponse.success(
+#             {
+#                 "user": user,
+#                 "project": userProject,
+#                 "case": cases
+#             }
+#         )
 
 
 class SetPasswordController(Resource):
@@ -233,7 +232,7 @@ api_script = Api(userBP)
 api_script.add_resource(MoHuSearch, "/search")
 api_script.add_resource(AddAdminController, "/admin")
 api_script.add_resource(UserTagController, "/tag/opt")
-api_script.add_resource(UserController, "/detail")
+# api_script.add_resource(UserController, "/detail")
 api_script.add_resource(UserOptController, "/opt")
 api_script.add_resource(SetPasswordController, "/setpassword")
 api_script.add_resource(CurrentUserController, '/current')

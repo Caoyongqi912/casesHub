@@ -8,9 +8,8 @@ from typing import AnyStr, List, Dict, Any
 
 from openpyxl import load_workbook
 from App import create_app
-from Models.CaseModel.caseOldModel import Cases
+from Models.CaseModel.caseModel import CaseModel
 from Models.CaseModel.casePartModel import CasePart
-from Models.CaseModel.platformsModel import Platform
 from Utils import MyLog
 from Enums.myEnum import CaseLevel
 
@@ -53,11 +52,11 @@ class MyExcel:
                 else:
                     case["partID"] = casePart.get("id")
                 case['case_level'] = CaseLevel.getValue(case['case_level'])
-                platform: str = case.pop("platform")
-                platform = Platform.get_by_name(platform)
-                case['platformID'] = platform.id
+                # platform: str = case.pop("platform")
+                # platform = None
+                # case['platformID'] = None
                 log.info(f"save{case}")
-                Cases(**case).save()
+                CaseModel(**case).save()
 
     @staticmethod
     def _steps(steps: AnyStr, exp: AnyStr) -> List[Dict]:
@@ -77,4 +76,3 @@ class MyExcel:
             _steps.append(z)
 
         return _steps
-

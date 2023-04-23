@@ -9,12 +9,9 @@ from flask_restful import Api
 from App import auth, limiter, UID, auth
 from App.CaseController import caseBP
 from Comment.myException import MyResponse
-from Enums import CaseTag, CaseLevel, CaseType
-from Models.CaseModel.caseOldModel import Cases
+from Models.CaseModel.caseModel import CaseModel
 from Models.CaseModel.casePartModel import CasePart
-from Models.CaseModel.platformsModel import Platform
 from Models.ProjectModel.projectModel import Project
-from Models.ProjectModel.versions import Version
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Utils import MyLog
 
@@ -30,20 +27,14 @@ class CaseController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="title", type=str, required=True)
-        parse.add(name="desc", type=str, required=True)
-        parse.add(name="setup", type=str, required=False)
-
-        parse.add(name="tag", enum=CaseTag, required=True)
-        parse.add(name="case_level", enum=CaseLevel, required=True)
-        parse.add(name="case_type", enum=CaseType, required=False)
-
-        parse.add(name="platformID", type=int, isExist=Platform, required=False)
-        parse.add(name="projectID", type=int, isExist=Project, required=False)
-        parse.add(name="partID", type=int, isExist=CasePart, required=False)
-        parse.add(name="versionID", type=int, isExist=Version, required=False)
-        parse.add(name="info", type=list, required=True)
-        Cases(**parse.parse_args).save()
+        parse.add(name="case_title", type=str, required=True)
+        parse.add(name="case_level", type=str, required=True)
+        parse.add(name="case_desc", type=str, required=True)
+        parse.add(name="case_type", type=str, required=False)
+        parse.add(name="case_info", type=list, required=True)
+        parse.add(name="projectID", type=int, isExist=Project, required=True)
+        parse.add(name="casePartID", type=int, isExist=CasePart, required=True)
+        CaseModel(**parse.parse_args).save()
         return MyResponse.success()
 
     @auth.login_required
@@ -54,38 +45,37 @@ class CaseController(Resource):
         """
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, type=int, required=True, isExist=Cases)
-        parse.add(name="part", type=str, required=False)
-        parse.add(name="title", type=str, required=False)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="case_level", type=str, enum=CaseLevel, required=False)
-        parse.add(name="case_type", type=str, enum=CaseType, required=False)
-        parse.add(name="platformID", type=int, required=False)
-        parse.add(name="projectID", type=int, required=False)
-        parse.add(name="versionID", type=int, required=False)
-        parse.add(name="steps", type=list, required=False)
-        Cases.update(**parse.parse_args)
+        parse.add(name=UID, type=int, required=True, isExist=CaseModel)
+        parse.add(name="case_title", type=str, required=False)
+        parse.add(name="case_level", type=str, required=False)
+        parse.add(name="case_desc", type=str, required=False)
+        parse.add(name="case_type", type=str, required=False)
+        parse.add(name="case_info", type=list, required=False)
+        parse.add(name="projectID", type=int, isExist=Project, required=False)
+        parse.add(name="casePartID", type=int, isExist=CasePart, required=False)
+        CaseModel.update(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
     def delete(self) -> MyResponse:
         """
-        通过id删除
+        通过uid删除
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        Cases.delete_by_id(**parse.parse_args)
+        CaseModel.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
     @auth.login_required
     def get(self) -> MyResponse:
         """
-        通过caseID查
+        uid查询
         :return: MyResponse
         """
-        parse = MyRequestParseUtil("values")
-        return MyResponse.success(Cases.page(**parse.page(Cases)))
+        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse.add(name=UID, required=True, type=str)
+        return MyResponse.success(CaseModel.get_by_uid(**parse.parse_args))
 
 
 # class UpdateExcel2CaseController(Resource):
@@ -111,7 +101,7 @@ class CaseController(Resource):
 #         return MyResponse.success()
 
 
-class QueryCaseController(Resource):
+class PageCaseController(Resource):
 
     @auth.login_required
     def get(self) -> MyResponse:
@@ -120,16 +110,9 @@ class QueryCaseController(Resource):
         :return:
         """
         parse = MyRequestParseUtil("values")
-        return MyResponse.success(Cases.page(**parse.page(Cases)))
-
-
-class QueryUserCase(Resource):
-
-    @auth.login_required
-    def get(self):
-        pass
+        return MyResponse.success(CaseModel.page(**parse.page(CaseModel)))
 
 
 api_script = Api(caseBP)
 api_script.add_resource(CaseController, "/opt")
-api_script.add_resource(QueryCaseController, "/query")
+api_script.add_resource(PageCaseController, "/page")
