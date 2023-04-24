@@ -30,6 +30,7 @@ class CaseController(Resource):
         parse.add(name="case_title", type=str, required=True)
         parse.add(name="case_level", type=str, required=True)
         parse.add(name="case_desc", type=str, required=True)
+        parse.add(name="case_setup", type=str, required=True)
         parse.add(name="case_type", type=str, required=False)
         parse.add(name="case_info", type=list, required=True)
         parse.add(name="projectID", type=int, isExist=Project, required=True)

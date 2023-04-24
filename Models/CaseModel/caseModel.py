@@ -29,7 +29,7 @@ class CaseModel(Base):
     creatorName = db.Column(db.String(20), comment="创建人姓名")
     updaterName = db.Column(db.String(20), comment="修改人姓名")
 
-    casePartID = Column(INTEGER, db.ForeignKey('case_part.id'), nullable=True,
+    casePartID = Column(INTEGER, db.ForeignKey('case_part.id'), nullable=False,
                         comment="所属模块")
     projectID = db.Column(db.INTEGER, db.ForeignKey("project.id"), nullable=False,
                           comment="所属产品")
@@ -44,13 +44,13 @@ class CaseModel(Base):
         self.case_setup = case_setup
         self.case_info = self.__verify_info(case_info)
         self.casePartID = casePartID
-        self.casePartID = projectID
+        self.projectID = projectID
         self.case_mark = case_mark
         self.creator = g.user.id
         self.creatorName = g.user.username
 
     @staticmethod
-    def __verify_info(info: List[Dict]) -> json:
+    def __verify_info(info: List[Dict]) -> List[Dict[str, Any]]:
         """
         校验steps格式  并按照 step 排序
         [
@@ -74,7 +74,7 @@ class CaseModel(Base):
         for step in info:
             if not step.get("step"):
                 raise ParamException(ResponseMsg.miss("step"))
-            if not step.get("do"):
+            if not step.get("todo"):
                 raise ParamException(ResponseMsg.miss("todo"))
             if not step.get("exp"):
                 raise ParamException(ResponseMsg.miss("exp"))
