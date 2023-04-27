@@ -19,18 +19,11 @@ from requests.auth import HTTPBasicAuth
 log = MyLog.get_log(__file__)
 
 
-def getHost(host: HostModel):
-    if host.port:
-        return host.host + ":" + host.port
-    return host.host
-
-
 class MyBaseRequest:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     response: Response = None
 
-    def __init__(self, host: HostModel):
-        self.host = getHost(host)
+    def __init__(self):
         self.request_obj = requests.session()
         self.LOG = []
 
@@ -47,8 +40,7 @@ class MyBaseRequest:
         auth = MyTools.auth(extract, kwargs.get("auth"))
         body = kwargs.get('body')
         method = kwargs['method']
-        url = kwargs["url"].split("?")[0]
-
+        url = http.lower() + "://" + kwargs["host"] + kwargs['url']
 
         self.LOG.append(f"step-{kwargs['step']}:url     ====== {url}\n")
         self.LOG.append(f"step-{kwargs['step']}:method  ====== {method}\n")
@@ -78,7 +70,10 @@ class MyBaseRequest:
         kwargs = MyTools.delKey(**kwargs)
         if kwargs.get("auth", None):
             kwargs['auth'] = HTTPBasicAuth(**kwargs['auth'])
-        kwargs["url"] = http.lower() + "://" + self.host + kwargs['url']
+        kwargs.setdefault("verify", False)
+
+        # else:
+        #     kwargs.setdefault("verify",False)
         method = method.lower()
         try:
             self.response = getattr(self.request_obj, method)(**kwargs)

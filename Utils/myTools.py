@@ -30,7 +30,7 @@ class MyTools:
             return params
         D = {}
         for _ in params:
-            D[_["key"]] = _["value"]
+            D[_["key"].strip()] = _["value"]
         DD = deepcopy(D)
         if extracts:  # 如果存在待提取的参数
             for k, v in DD.items():

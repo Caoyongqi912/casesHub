@@ -28,7 +28,7 @@ from Models.CaseModel.casePartModel import CasePart
 from Models.CaseModel.hostModel import HostModel
 from flask_restful import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
-from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
+from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, InterfaceGroupResultModel
 from Utils import MyLog
 from Utils.myRequests import MyRequest
 
@@ -111,10 +111,8 @@ class RunController(Resource):
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name=UID)
-        pare.add(name="HostID")
-        Host = HostModel.get_by_uid(pare.parse_args.get("HostID"))
         inter = InterfaceModel.get_by_uid(pare.parse_args.get(UID))
-        uid = MyRequest(HOST=Host, starter=g.user).runAPI(inter)
+        uid = MyRequest(starter=g.user).runAPI(inter)
         return MyResponse.success(uid)
 
 
@@ -147,12 +145,10 @@ class RunInterfaceDemo(Resource):
     @auth.login_required
     def post(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil()
-        pare.add(name="HostID", required=True)
         pare.add(name="step", type=dict, required=False)
         from Utils.myRequests import MyRequest
         reqData = pare.parse_args
-        host = HostModel.get_by_uid(uid=reqData.pop("HostID"))
-        response = MyRequest(HOST=host, starter=g.user).runText(reqData.get("step"))
+        response = MyRequest(starter=g.user).runText(reqData.get("step"))
         return MyResponse.success(response)
 
 
@@ -173,25 +169,33 @@ class InterfaceGroupController(Resource):
 
     def __init__(self):
         pare: MyRequestParseUtil = MyRequestParseUtil()
-        pare.add(name="hostID", required=True)
-        pare.add(name="partUID", required=False)
-        pare.add(name="interfaceIDs", type=list, required=False)
-        self.host = HostModel.get_by_uid(pare.parse_args.get("hostID"))
+        pare.add(name="interfaceIDs", type=list, required=True)
         self.interfaceIDs: List[str] = pare.parse_args.get("interfaceIDs")
 
+    # @auth.login_required
+    # async def post(self) -> MyResponse:
+    #     loop = asyncio.get_event_loop()
+    #     if self.interfaceIDs:
+    #         interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
+    #         httpx = MyHttpx(interfaces, g.user)
+    #         task = loop.create_task(httpx.master())
+    #         resp = MyResponse.success()
+    #         await task
+    #         return resp
+    #     else:
+    #         return MyResponse.success("err")
     @auth.login_required
-    async def post(self) -> MyResponse:
-        loop = asyncio.get_event_loop()
-        if self.interfaceIDs:
-            # interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
-            interfaces = InterfaceModel.all()
-            httpx = MyHttpx(interfaces, g.user, self.host)
-            task = loop.create_task(httpx.master())
-            resp = MyResponse.success()
-            await task
-            return resp
-        else:
-            return MyResponse.success("err")
+    def post(self):
+        from gevent import spawn
+        self.user = g.user.id
+        spawn(self.todo)
+        return MyResponse.success()
+
+    def todo(self):
+        create_app().app_context().push()
+        interfaces = interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
+        my = MyHttpx(interfaces, User.get(self.user))
+        asyncio.run(my.master())
 
 
 class AsyncDemo(Resource):
@@ -222,10 +226,20 @@ class AsyncDemo(Resource):
         asyncio.run(my.master())
 
 
+class QueryInterfaceGroupResult(Resource):
+
+    @auth.login_required
+    def get(self) -> MyResponse:
+        pare: MyRequestParseUtil = MyRequestParseUtil("values")
+        info = InterfaceGroupResultModel.page(**pare.page(InterfaceGroupResultModel))
+        return MyResponse.success(info)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
+api_script.add_resource(QueryInterfaceGroupResult, "/interface/group/page")
 api_script.add_resource(InterfaceGroupController, "/interface/group/run")
 api_script.add_resource(RunController, "/interface/run")
 api_script.add_resource(GetInterResponse, "/interface/response")

@@ -93,6 +93,7 @@ class InterfaceResultModel(Base):
 
 class InterfaceGroupResultModel(Base):
     __tabename__ = "interface_group_result"
+    result_status = db.Column(db.String(10), default="RUNNING", comment="状态")
     totalNumber = db.Column(db.INTEGER, comment="总运行数量")
     successNumber = db.Column(db.INTEGER, comment="成功数量")
     failNumber = db.Column(db.INTEGER, comment="失败梳理")

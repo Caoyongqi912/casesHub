@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 @app.route("/login", methods=["POST"])
 def login():
-    time.sleep(3)
+    time.sleep(10)
     return jsonify({"code": 0, "data": "im token", "msg": "ok"})
 
 

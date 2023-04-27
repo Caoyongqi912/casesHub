@@ -6,9 +6,8 @@
 from App import create_app
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-# from gevent import monkey
-#
-# monkey.patch_all()
+from gevent import monkey
+monkey.patch_all()
 
 app = create_app()
 
