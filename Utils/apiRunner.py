@@ -18,12 +18,11 @@ from Utils.myJsonpath import MyJsonPath
 log = MyLog.get_log(__file__)
 
 
-class MyRequest:
+class ApiRunner:
     response: Response = None
 
     def __init__(self, variable: Mapping[str, Any] = None, starter: User = None):
         """
-        :param HOST:      host
         :param variable:  使用得环境变量
         :param starter:   运行人
         """
@@ -37,32 +36,29 @@ class MyRequest:
         log.info(f"starter ====== {self.starter.username}")
         self.LOG.append(f"starter ====== {self.starter.username}\n")
 
-    def runAPI(self, interface: InterfaceModel) -> str:
+    def runAPI(self, inter: InterfaceModel) -> str:
         """
         运行api
         进行校验与结果入库
-        :param interface: InterfaceModel
+        :param inter: InterfaceModel
         """
         STATUS = 'SUCCESS'
         useTime = 0
-        for step in interface.steps:
+        for step in inter.steps:
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
-            log.info(f"========================= request step-{step['step']} start ================================")
-            response: Union[Response, Exception] = self.worker.run(interface.http, self.extract, **step)
+            response: Union[Response, Exception] = self.worker.run(inter.http, self.extract, **step)
             self.LOG.extend(self.worker.LOG)
             # 如果响应报错
             if isinstance(response, Exception):
                 STATUS = "FAIL"
                 self._writeError(step.get("step"), response)
-                log.error(repr(response))
                 self.LOG.append(f"step-{step['step']}:response      ====== {repr(response)}\n")
                 break
+
             # 如果相应非200
             elif response.status_code != 200:
                 STATUS = "FAIL"
-                log.info(
-                    f"step-{step['step']}:response.text            ====== {response.text}\n")
                 self.LOG.append(f"step-{step['step']}:response.text            ====== {response.text}\n")
                 self.LOG.append(f"step-{step['step']}:response.status_code     ====== {response.status_code}\n")
                 break
@@ -83,11 +79,20 @@ class MyRequest:
                 else:
                     STATUS = 'FAIL'
                     break
-        self.LOG.append(f"case {interface.title} 结束 . 共用时{MyTools.to_ms(useTime)}\n")
-        return self._writeResult(interface.id, interface.title, len(interface.steps), self.responseInfo, STATUS,
+        self.LOG.append(f"case {inter.title} 结束 . 共用时{MyTools.to_ms(useTime)}\n")
+        return self._writeResult(inter.id, inter.title, len(inter.steps), self.responseInfo, STATUS,
                                  useTime)
 
-    def runText(self, step: dict, http: str = "http") -> Dict[str, Any]:
+    def runApis(self, interfaces: List[InterfaceModel]):
+        """
+        接口顺序批量运行
+        :param interfaces: List[InterfaceModel]
+        :return:
+        """
+        for inter in interfaces:
+            pass
+
+    def runTest(self, step: Dict[str, Any], http: str = "http") -> Dict[str, Any]:
         """
         单步骤调试
         :param http: default http
@@ -137,11 +142,17 @@ class MyRequest:
                 ext["val"] = value
                 self.extract.append(ext)
 
-    def _writeError(self, stepID: int, response: Any):
+    def _writeError(self, stepID: int, response: Exception):
+        """
+        请求存在报错、写入报错信息
+        :param stepID:
+        :param response:
+        :return:
+        """
         info = {
             "step": stepID,
             "response": {
-                "status_code": None,
+                "status_code": 500,
                 "response": repr(response),
                 "elapsed": None
             },
@@ -198,13 +209,3 @@ class MyRequest:
         interfaceResult.starterName = self.starter.username
         interfaceResult.save()
         return interfaceResult.uid
-
-
-if __name__ == '__main__':
-    from App import create_app
-
-    create_app().app_context().push()
-    interface = InterfaceModel.get_by_uid("KiBBggmgqRDfQDhADrpS")
-    user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
-    m = MyRequest(None, user)
-    m.runAPI(interface)

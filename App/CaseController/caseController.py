@@ -46,7 +46,7 @@ class CaseController(Resource):
         """
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, type=int, required=True, isExist=CaseModel)
+        parse.add(name=UID, type=str, required=True)
         parse.add(name="case_title", type=str, required=False)
         parse.add(name="case_level", type=str, required=False)
         parse.add(name="case_desc", type=str, required=False)
@@ -74,7 +74,7 @@ class CaseController(Resource):
         uid查询
         :return: MyResponse
         """
-        parse: MyRequestParseUtil = MyRequestParseUtil()
+        parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True, type=str)
         return MyResponse.success(CaseModel.get_by_uid(**parse.parse_args))
 

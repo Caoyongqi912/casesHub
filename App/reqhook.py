@@ -1,3 +1,4 @@
+import traceback
 from typing import Union, NoReturn
 
 import sqlalchemy
@@ -42,7 +43,8 @@ def resp(response: Response) -> Union[MyResponse, Response]:
 def register_errors(app):
     @app.errorhandler(Exception)
     def framework_error(e):
-        log.error(repr(e))
+        tb = traceback.format_exc()
+        log.error(f"{repr(e)}\n{tb}")
         if isinstance(e, AuthException | ParamException | MethodNotAllowed):
             return e
         if isinstance(e, RateLimitExceeded):

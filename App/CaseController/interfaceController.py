@@ -17,20 +17,18 @@ from Models.UserModel.userModel import User
 from Utils.myHttpx import MyHttpx
 import asyncio
 
-from flask import g, current_app
+from flask import g
 from flask_restful import Resource
 from App import auth, UID, create_app
 from App.CaseController import caseBP
 from Comment.myResponse import MyResponse
 from Enums import CaseLevel
 from Enums.myEnum import CaseAPIStatus
-from Models.CaseModel.casePartModel import CasePart
-from Models.CaseModel.hostModel import HostModel
 from flask_restful import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, InterfaceGroupResultModel
 from Utils import MyLog
-from Utils.myRequests import MyRequest
+from Utils.apiRunner import ApiRunner
 
 log = MyLog.get_log(__file__)
 
@@ -112,7 +110,7 @@ class RunController(Resource):
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name=UID)
         inter = InterfaceModel.get_by_uid(pare.parse_args.get(UID))
-        uid = MyRequest(starter=g.user).runAPI(inter)
+        uid = ApiRunner(starter=g.user).runAPI(inter=inter)
         return MyResponse.success(uid)
 
 
@@ -146,9 +144,9 @@ class RunInterfaceDemo(Resource):
     def post(self) -> MyResponse:
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name="step", type=dict, required=False)
-        from Utils.myRequests import MyRequest
+        from Utils.apiRunner import ApiRunner
         reqData = pare.parse_args
-        response = MyRequest(starter=g.user).runText(reqData.get("step"))
+        response = ApiRunner(starter=g.user).runTest(reqData.get("step"))
         return MyResponse.success(response)
 
 
@@ -219,10 +217,9 @@ class AsyncDemo(Resource):
 
     def todo(self):
         create_app().app_context().push()
-        host = HostModel.get_by_uid("KcyzFXXCMFepXWIVAlat")
         interfaces = InterfaceModel.all()
         user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
-        my = MyHttpx(interfaces, user, host)
+        my = MyHttpx(interfaces, user)
         asyncio.run(my.master())
 
 

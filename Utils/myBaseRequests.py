@@ -48,22 +48,18 @@ class MyBaseRequest:
         self.LOG.append(f"step-{kwargs['step']}:params  ====== {params}\n")
         self.LOG.append(f"step-{kwargs['step']}:body    ====== {body}\n")
 
-        response = self.todo(url=url,
-                             http=http,
-                             method=method,
-                             headers=headers,
-                             params=params,
-                             json=body,
-                             auth=auth)
-        return response
+        return self.todo(url=url,
+                         method=method,
+                         headers=headers,
+                         params=params,
+                         json=body,
+                         auth=auth)
 
     def todo(self,
              method: str,
-             http: str,
              **kwargs
              ) -> Response | Exception:
         """
-        :param http: http
         :param method : 请求方法
         :return: response
         """
@@ -71,9 +67,6 @@ class MyBaseRequest:
         if kwargs.get("auth", None):
             kwargs['auth'] = HTTPBasicAuth(**kwargs['auth'])
         kwargs.setdefault("verify", False)
-
-        # else:
-        #     kwargs.setdefault("verify",False)
         method = method.lower()
         try:
             self.response = getattr(self.request_obj, method)(**kwargs)

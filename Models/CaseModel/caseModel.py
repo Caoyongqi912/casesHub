@@ -50,7 +50,7 @@ class CaseModel(Base):
         self.creatorName = g.user.username
 
     @staticmethod
-    def __verify_info(info: List[Dict]) -> List[Dict[str, Any]]:
+    def __verify_info(info: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         校验steps格式  并按照 step 排序
         [
@@ -69,14 +69,12 @@ class CaseModel(Base):
         ]
         :param info: ↑
         :return: info
-        :raise: ParamErr
+        :raise: ParamException
         """
-        for step in info:
-            if not step.get("step"):
-                raise ParamException(ResponseMsg.miss("step"))
-            if not step.get("todo"):
-                raise ParamException(ResponseMsg.miss("todo"))
-            if not step.get("exp"):
-                raise ParamException(ResponseMsg.miss("exp"))
-        info.sort(key=lambda s: s['step'])
-        return info
+
+        def check_step(step):
+            if not all(key in step for key in ["step", "todo", "exp"]):
+
+                raise ParamException(ResponseMsg.error_param(target="case_info", msg="key err"))
+        list(map(check_step, info))
+        return sorted(info, key=lambda s: s["step"])
