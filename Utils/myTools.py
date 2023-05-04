@@ -5,7 +5,7 @@
 # @Desc:
 import copy
 import re
-from typing import List, Dict, Any, Mapping
+from typing import List, Dict, Any, Mapping, Union
 from copy import deepcopy
 from httpx import Response as HTTPxResponse
 from requests import Response as RequestResponse
@@ -142,8 +142,11 @@ class MyTools:
         return c
 
     @classmethod
-    def to_ms(cls, number: int | float) -> str:
-        return f"{round(number * 1000, 2)}ms"
+    def to_ms(cls, number: int | float, count: int = 2, toStr: bool = True) -> Union[str, float]:
+        if toStr:
+            return f"{round(number * 1000, count)}ms"
+        else:
+            return round(number * 1000, count)
 
     @classmethod
     def delKey(cls, **kwargs):

@@ -27,7 +27,7 @@ from Enums.myEnum import CaseAPIStatus
 from flask_restful import Api
 from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, InterfaceGroupResultModel
-from Utils import MyLog
+from Utils import MyLog, UUID
 from Utils.apiRunner import ApiRunner
 
 log = MyLog.get_log(__file__)
@@ -159,68 +159,27 @@ class GetInterResponse(Resource):
         return MyResponse.success(InterfaceResultModel.get_by_uid(**pare.parse_args))
 
 
-async def execute_task(myHttpx: MyHttpx):
-    await myHttpx.master()
-
-
 class InterfaceGroupController(Resource):
 
     def __init__(self):
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name="interfaceIDs", type=list, required=True)
         self.interfaceIDs: List[str] = pare.parse_args.get("interfaceIDs")
-
-    # @auth.login_required
-    # async def post(self) -> MyResponse:
-    #     loop = asyncio.get_event_loop()
-    #     if self.interfaceIDs:
-    #         interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
-    #         httpx = MyHttpx(interfaces, g.user)
-    #         task = loop.create_task(httpx.master())
-    #         resp = MyResponse.success()
-    #         await task
-    #         return resp
-    #     else:
-    #         return MyResponse.success("err")
-    @auth.login_required
-    def post(self):
-        from gevent import spawn
-        self.user = g.user.id
-        spawn(self.todo)
-        return MyResponse.success()
-
-    def todo(self):
-        create_app().app_context().push()
-        interfaces = interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
-        my = MyHttpx(interfaces, User.get(self.user))
-        asyncio.run(my.master())
-
-
-class AsyncDemo(Resource):
-    def get(self):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(asyncio.ensure_future(self.sleep1(10)))
-        loop.close()
-        return MyResponse.success()
-
-    async def sleep1(self, n):
-        print(f'[sleep start]{datetime.now().strftime("%Y/%m/%d %H:%M:%S")}')
-        time.sleep(n)
-        print('slept!!')
-        print(f'[sleep   end]{datetime.now().strftime("%Y/%m/%d %H:%M:%S")}')
+        self.interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
 
     @auth.login_required
     def post(self):
         from gevent import spawn
-        spawn(self.todo)
+        user: User = g.user
+        user.detach()
+        spawn(self.worker, user)
         return MyResponse.success()
 
-    def todo(self):
+    def worker(self, user: User):
         create_app().app_context().push()
-        interfaces = InterfaceModel.all()
-        user = User.get_by_uid("vSOATEHmnwVQfeYfVaqt")
-        my = MyHttpx(interfaces, user)
-        asyncio.run(my.master())
+        interfaces = [InterfaceModel.get_by_uid(uid) for uid in self.interfaceIDs]
+
+        ApiRunner(user).runApis(interfaces)
 
 
 class QueryInterfaceGroupResult(Resource):
@@ -232,13 +191,22 @@ class QueryInterfaceGroupResult(Resource):
         return MyResponse.success(info)
 
 
+class PageInterfaceResultController(Resource):
+
+    @auth.login_required
+    def get(self):
+        pare: MyRequestParseUtil = MyRequestParseUtil("values")
+        info = InterfaceResultModel.page(**pare.page(InterfaceResultModel))
+        return MyResponse.success(info)
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(InterfaceHistoryController, "/interface/history")
 api_script.add_resource(QueryInterfaceGroupResult, "/interface/group/page")
+api_script.add_resource(PageInterfaceResultController, "/interface/result/page")
 api_script.add_resource(InterfaceGroupController, "/interface/group/run")
 api_script.add_resource(RunController, "/interface/run")
 api_script.add_resource(GetInterResponse, "/interface/response")
 api_script.add_resource(RunInterfaceDemo, "/interface/demo")
-api_script.add_resource(AsyncDemo, "/interface/async")

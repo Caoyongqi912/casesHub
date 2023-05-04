@@ -5,12 +5,13 @@
 import json
 
 from typing import Dict, Any, List, NoReturn, Union, Mapping, AnyStr
+
 from requests import Response
 
-from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel
-from Models.CaseModel.hostModel import HostModel
+from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, \
+    InterfaceGroupResultModel
 from Models.UserModel.userModel import User
-from Utils import MyLog, MyTools
+from Utils import MyLog, MyTools, UUID
 from Utils.myAssert import MyAssert
 from Utils.myBaseRequests import MyBaseRequest
 from Utils.myJsonpath import MyJsonPath
@@ -21,7 +22,7 @@ log = MyLog.get_log(__file__)
 class ApiRunner:
     response: Response = None
 
-    def __init__(self, variable: Mapping[str, Any] = None, starter: User = None):
+    def __init__(self, starter: User, variable: Mapping[str, Any] = None, ):
         """
         :param variable:  使用得环境变量
         :param starter:   运行人
@@ -29,6 +30,7 @@ class ApiRunner:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
+        print(self.starter)
         self.worker = MyBaseRequest()
         if variable:
             self.extract.append(variable)
@@ -36,14 +38,18 @@ class ApiRunner:
         log.info(f"starter ====== {self.starter.username}")
         self.LOG.append(f"starter ====== {self.starter.username}\n")
 
-    def runAPI(self, inter: InterfaceModel) -> str:
+    def runAPI(self, inter: InterfaceModel, entity: bool = False) -> Union[
+        InterfaceResultModel.uid, InterfaceResultModel]:
         """
         运行api
         进行校验与结果入库
         :param inter: InterfaceModel
+        :param entity: 是否返回实体类
         """
         STATUS = 'SUCCESS'
         useTime = 0
+        log.info(f" === {inter.title} === 开始")
+
         for step in inter.steps:
             self.LOG.append(
                 f"========================= request step-{step['step']} start ================================\n")
@@ -81,7 +87,7 @@ class ApiRunner:
                     break
         self.LOG.append(f"case {inter.title} 结束 . 共用时{MyTools.to_ms(useTime)}\n")
         return self._writeResult(inter.id, inter.title, len(inter.steps), self.responseInfo, STATUS,
-                                 useTime)
+                                 useTime, entity)
 
     def runApis(self, interfaces: List[InterfaceModel]):
         """
@@ -89,8 +95,25 @@ class ApiRunner:
         :param interfaces: List[InterfaceModel]
         :return:
         """
+        apis_report = []
+        groupModel = InterfaceGroupResultModel()
+        groupModel.totalNumber = len(interfaces)
+        groupModel.successNumber = 0
+        groupModel.failNumber = 0
+        totalUseTime = 0
+        interfacesDetail = []
         for inter in interfaces:
-            pass
+            restfulModel: InterfaceResultModel = self.runAPI(inter, True)
+            groupModel.successNumber += 1 if restfulModel.status == "SUCCESS" else 0
+            groupModel.failNumber += 1 if restfulModel.status == "FAIL" else 0
+            totalUseTime += float(restfulModel.useTime) / 1000
+            interfacesDetail.append(restfulModel.uid)
+            groupModel.totalUseTime = MyTools.to_ms(totalUseTime)
+            groupModel.detail = interfacesDetail
+            groupModel.save()
+            print(interfacesDetail)
+        groupModel.status = "DONE"
+        groupModel.save()
 
     def runTest(self, step: Dict[str, Any], http: str = "http") -> Dict[str, Any]:
         """
@@ -188,13 +211,14 @@ class ApiRunner:
 
     def _writeResult(self, interfaceID: int, interfaceName: str, interfaceSteps: int,
                      responseInfo: List[Dict[str, Any]], status: str,
-                     useTime: Union[str, float, int]) -> InterfaceModel.uid:
+                     useTime: Union[str, float, int], entity: bool) -> Union[InterfaceModel.uid, InterfaceModel]:
         """
         测试结果入库
         :param interfaceID: 接口id
         :param responseInfo: 测试结果信息
         :param status: 测试结果
         :param useTime:用时
+        :param entity: 是否返回实体类
         :return:NoReturn
         """
         interfaceResult = InterfaceResultModel()
@@ -204,8 +228,12 @@ class ApiRunner:
         interfaceResult.resultInfo = responseInfo
         interfaceResult.interfaceLog = "".join(self.LOG)
         interfaceResult.status = status
-        interfaceResult.useTime = MyTools.to_ms(useTime)
+        interfaceResult.useTime = MyTools.to_ms(number=useTime, toStr=False) if entity else MyTools.to_ms(
+            number=useTime)
         interfaceResult.starterID = self.starter.id
         interfaceResult.starterName = self.starter.username
         interfaceResult.save()
+        log.info(f"=== {interfaceName} === 结束")
+        if entity:
+            return interfaceResult
         return interfaceResult.uid

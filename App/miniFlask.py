@@ -15,8 +15,8 @@ app = Flask(__name__)
 @app.route("/login", methods=["POST"])
 def login():
     # time.sleep(10)
-    raise "err"
-    # return jsonify({"code": 0, "data": "im token", "msg": "ok"})
+    # raise "err"
+    return jsonify({"code": 0, "data": "im token", "msg": "ok"})
 
 
 @app.route("/query", methods=["GET"])

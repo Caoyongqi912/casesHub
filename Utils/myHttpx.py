@@ -157,7 +157,7 @@ class MyHttpx:
         self.interfaceGroupResultModel.failNumber = self.failNumber
         self.interfaceGroupResultModel.totalUseTime = MyTools.to_ms(self.totalUseTime)
         self.interfaceGroupResultModel.detail = self.interfacesDetail
-        self.interfaceGroupResultModel.result_status = "DONE"
+        self.interfaceGroupResultModel.status = "DONE"
         self.interfaceGroupResultModel.save(new=False)
 
     async def to_sender(self, client: AsyncClient,

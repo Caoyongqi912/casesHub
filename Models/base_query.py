@@ -39,17 +39,3 @@ class MyBaseQuery(BaseQuery):
         if not rv:
             raise ParamException(ResponseMsg.no_existent(name))
         return rv
-
-    @pageSerialize
-    def my_paginate(self, pageSize: int, current: int, sort: Dict[str, Any] = None, **kwargs) -> Pagination:
-        """
-        paginate
-        :param pageSize:    pageSize
-        :param current:     current
-        :param sort:        order_by(sort)  'descend' or "ascend'
-        :return:            Pagination
-        """
-
-        items = self.order_by(sort).limit(pageSize).offset((current - 1) * pageSize).all()
-        total = self.order_by(sort).count()
-        return Pagination(self, current, pageSize, total, items)

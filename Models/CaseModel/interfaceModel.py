@@ -8,6 +8,8 @@
 
 from typing import List, Any, NoReturn, Mapping, Dict
 from flask import g
+from sqlalchemy import Column, String, JSON
+
 from App import db
 from Enums import CaseLevel, IntEnum, CaseStatus
 from Enums.myEnum import CaseAPIStatus
@@ -92,8 +94,8 @@ class InterfaceResultModel(Base):
 
 
 class InterfaceGroupResultModel(Base):
-    __tabename__ = "interface_group_result"
-    result_status = db.Column(db.String(10), default="RUNNING", comment="状态")
+    __tabename__ = "interfaces_result"
+    status = db.Column(db.String(10), default="RUNNING", comment="状态")
     totalNumber = db.Column(db.INTEGER, comment="总运行数量")
     successNumber = db.Column(db.INTEGER, comment="成功数量")
     failNumber = db.Column(db.INTEGER, comment="失败梳理")

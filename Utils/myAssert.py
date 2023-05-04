@@ -51,7 +51,6 @@ class MyAssert:
                         self._option(assertOpt, expect, actual)
                         _["result"] = True
                         assert_result.append(_)
-                        log.info(f"assert   -> [{flag}]")
                     except Exception as e:
                         log.error(repr(e))
                         flag, _["result"] = False, False

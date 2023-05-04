@@ -25,6 +25,9 @@ class Base(db.Model):
     create_time = Column(DATETIME, default=datetime.now, comment="创建时间")
     update_time = Column(DATETIME, nullable=True, onupdate=datetime.now, comment="修改时间")
 
+    def detach(self):
+        db.session.expunge(self)
+
     def save(self, new: bool = True) -> NoReturn:
         """
         save
