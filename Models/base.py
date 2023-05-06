@@ -155,7 +155,14 @@ class Base(db.Model):
 
     @staticmethod
     def to_json(obj) -> Dict:
-        return {c.name: getattr(obj, c.name, None) for c in obj.__table__.columns}
+        """将模型对象转换为 JSON 字典"""
+        json_obj = {}
+        for column in obj.__table__.columns:
+            value = getattr(obj, column.name, None)
+            if isinstance(value, datetime):
+                value = value.strftime('%Y-%m-%d %H:%M:%S')
+            json_obj[column.name] = value
+        return json_obj
 
     @classmethod
     @pageSerialize

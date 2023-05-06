@@ -27,14 +27,14 @@ class CaseController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="case_title", type=str, required=True)
-        parse.add(name="case_level", type=str, required=True)
-        parse.add(name="case_desc", type=str, required=True)
-        parse.add(name="case_setup", type=str, required=True)
-        parse.add(name="case_type", type=str, required=False)
-        parse.add(name="case_info", type=list, required=True)
-        parse.add(name="projectID", type=int, isExist=Project, required=True)
-        parse.add(name="casePartID", type=int, isExist=CasePart, required=True)
+        parse.add(name="case_title", T=str, required=True)
+        parse.add(name="case_level", T=str, required=True)
+        parse.add(name="case_desc", T=str, required=True)
+        parse.add(name="case_setup", T=str, required=True)
+        parse.add(name="case_type", T=str, required=False)
+        parse.add(name="case_info", T=list, required=True)
+        parse.add(name="projectID", T=int, isExist=Project, required=True)
+        parse.add(name="casePartID", T=int, isExist=CasePart, required=True)
         CaseModel(**parse.parse_args).save()
         return MyResponse.success()
 
@@ -46,14 +46,14 @@ class CaseController(Resource):
         """
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, type=str, required=True)
-        parse.add(name="case_title", type=str, required=False)
-        parse.add(name="case_level", type=str, required=False)
-        parse.add(name="case_desc", type=str, required=False)
-        parse.add(name="case_type", type=str, required=False)
-        parse.add(name="case_info", type=list, required=False)
-        parse.add(name="projectID", type=int, isExist=Project, required=False)
-        parse.add(name="casePartID", type=int, isExist=CasePart, required=False)
+        parse.add(name=UID, T=str, required=True)
+        parse.add(name="case_title", T=str, required=False)
+        parse.add(name="case_level", T=str, required=False)
+        parse.add(name="case_desc", T=str, required=False)
+        parse.add(name="case_type", T=str, required=False)
+        parse.add(name="case_info", T=list, required=False)
+        parse.add(name="projectID", T=int, isExist=Project, required=False)
+        parse.add(name="casePartID", T=int, isExist=CasePart, required=False)
         CaseModel.update(**parse.parse_args)
         return MyResponse.success()
 
@@ -75,7 +75,7 @@ class CaseController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name=UID, required=True, type=str)
+        parse.add(name=UID, required=True, T=str)
         return MyResponse.success(CaseModel.get_by_uid(**parse.parse_args))
 
 
@@ -89,8 +89,8 @@ class CaseController(Resource):
 #         :return:
 #         """
 #         parse: MyRequestParseUtil = MyRequestParseUtil()
-#         parse.add(name="projectID", type=int, required=True, isExist=Project)
-#         parse.add(name="fileID", type=str, required=True)
+#         parse.add(name="projectID", T=int, required=True, isExist=Project)
+#         parse.add(name="fileID", T=str, required=True)
 #         fileID: str = parse.parse_args.get("fileID")
 #         file = CaseExcel.get_by_uid(fileID)
 #         projectID: int = parse.parse_args.get("projectID")

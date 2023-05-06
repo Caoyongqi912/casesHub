@@ -5,10 +5,10 @@
 # @File : casesHub
 # @Software: PyCharm
 # @Desc: 流程接口实体类
-
+from datetime import datetime
 from typing import List, Any, NoReturn, Mapping, Dict
 from flask import g
-from sqlalchemy import Column, String, JSON
+from sqlalchemy import Column, String, JSON, INTEGER
 
 from App import db
 from Enums import CaseLevel, IntEnum, CaseStatus
@@ -18,7 +18,7 @@ from Models.base import Base
 
 class InterfaceModel(Base):
     __tablename__ = 'interface'
-    title = db.Column(db.String(40), comment="标题")
+    title = db.Column(db.String(40), unique=True, comment="标题")
     desc = db.Column(db.String(200), nullable=True, comment="描述")
     http = db.Column(db.String(10), default="HTTP", comment='请求类型')
     level = db.Column(IntEnum(CaseLevel), comment="接口用例等级")
@@ -63,16 +63,6 @@ class InterfaceModel(Base):
     def query_results(self):
         return self.results.order_by("create_time").all()
 
-    @classmethod
-    def update(cls, **kwargs) -> NoReturn:
-        """
-        更新、添加updaterName字段
-        :param kwargs:
-        :return:
-        """
-        kwargs.setdefault("updaterName", g.user.username)
-        return super(InterfaceModel, cls).update(**kwargs)
-
     def __repr__(self):
         return f"<{InterfaceModel.__name__} {self.title}>"
 
@@ -94,14 +84,17 @@ class InterfaceResultModel(Base):
 
 
 class InterfaceGroupResultModel(Base):
-    __tabename__ = "interfaces_result"
+    __tablename__ = "interfaces_result"
     status = db.Column(db.String(10), default="RUNNING", comment="状态")
     totalNumber = db.Column(db.INTEGER, comment="总运行数量")
     successNumber = db.Column(db.INTEGER, comment="成功数量")
     failNumber = db.Column(db.INTEGER, comment="失败梳理")
-    starter = db.Column(db.String(20), comment="运行人")
+    rateNumber = Column(INTEGER, comment="通过率")
+    starterName = db.Column(db.String(20), comment="运行人名称")
+    starterID = db.Column(db.INTEGER, comment="运行人ID")
     totalUseTime = db.Column(db.String(20), comment="运行时间")
     detail = db.Column(db.JSON, comment="运行详情")
+    end_time = db.Column(db.DATETIME, nullable=True, comment="结束时间")
 
     def __repr__(self):
         return f"<{InterfaceGroupResultModel.__name__}>"

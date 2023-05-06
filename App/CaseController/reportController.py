@@ -22,14 +22,14 @@ class ReportController(Resource):
         :return:
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="title", type=str, unique=Report, required=True)
-        parse.add(name="version", type=str, required=True)
-        parse.add(name="online", type=str, required=True)
-        parse.add(name="desc", type=str, required=True)
-        parse.add(name="status", type=str, choices=["RELEASE", "UNRELEASE"], required=True)
-        parse.add(name='demands', type=list, required=False)
-        parse.add(name="bugs", type=list, required=False)
-        parse.add(name="players", type=list, required=False)
+        parse.add(name="title", T=str, unique=Report, required=True)
+        parse.add(name="version", T=str, required=True)
+        parse.add(name="online", T=str, required=True)
+        parse.add(name="desc", T=str, required=True)
+        parse.add(name="status", T=str, choices=["RELEASE", "UNRELEASE"], required=True)
+        parse.add(name='demands', T=list, required=False)
+        parse.add(name="bugs", T=list, required=False)
+        parse.add(name="players", T=list, required=False)
         rep = parse.parse_args
         Report(**rep).save()
         return MyResponse.success()
@@ -41,15 +41,15 @@ class ReportController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, isExcist=Report, required=True)
-        parse.add(name="title", type=str, required=False)
-        parse.add(name="version", type=str, required=False)
-        parse.add(name="online", type=str, required=False)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="status", type=str, choices=["RELEASE", "UNRELEASE"], required=False)
-        parse.add(name='demands', type=list, required=False)
-        parse.add(name="bugs", type=list, required=False)
-        parse.add(name="players", type=list, required=False)
+        parse.add(name="id", T=int, isExcist=Report, required=True)
+        parse.add(name="title", T=str, required=False)
+        parse.add(name="version", T=str, required=False)
+        parse.add(name="online", T=str, required=False)
+        parse.add(name="desc", T=str, required=False)
+        parse.add(name="status", T=str, choices=["RELEASE", "UNRELEASE"], required=False)
+        parse.add(name='demands', T=list, required=False)
+        parse.add(name="bugs", T=list, required=False)
+        parse.add(name="players", T=list, required=False)
         Report.update(**parse.parse_args)
         return MyResponse.success()
 
@@ -60,7 +60,7 @@ class ReportController(Resource):
         :return: MyResponse
         """
         parse = MyRequestParseUtil("values")
-        parse.add(name="id", type=str, required=True)
+        parse.add(name="id", T=str, required=True)
         return MyResponse.success(Report.get(parse.parse_args.get("id"), "id"))
 
     @auth.login_required
@@ -70,7 +70,7 @@ class ReportController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
+        parse.add(name="id", T=int, required=True)
         Report.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 
@@ -82,7 +82,7 @@ class SendReport(Resource):
         from Utils.myMail import SendMail
 
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", type=int, required=True)
+        parse.add(name="id", T=int, required=True)
         report = Report.get(parse.parse_args.get("id"), "id")
         SendMail().sendReport(report)
         return MyResponse.success()

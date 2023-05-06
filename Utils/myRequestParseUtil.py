@@ -40,28 +40,22 @@ class MyRequestParseUtil:
             log.error(repr(e))
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
 
-    def add(self, **kwargs):
+    def add(self, name: str, T: Type = str, required: bool = True, **kwargs):
         """
         添加请求数据与数据类型
-        :param kwargs: name  参数名称
-        :param kwargs: type  参数类型
-        :param kwargs: required bool default false 是否必传
+        :param name:   参数名称
+        :param T:   参数类型
+        :param required: required bool default false 是否必传
         :param kwargs: default 默认值
         :param kwargs: choices 是否在区间内
         :param kwargs: isExist=cls  put 请求主键还会再校验一次 不需要添加 添加外键
-        :param kwargs: unique  put 不要添加
+        :param kwargs: unique=cls  put 不要添加
         :param kwargs: enum 枚举字段 返回其枚举值
         :param kwargs: page 页
         :param kwargs: limit 数量
         :param kwargs: target 类
-
         """
-        # 默认类型为字符
-        if not kwargs.get("type"):
-            kwargs.setdefault("type", str)
-        # 默认非必传
-        if not kwargs.get("required"):
-            kwargs.setdefault("required", False)
+        kwargs.update({"name": name, "type": T, "required": required})
         self.args.append(kwargs)
 
     def page(self, cls: Generic[clsType]) -> Dict[str, Any]:
@@ -115,9 +109,9 @@ class MyRequestParseUtil:
             if kw.get("isExist"):
                 cls: clsType = kw.get("isExist")
                 cls.get(self.body.get(kw['name']), kw['name'])
-            #   校验cls 重名
+            #   校验cls 字段唯一
             if kw.get("unique"):
-                cls = kw.get("unique")
+                cls: clsType = kw.get("unique")
                 cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
 
             # 枚举校验

@@ -17,9 +17,9 @@ class HostController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="name", type=str, required=True)
-        parse.add(name="host", type=str, required=True)
-        parse.add(name="port", type=str, required=False)
+        parse.add(name="name", T=str, required=True)
+        parse.add(name="host", T=str, required=True)
+        parse.add(name="port", T=str, required=False)
         parse.add(name="desc")
         HostModel(**parse.parse_args).save()
         return MyResponse.success()
@@ -37,9 +37,9 @@ class HostController(Resource):
     def put(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        parse.add(name="name", type=str)
-        parse.add(name="host", type=str)
-        parse.add(name="desc", type=str)
+        parse.add(name="name", T=str)
+        parse.add(name="host", T=str)
+        parse.add(name="desc", T=str)
         HostModel.update(**parse.parse_args)
         return MyResponse.success()
 

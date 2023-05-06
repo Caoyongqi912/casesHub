@@ -29,8 +29,8 @@ class DepartmentController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name="name", unique=Department, required=True)
         parse.add(name="desc", required=False)
-        parse.add(name="adminID", type=int, required=False)
-        parse.add(name="tags", type=list, required=False)
+        parse.add(name="adminID", T=int, required=False)
+        parse.add(name="tags", T=list, required=False)
         info = parse.parse_args
         department = Department(**info)
         department.save()
@@ -51,7 +51,7 @@ class DepartmentController(Resource):
         parse.add(name=UID, required=True)
         parse.add(name="name", required=False)
         parse.add(name="desc", required=False)
-        parse.add(name="adminID", type=int, required=False)
+        parse.add(name="adminID", T=int, required=False)
         Department.update(**parse.parse_args)
         return MyResponse.success()
 

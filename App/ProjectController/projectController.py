@@ -31,9 +31,9 @@ class ProjectController(Resource):
         """
         from Models.UserModel.userModel import User
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="name", type=str, unique=Project, required=True)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="adminID", type=int, required=True)
+        parse.add(name="name", T=str, unique=Project, required=True)
+        parse.add(name="desc", T=str, required=False)
+        parse.add(name="adminID", T=int, required=True)
         par = parse.parse_args
         user = User.get(id=par.get("adminID"))
         par.setdefault("adminName", user.username)
@@ -108,7 +108,7 @@ class AddUser2ProjectController(Resource):
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
         parse.add(name=UID, required=True)
-        parse.add(name="userIds", type=list, required=True)
+        parse.add(name="userIds", T=list, required=True)
         info = parse.parse_args
         Project.get_by_uid(info.get(UID)).addUsers(info['userIds'])
         return MyResponse.success()

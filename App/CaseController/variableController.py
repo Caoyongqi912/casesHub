@@ -22,10 +22,10 @@ class VariableController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="key", type=str, required=True)
-        parse.add(name="val", type=str, required=True)
-        parse.add(name="desc", type=str, required=False)
-        parse.add(name="projectID", type=int, required=True, isExist=Project)
+        parse.add(name="key", T=str, required=True)
+        parse.add(name="val", T=str, required=True)
+        parse.add(name="desc", T=str, required=False)
+        parse.add(name="projectID", T=int, required=True, isExist=Project)
         key = {"key": parse.parse_args.get("key")}
         variable: VariableModel = VariableModel.get_by_field(**key)
         if variable:
@@ -45,7 +45,7 @@ class VariableController(Resource):
     @auth.login_required
     def delete(self) -> MyResponse:
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name=UID, type=int, required=True)
+        parse.add(name=UID, T=int, required=True)
         VariableModel.delete_by_id(**parse.parse_args)
         return MyResponse.success()
 

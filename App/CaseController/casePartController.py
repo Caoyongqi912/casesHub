@@ -25,9 +25,9 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="partName", type=str, required=True)
-        parse.add(name="projectID", type=int, isExist=Project, required=True)
-        parse.add(name="parentID", type=int)
+        parse.add(name="partName", T=str, required=True)
+        parse.add(name="projectID", T=int, isExist=Project, required=True)
+        parse.add(name="parentID", T=int)
         CasePart(**parse.parse_args).save_()
         return MyResponse.success()
 
@@ -48,7 +48,7 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", required=True, type=int)
+        parse.add(name="id", required=True, T=int)
         parse.add(name="partName")
         CasePart.update(**parse.parse_args)
         return MyResponse.success()
@@ -60,7 +60,7 @@ class CasePartController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="id", required=True, type=int)
+        parse.add(name="id", required=True, T=int)
         CasePart.part_delete(**parse.parse_args)
         return MyResponse.success()
 
@@ -84,8 +84,8 @@ class CasePartOrCreateController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
-        parse.add(name="partName", type=str, required=True)
-        parse.add(name="projectID", type=str, required=True)
+        parse.add(name="partName", T=str, required=True)
+        parse.add(name="projectID", T=str, required=True)
         return MyResponse.success(CasePart.getOrCreate(**parse.parse_args))
 
 

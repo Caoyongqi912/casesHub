@@ -3,6 +3,7 @@
 # @Author  : cyq
 # @File    : myRequest.py
 import json
+from datetime import datetime
 
 from typing import Dict, Any, List, NoReturn, Union, Mapping, AnyStr
 
@@ -11,6 +12,7 @@ from requests import Response
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, \
     InterfaceGroupResultModel
 from Models.UserModel.userModel import User
+from Models.base import Base
 from Utils import MyLog, MyTools, UUID
 from Utils.myAssert import MyAssert
 from Utils.myBaseRequests import MyBaseRequest
@@ -101,18 +103,22 @@ class ApiRunner:
         groupModel.successNumber = 0
         groupModel.failNumber = 0
         totalUseTime = 0
+        groupModel.starterID = self.starter.id
+        groupModel.starterName = self.starter.username
         interfacesDetail = []
         for inter in interfaces:
             restfulModel: InterfaceResultModel = self.runAPI(inter, True)
             groupModel.successNumber += 1 if restfulModel.status == "SUCCESS" else 0
             groupModel.failNumber += 1 if restfulModel.status == "FAIL" else 0
             totalUseTime += float(restfulModel.useTime) / 1000
-            interfacesDetail.append(restfulModel.uid)
+            print(Base.to_json(restfulModel))
+            interfacesDetail.append(json.loads(json.dumps(Base.to_json(restfulModel))))
             groupModel.totalUseTime = MyTools.to_ms(totalUseTime)
             groupModel.detail = interfacesDetail
             groupModel.save()
-            print(interfacesDetail)
         groupModel.status = "DONE"
+        groupModel.end_time = datetime.now()
+        groupModel.rateNumber = round(groupModel.successNumber / groupModel.totalNumber * 100, 2)
         groupModel.save()
 
     def runTest(self, step: Dict[str, Any], http: str = "http") -> Dict[str, Any]:

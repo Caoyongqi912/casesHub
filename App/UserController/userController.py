@@ -23,9 +23,9 @@ class AddAdminController(Resource):
         :raise: ParamException
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="username", type=str, unique=User, required=True)
-        parse.add(name="password", type=str, required=True)
-        parse.add(name="phone", type=str, unique=User, required=True)
+        parse.add(name="username", T=str, unique=User, required=True)
+        parse.add(name="password", T=str, required=True)
+        parse.add(name="phone", T=str, unique=User, required=True)
         User(**parse.parse_args).addAdmin()
         return MyResponse.success()
 
@@ -58,7 +58,7 @@ class UserOptController(Resource):
         parse.add(name="phone", unique=User, required=True)
         parse.add(name="gender", enum=Gender, required=True)
         parse.add(name="tagName", required=False)
-        parse.add(name="departmentID", type=int, isExist=Department, required=False)
+        parse.add(name="departmentID", T=int, isExist=Department, required=False)
         User(**parse.parse_args).addUser()
         return MyResponse.success()
 
@@ -77,7 +77,7 @@ class UserOptController(Resource):
         parse.add(name="phone", required=False)
         parse.add(name="gender", enum=Gender, required=False)
         parse.add(name="tagName", required=False)
-        parse.add(name="departmentID", type=int, required=False)
+        parse.add(name="departmentID", T=int, required=False)
         User.update(**parse.parse_args)
         return MyResponse.success()
 
@@ -125,8 +125,8 @@ class LoginController(Resource):
         :return: MyResponse
         """
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="username", type=str, required=True)
-        parse.add(name="password", type=str, required=True)
+        parse.add(name="username", T=str, required=True)
+        parse.add(name="password", T=str, required=True)
         return MyResponse.success(User.login(**parse.parse_args))
 
 
@@ -162,8 +162,8 @@ class SetPasswordController(Resource):
         """
         user: User = g.user
         parse: MyRequestParseUtil = MyRequestParseUtil()
-        parse.add(name="old_password", type=str, required=True)
-        parse.add(name="new_password", type=str, required=True)
+        parse.add(name="old_password", T=str, required=True)
+        parse.add(name="new_password", T=str, required=True)
         user.set_password(**parse.parse_args)
         return MyResponse.success()
 
