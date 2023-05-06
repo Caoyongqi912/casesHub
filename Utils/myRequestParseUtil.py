@@ -40,7 +40,7 @@ class MyRequestParseUtil:
             log.error(repr(e))
             raise ParamException(ResponseMsg.REQUEST_BODY_ERROR)
 
-    def add(self, name: str, T: Type = str, required: bool = True, **kwargs):
+    def add(self, name: str, T: Type = str, required: bool = False, **kwargs):
         """
         添加请求数据与数据类型
         :param name:   参数名称

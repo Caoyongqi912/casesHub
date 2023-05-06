@@ -111,7 +111,6 @@ class ApiRunner:
             groupModel.successNumber += 1 if restfulModel.status == "SUCCESS" else 0
             groupModel.failNumber += 1 if restfulModel.status == "FAIL" else 0
             totalUseTime += float(restfulModel.useTime) / 1000
-            print(Base.to_json(restfulModel))
             interfacesDetail.append(json.loads(json.dumps(Base.to_json(restfulModel))))
             groupModel.totalUseTime = MyTools.to_ms(totalUseTime)
             groupModel.detail = interfacesDetail

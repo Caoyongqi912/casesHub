@@ -53,7 +53,7 @@ class AvatarController(Resource):
         parse: MyRequestParseUtil = MyRequestParseUtil("values")
         parse.add(name=UID, required=True)
         f: FileModel = FileModel.get_by_uid(**parse.parse_args)
-        return Response(MyFile.reader(f), mimeT=f.fileType)
+        return Response(MyFile.reader(f), mimetype=f.fileType)
 
 
 class BugController(Resource):

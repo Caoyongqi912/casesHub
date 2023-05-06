@@ -77,15 +77,15 @@ class InterfaceController(Resource):
         """
         pare: MyRequestParseUtil = MyRequestParseUtil()
         pare.add(name=UID, required=True)
-        pare.add(name="title", required=False)
-        pare.add(name="desc", required=False)
-        pare.add(name="http", required=False)
-        pare.add(name="level", enum=CaseLevel, required=False)
-        pare.add(name="status", enum=CaseAPIStatus, required=False)
+        pare.add(name="title")
+        pare.add(name="desc")
+        pare.add(name="http")
+        pare.add(name="level", enum=CaseLevel)
+        pare.add(name="status", enum=CaseAPIStatus)
 
-        pare.add(name="steps", T=list, required=False)
-        pare.add(name="connectTimeout", T=int, required=False)
-        pare.add(name="responseTimeout", T=int, required=False)
+        pare.add(name="steps", T=list)
+        pare.add(name="connectTimeout", T=int)
+        pare.add(name="responseTimeout", T=int)
         InterfaceModel.update(**pare.parse_args)
         return MyResponse.success()
 
