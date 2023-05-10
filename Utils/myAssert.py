@@ -155,7 +155,7 @@ class MyAssert:
         :return:
         """
 
-        assert expect >= actual
+        assert int(expect) >= int(actual)
 
     @staticmethod
     def assertEqualLess(expect: Any, actual: Any):
@@ -166,4 +166,4 @@ class MyAssert:
         :return:
         """
 
-        assert expect <= actual
+        assert int(expect) <= int(actual)

@@ -32,12 +32,10 @@ class ApiRunner:
         self.extract = []
         self.responseInfo = []
         self.starter = starter
-        print(self.starter)
         self.worker = MyBaseRequest()
         if variable:
             self.extract.append(variable)
         self.LOG = []
-        log.info(f"starter ====== {self.starter.username}")
         self.LOG.append(f"starter ====== {self.starter.username}\n")
 
     def runAPI(self, inter: InterfaceModel, entity: bool = False) -> Union[
@@ -111,7 +109,7 @@ class ApiRunner:
             groupModel.successNumber += 1 if restfulModel.status == "SUCCESS" else 0
             groupModel.failNumber += 1 if restfulModel.status == "FAIL" else 0
             totalUseTime += float(restfulModel.useTime) / 1000
-            interfacesDetail.append(json.loads(json.dumps(Base.to_json(restfulModel))))
+            interfacesDetail.append(Base.to_json(restfulModel))
             groupModel.totalUseTime = MyTools.to_ms(totalUseTime)
             groupModel.detail = interfacesDetail
             groupModel.save()
