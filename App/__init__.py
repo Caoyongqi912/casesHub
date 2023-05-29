@@ -41,7 +41,7 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     :return: app
     """
 
-    app = Flask(__name__)
+    app: Flask = Flask(__name__)
     config[configName].SQLALCHEMY_ECHO = printSql
     app.config.from_object(config[configName])
     app.config["BABEL_DEFAULT_LOCALE"] = "zh"

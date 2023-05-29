@@ -113,7 +113,6 @@ class MyRequestParseUtil:
             if kw.get("unique"):
                 cls: clsType = kw.get("unique")
                 cls.verify_unique(**{kw['name']: self.body.get(kw['name'])})
-
             # 枚举校验
             if kw.get("enum"):
                 self.body[kw['name']] = self._verify_enum(kw['enum'], self.body.get(kw["name"]), kw["name"])

@@ -176,7 +176,7 @@ class CurrentUserController(Resource):
         :return: MyResponse
         """
         from flask import g
-        return MyResponse.success(User.get_by_uid(g.user.uid))
+        return MyResponse.success(g.user)
 
 
 class MoHuSearch(Resource):
