@@ -17,7 +17,6 @@ from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
 from flask_restful import Api
 from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
-from .mySocket import socketIO
 
 catch: Cache = Cache()
 mg: MongoEngine = MongoEngine()
@@ -50,7 +49,6 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     db.init_app(app)  # db绑定app
     mg.init_app(app)  # mongodb
     app.json_encoder = JSONEncoder  # json
-    socketIO.init_app(app)
     limiter.init_app(app)  # 接口频率限制
     CORS(app, supports_credentials=True)
 
