@@ -13,6 +13,8 @@ import time
 from datetime import datetime
 from typing import List
 
+import gevent
+
 from Models.UserModel.userModel import User
 from Utils.myHttpx import MyHttpx
 import asyncio
@@ -29,6 +31,7 @@ from Utils.myRequestParseUtil import MyRequestParseUtil
 from Models.CaseModel.interfaceModel import InterfaceModel, InterfaceResultModel, InterfaceGroupResultModel
 from Utils import MyLog, UUID
 from Utils.apiRunner import ApiRunner
+from App import socketIO
 
 log = MyLog.get_log(__file__)
 
@@ -211,6 +214,23 @@ class GetInterfacesResultInfo(Resource):
         return MyResponse.success(info)
 
 
+class SocketIODEMO(Resource):
+
+    def _async_job(self):
+
+        from App import socketIO
+        # 在这里，编写您的异步任务逻辑
+        for i in range(10):
+            message = 'current progress: ' + str(i)
+            socketIO.emit('job_progress', {'data': message}, namespace='/test')
+            gevent.sleep(1)
+
+    def get(self):
+        # 开启一个 gevent 协程来执行任务
+        gevent.spawn(self._async_job)
+        return MyResponse.success()
+
+
 api_script = Api(caseBP)
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
@@ -221,3 +241,4 @@ api_script.add_resource(InterfacesController, "/interfaces/run")
 api_script.add_resource(RunController, "/interface/run")
 api_script.add_resource(GetInterResponse, "/interface/response")
 api_script.add_resource(RunInterfaceDemo, "/interface/demo")
+api_script.add_resource(SocketIODEMO, "/log")

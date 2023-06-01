@@ -1,20 +1,25 @@
-# @Time : 2022/7/7 22:48 
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# @Time : 2023-06-01
 # @Author : cyq
-# @File : main.py 
+# @File : casesHub
 # @Software: PyCharm
-# @Desc: 入口
-from App import create_app
+# @Desc:
+
+import gevent.monkey
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-from gevent import monkey
-monkey.patch_all()
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from App import create_app
+from App.mySocket import socketIO
 
+gevent.monkey.patch_all()
 app = create_app()
-
 if __name__ == '__main__':
-    # config = Config()
-    # app.run(host=config.get_conf("domain", "host"), port=config.get_conf("domain", "port"))
-    # celery_cmd = "celery -A celery_task.tasks worker -l info -P eventlet"
-    # app.run(host="localhost", port=5000)
-    http_server = WSGIServer(("localhost", 5000), app, handler_class=WebSocketHandler)
+    # 定义 WSGI 中间件
+    dispatcher = DispatcherMiddleware(app, {'/socket.io': socketIO})
+    # 定义 Gunicorn 服务器使用的 handler
+    handler_class = WebSocketHandler
+    # 启动 Gunicorn 服务器
+    http_server = WSGIServer(('127.0.0.1', 5000), dispatcher, handler_class=handler_class)
     http_server.serve_forever()
