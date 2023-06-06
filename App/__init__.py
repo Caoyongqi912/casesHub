@@ -17,6 +17,7 @@ from Models.base_query import MyBaseQuery
 from Utils import JSONEncoder
 from flask_restful import Api
 from flask_limiter import Limiter  # https://flask-limiter.readthedocs.io/
+from flask_socketio import SocketIO
 
 catch: Cache = Cache()
 mg: MongoEngine = MongoEngine()
@@ -26,6 +27,7 @@ limiter = Limiter(key_func=get_remote_address, strategy="fixed-window")
 api = Api()
 db: SQLAlchemy = SQLAlchemy(query_class=MyBaseQuery)
 UID = "uid"
+io = SocketIO()
 
 
 def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
@@ -51,7 +53,6 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     app.json_encoder = JSONEncoder  # json
     limiter.init_app(app)  # 接口频率限制
     CORS(app, supports_credentials=True)
-
     from .UserController import userBP
     app.register_blueprint(userBP)
 
@@ -68,5 +69,6 @@ def create_app(configName: AnyStr = "default", printSql: bool = False) -> Flask:
     app.before_request(logWrite)
     app.after_request(resp)
     register_errors(app)
+    io.init_app(app, cors_allowed_origins="*", async_mode="gevent", engineio_logger=True)
 
     return app

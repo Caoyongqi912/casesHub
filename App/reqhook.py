@@ -6,6 +6,7 @@ from flask import request, Response
 from flask_limiter import RateLimitExceeded
 from werkzeug.exceptions import HTTPException, MethodNotAllowed
 
+from App import io
 from Comment.myException import AuthException, ParamException, MyException
 from Comment.myResponse import MyResponse
 from Utils import MyLog
@@ -18,12 +19,13 @@ def logWrite() -> NoReturn:
     请求钩子  日志写入请求参数
     :return:
     """
-    log.info(
-        f"request ip = {request.remote_addr} \n"
-        f"request url = {request.url} \n"
-        f"request Host = {request.host} \n"
-        f"request Method = {request.method} ")
-    log.info(request.headers)
+    # log.info(
+    #     f"request ip = {request.remote_addr} \n"
+    #     f"request url = {request.url} \n"
+    #     f"request Host = {request.host} \n"
+    #     f"request Method = {request.method} ")
+    # log.info(request.headers)
+    pass
 
 
 def resp(response: Response) -> Union[MyResponse, Response]:
@@ -52,3 +54,8 @@ def register_errors(app):
         if isinstance(e, sqlalchemy.exc.OperationalError):
             return MyException("MySQL server error")
         return MyException()
+
+
+@io.on('connect')
+def handle_connect():
+    log.info("WebSocket connected")

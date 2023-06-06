@@ -10,15 +10,10 @@
 
 """
 import time
-from datetime import datetime
 from typing import List
-
-import gevent
+from App import io
 
 from Models.UserModel.userModel import User
-from Utils.myHttpx import MyHttpx
-import asyncio
-
 from flask import g
 from flask_restful import Resource
 from App import auth, UID, create_app
@@ -213,10 +208,31 @@ class GetInterfacesResultInfo(Resource):
         return MyResponse.success(info)
 
 
+class SocketIODEMO(Resource):
 
+    def callBackMsg(self):
+        log.info("=================call back===============")
+
+    def job(self):
+        from App import io
+        for i in range(10):
+            # 模拟任务执行并输出日志信息
+            log_msg = f"Task is running, progress: {i} \n"
+            io.emit('log', log_msg, callback=self.callBackMsg)  # 将日志信息发送给前端
+            log.info(f"=== {log_msg}")
+            time.sleep(1)
+
+    def get(self):
+        io.start_background_task(self.job)  # 启动后台任务
+        return MyResponse.success()
+
+    def post(self):
+        return MyResponse.success()
 
 
 api_script = Api(caseBP)
+api_script.add_resource(SocketIODEMO, "/log")
+
 api_script.add_resource(InterfaceController, "/interface/opt")
 api_script.add_resource(PageInterfaceController, "/interface/page")
 api_script.add_resource(GetInterfacesResultInfo, "/interfaces/report/info")
