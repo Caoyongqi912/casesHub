@@ -11,10 +11,12 @@
 """
 import time
 from typing import List
+
+import Utils
 from App import io
 
 from Models.UserModel.userModel import User
-from flask import g
+from flask import g, request, current_app
 from flask_restful import Resource
 from App import auth, UID, create_app
 from App.CaseController import caseBP
@@ -210,21 +212,22 @@ class GetInterfacesResultInfo(Resource):
 
 class SocketIODEMO(Resource):
 
-    def callBackMsg(self):
-        log.info("=================call back===============")
-
-    def job(self):
+    def job(self, roomID):
+        from flask_socketio import join_room
         from App import io
+        log.info(f'=====rommid {roomID} ========')
+
         for i in range(10):
             # 模拟任务执行并输出日志信息
             log_msg = f"Task is running, progress: {i} \n"
-            io.emit('log', log_msg, callback=self.callBackMsg)  # 将日志信息发送给前端
-            log.info(f"=== {log_msg}")
+            io.emit('log', {"code": 1, "msg": log_msg}, to=roomID)  # 将日志信息发送给前端
             time.sleep(1)
+        io.emit("log", {"code": 0, "msg": "Done"}, to=roomID)
 
     def get(self):
-        io.start_background_task(self.job)  # 启动后台任务
-        return MyResponse.success()
+        roomID = UUID().getUUID
+        io.start_background_task(self.job, roomID)  # 启动后台任务
+        return MyResponse.success(roomID)
 
     def post(self):
         return MyResponse.success()

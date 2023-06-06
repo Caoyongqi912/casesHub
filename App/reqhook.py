@@ -58,4 +58,13 @@ def register_errors(app):
 
 @io.on('connect')
 def handle_connect():
-    log.info("WebSocket connected")
+    from flask_socketio import join_room
+    join_room(room=request.args.get("room"))
+    log.info("WebSocket connected join room")
+
+
+@io.on("disconnect")
+def handle_disconnect():
+    from flask_socketio import close_room
+    close_room(room=request.args.get("room"))
+    log.info("WebSocket disconnect close room")
